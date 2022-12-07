@@ -1,1 +1,2 @@
-A simple mdp version of the task with 9 states ( 8 ports and one reward state) and 4 possible actions in each state. Written by NR.
+A simple mdp version of the task with 9 states ( 8 ports and one reward state) and 4 possible actions in each state.
+To run the code, run MDP_main script. Written by NR.
