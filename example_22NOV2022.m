@@ -1,0 +1,94 @@
+
+% Egocentric version of the RL navigation task in an open arena with 2
+% odors
+
+% There are 400 states in total:
+
+% - There are 100 spatial states : 25 for each gridcell in the arena and 4
+% possible head direction
+
+% - There are 2 possible light ports ( top - bottom) and 2 possible odor (
+% odor 1 - odor 2)
+
+%% initialize :
+numContexts = 1;
+numRuns = 100; % the number of experiments
+params = setParamsEgo(numContexts);
+
+funcApprox = true;
+meanNorm = true;
+params.contexts{1} = [1:params.numStates/numContexts]; % list of states in context 1
+goals = zeros(numContexts, 1);
+numReps = 1;
+totalQ = zeros(400,3); % Q values of the state-action 
+jointRep = false;
+makePlots = true;
+
+
+%% Run the experiment : 
+for i=1:numReps
+
+     % Random start location - if start position is [1 100] odor 1 is present ,
+     % otherwise odor 2 is present. So each odor is presented with probability 0.5
+
+     params.start = randi(200,1,1);
+
+     % Build the grid world enviroment
+    [GW, Q, states, transitionList] = buildGridEgo(params);
+    
+    % Define states as 1) joint representation of location and odor or 2)
+    % representation of location and odor disjointly
+
+    if jointRep % joint representation - 400 unique "states" -
+       y = eye(400,400);
+       % input layer is the same as states
+       x=y;
+    else  % 
+        % 100 spatial states:
+        y = eye(100,100);
+
+        % 4 sets of lights and odor states that are distinct from spatial
+        % states:
+        x1 = [ones(100,75) zeros(100,75) zeros(100,75) zeros(100,75)];
+        x2 = [zeros(100,75) ones(100,75) zeros(100,75) zeros(100,75)];
+        x3 = [zeros(100,75) zeros(100,75) ones(100,75) zeros(100,75)];
+        x4 = [zeros(100,75) zeros(100,75) zeros(100,75) ones(100,75)];
+        x = [x1; x2; x3; x4];
+
+        % our final input layer is the combination of spatial neurons and
+        % light and odor neurons
+        x = [repmat(y,4,1) x];
+    end
+
+    w = zeros(size(x, 1), params.numActions);
+
+    context = 1;
+    [Q1, numSteps1, w1,output] = QLearningFuncApproxEgo(GW, Q, params, states, transitionList, w, x);
+    numStepsCon1(i, :) = numSteps1;
+    totalQ = totalQ+Q1;
+end
+
+
+% find the maximum valued action in each state:
+for j=1:length(totalQ)
+     [m,ind]= max(totalQ(j,:));
+        % Choose max Q value
+     maxQ(j) = m;
+end
+ 
+
+%% Plot results
+
+figure(1);
+imagesc(x)
+ylabel('states')
+xlabel('input layer neurons')
+title('input layer representation')
+
+
+figure;
+plot(mean(numStepsCon1,1))
+title('Number of Steps to Reward')
+xlabel('Session')
+ylabel('Number of Steps')
+
