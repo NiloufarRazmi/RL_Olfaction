@@ -1,0 +1,50 @@
+function [GW, Q, states, transitionList] = buildGrid(params)
+% BUILDGRID builds the grid for gridworld using the params and the goal.
+% It outputs a gridworld, matrix of Q values, a matrix of states,
+% the goal state, and a transitionList.
+
+numContexts = params.numContexts;
+numStates = params.numStates;
+rows = params.rows;
+cols = params.cols;
+walls = params.walls;
+totNumStates = 400;
+start = params.start;
+
+% Build grid of zeros, true values
+GW = zeros(totNumStates,1);
+
+% To store action-value estimates (4 for each basis function)
+Q = zeros(totNumStates, 4);
+
+% Create matrix of states 1 ... n
+states = reshape(1:25, rows, cols*numContexts);
+
+% Create transition list
+transitionList = egoTransitionList(params, states, walls);
+a = transitionList;
+transitionList = [transitionList ; a+100 ;a+200 ;a+300];
+
+% assign odor identity:
+
+if start<101 %lights on top port
+    % randomly assign odor 1 or 
+    if rand < 0.5
+    transitionList(12,1) = 211;  
+    else % odor 2
+    transitionList(12,1) = 311;  
+  
+
+    
+    else  
+        if rand<0.5
+                transitionList(139,1) = 340;
+        else
+   % Go to the context with rewarding state on the left
+    transitionList(139,1) = 340;
+    
+    
+end
+
+
+end
