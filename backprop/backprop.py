@@ -59,7 +59,7 @@ from tqdm import tqdm
 # import pandas as pd
 # import json
 
-# %matplotlib ipympl
+# %matplotlib ipympl # Replace by `%matplotlib inline` in case you get javascript issues
 import matplotlib.pyplot as plt
 
 # %load_ext lab_black
