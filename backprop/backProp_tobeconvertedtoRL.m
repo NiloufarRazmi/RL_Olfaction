@@ -38,6 +38,7 @@
 
 
 clear classes
+rng(42)
 
 
 % Main options:
@@ -52,6 +53,8 @@ nTest =100;
 nTot=nTrain+nTest;
 % create two normal input channels
 X = mvnrnd([0,0],[10, 10], nTot);
+writematrix(X, 'X.csv');
+
 %Y is positive if X(1) & X(2) are positive, OR if X(1) and X(2) are negative. 
 
 
@@ -95,6 +98,10 @@ for i = 1:(nLayers-1)
     wtMatrix{i}=normrnd(0, initVar, nUnits(i), nUnits(i+1));
 end
 
+fid = fopen('wtMatrix.json','w');
+txt = jsonencode(wtMatrix);
+fprintf(fid,'%s',txt);
+fclose(fid);
 
 %wtMatrix{1}=[10, 10, -10, -10; 10, -10, 10, -10];
 

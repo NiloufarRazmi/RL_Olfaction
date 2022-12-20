@@ -3,3 +3,6 @@
 *.log
 tmp/
 **/.ipynb_checkpoints/
+X.csv
+*.eps
+wtMatrix.json
