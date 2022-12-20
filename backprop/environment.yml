@@ -1,0 +1,26 @@
+---
+name: rl-olfaction
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python>=3.8
+  - mamba
+  - numpy
+  - ipykernel
+  - pip
+  - matplotlib
+  - jupyterlab
+  - jupytext
+  - ipympl
+  - jupyterlab-git
+  - ipdb
+  - black
+  - flake8
+  - ipywidgets
+  - seaborn
+  - nb_black
+  - pre-commit
+  - tqdm
+  - pandas
+  # - pip:
