@@ -59,8 +59,10 @@ from tqdm import tqdm
 # import pandas as pd
 # import json
 
-# %matplotlib ipympl # Replace by `%matplotlib inline` in case you get javascript issues
+# Replace by `%matplotlib inline` in case you get javascript issues
+# %matplotlib ipympl
 import matplotlib.pyplot as plt
+import ipywidgets as widgets
 
 # %load_ext lab_black
 
@@ -68,8 +70,16 @@ import matplotlib.pyplot as plt
 # ## Main options:
 
 # %%
+dropdown = widgets.Dropdown(
+    options=[("easy", 1), ("hard", 2), ("super hard", 3)],
+    value=2,
+    description="Problem",
+    disabled=False,
+)  # 3 = super hard, 2 = hard, 1 = easy. See below for actual functions.
+display(dropdown)
+
+# %%
 nLayers = 5  # set number of layers for neural network
-problem = 2  # 3 = super hard, 2 = hard, 1 = easy. See below for actual functions.
 
 # %% [markdown]
 # ## Step 1: generate data
@@ -87,6 +97,7 @@ X = np.random.multivariate_normal([0, 0], 10 * np.eye(2), size=nTot)
 X.shape
 
 # %%
+problem = dropdown.value
 if problem == 1:
     # Easy problem: LINEAR
     Y = np.sum(X, 1) > 0
@@ -129,7 +140,7 @@ plt.show()
 # determine number of units in each layer
 nOutputUnits = 1
 nInputUnits = X.shape[1]
-nHiddenUnits = 10
+nHiddenUnits = 20
 initVar = 1
 nonLin = np.block([False, np.ones((1, nLayers - 2), dtype=bool), True]).squeeze()
 

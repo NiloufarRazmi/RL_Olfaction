@@ -17,7 +17,7 @@ dependencies:
   # - ipdb
   # - black
   # - flake8
-  # - ipywidgets
+  - ipywidgets
   # - seaborn
   - nb_black
   # - pre-commit
