@@ -71,7 +71,7 @@ import ipywidgets as widgets
 
 # %%
 dropdown = widgets.Dropdown(
-    options=[("easy", 1), ("hard", 2), ("super hard", 3)],
+    options=[("1 - easy", 1), ("2 - hard", 2), ("3 - super hard", 3)],
     value=2,
     description="Problem",
     disabled=False,
@@ -177,9 +177,8 @@ for i in tqdm(range(nTrain)):
             input = X[i, :]  # THIS WILL BE YOUR POSITION/ODOR!!!!!
         else:
             if activity[j].shape == ():
-                input = activity[j - 1] * wtMatrix[j - 1]
-            else:
-                input = activity[j - 1] @ wtMatrix[j - 1]
+                activity[j] = activity[j, np.newaxis]
+            input = activity[j - 1] @ wtMatrix[j - 1]
 
         # Apply non-linearity
         if nonLin[j]:
@@ -219,16 +218,11 @@ for i in tqdm(range(nTrain)):
             # according to their responsibility... that is to say, if I
             # project to a unit in next layer with a strong weight,
             # then i inherit the gradient (PE) of that unit.
-            if (
-                delta[j + 1].shape == ()
-            ):  # Not very pretty but I don't know if there's a better way to do that...
-                delta[j] = (
-                    wtMatrix[j] * delta[j + 1] * (activity[j] * (1.0 - activity[j])).T
-                )
-            else:
-                delta[j] = (
-                    wtMatrix[j] @ delta[j + 1] * (activity[j] * (1.0 - activity[j])).T
-                )
+            if delta[j + 1].shape == ():
+                delta[j + 1] = delta[j + 1, np.newaxis]
+            delta[j] = (
+                wtMatrix[j] @ delta[j + 1] * (activity[j] * (1.0 - activity[j])).T
+            )
 
     # Update weight matrices according to gradients and activities:
     for j in range(len(wtMatrix) - 1):
