@@ -72,6 +72,7 @@ end
 
 
 hold on
+figure(1)
 plot([-2, 2], [0, 0], '--k')
 plot([0, 0],[-2, 2],  '--k')
 plot(X(Y==1,1), X(Y==1,2), 'o', 'markerFaceColor', 'r', 'lineWidth', 1, 'markerEdgeColor', 'k')
@@ -185,6 +186,7 @@ for i = 1:nTrain
     catPredict(i)=activity{end}>.5;
 end
 
+%%
 close all
 
 
@@ -194,7 +196,8 @@ for i = 1:(length(Bins)-1)
 meanError(i)=mean(abs(allError(Bins(i):Bins(i+1))));
 end
 
-figure(1)
+figure(2)
+hold on
 plot(meanError)
 ylabel('Error')
 xlabel('Batches')
@@ -236,7 +239,7 @@ isTest(nTrain+1:end)=true;
 
 close all
 
-figure(2)
+figure(3)
 subplot(1, 2, 1)
 title('Ground Truth')
 hold on
