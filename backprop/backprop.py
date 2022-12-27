@@ -59,7 +59,7 @@ from tqdm import tqdm
 # import pandas as pd
 # import json
 
-# Replace by `%matplotlib inline` in case you get javascript issues
+# Replace `%matplotlib ipympl` by `%matplotlib inline` in case you get javascript issues
 # %matplotlib ipympl
 import matplotlib.pyplot as plt
 import ipywidgets as widgets
@@ -176,7 +176,7 @@ for i in tqdm(range(nTrain)):
         if j == 0:
             input = X[i, :]  # THIS WILL BE YOUR POSITION/ODOR!!!!!
         else:
-            if activity[j].shape == ():
+            if activity[j].shape == ():  # Convert to a vector in case it is scalar
                 activity[j] = activity[j, np.newaxis]
             input = activity[j - 1] @ wtMatrix[j - 1]
 
@@ -188,13 +188,13 @@ for i in tqdm(range(nTrain)):
 
         # Take an action! softmax over actions or similar
 
-        # incorporate your model of the task, to dedtermine where agent actually goes.
+        # incorporate your model of the task, to determine where agent actually goes.
 
         # Now you need to do another forward pass, to see how good the new
         # state is so that you can compute the RPE below.
 
-        # your RPE will differ from the one below, should look something like this:
-        # RPE =  R - X(S)*W+ DISCOUNT*max(X(S')*W)
+        # your cost function will differ from the one below, should look something like this:
+        # C =  R - X(S)*W+ DISCOUNT*max(X(S')*W)
 
     # Backpropagate errors to compute gradients for all layers:
     delta = [np.array([]) for _ in range(nLayers)]
@@ -205,7 +205,7 @@ for i in tqdm(range(nTrain)):
             # activation with respect to input (activity.*(1-activity)) here.
             delta[j] = (Y[i] - activity[j]) * (
                 activity[j] * (1.0 - activity[j])
-            ).T  # THIS SHOULD BE REPLACED WITH YOUR RPE!
+            ).T  # THIS SHOULD BE REPLACED WITH YOUR COST FUNCTION!
 
             # doing this in RL framework means that you'll need one RPE for
             # each output neuron -- so RPE computed above should be
@@ -218,7 +218,7 @@ for i in tqdm(range(nTrain)):
             # according to their responsibility... that is to say, if I
             # project to a unit in next layer with a strong weight,
             # then i inherit the gradient (PE) of that unit.
-            if delta[j + 1].shape == ():
+            if delta[j + 1].shape == ():  # Convert to a vector in case it is scalar
                 delta[j + 1] = delta[j + 1, np.newaxis]
             delta[j] = (
                 wtMatrix[j] @ delta[j + 1] * (activity[j] * (1.0 - activity[j])).T
