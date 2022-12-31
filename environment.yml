@@ -5,20 +5,20 @@ channels:
   - defaults
 dependencies:
   - python>=3.8
-  # - mamba
+  - mamba
   - numpy
-  # - ipykernel
+  - ipykernel
   # - pip
   - matplotlib
   - jupyterlab
-  # - jupytext
+  - jupytext
   - ipympl
   - jupyterlab-git
-  # - ipdb
-  # - black
-  # - flake8
+  - ipdb
+  - black[jupyter]
+  - flake8
   - ipywidgets
-  # - seaborn
+  - seaborn
   - nb_black
   # - pre-commit
   - tqdm

@@ -21,7 +21,7 @@
 # %% [markdown]
 # 1. inputs need to reflect position in arena and odor (NOT CONJUNCTIONS)
 # 2. outputs need to reflect action values
-# 3. actions are selected via softmax on output neuron activity. 
+# 3. actions are selected via softmax on output neuron activity.
 # 4. RPE requires knowing value of new state -- so this will require a forward pass using "new state" inputs.
 
 # %% [markdown]
@@ -35,7 +35,7 @@
 # Originally I was going to code up a 3 layer network for simplicity -- but
 # it appears to work better on x/or if i give it more layers. I think its
 # because the non-linearity (logistic) is not very extreme, and a couple
-# layers can work together to make it a sharper non-linearity. 
+# layers can work together to make it a sharper non-linearity.
 #
 # Currently uses a logistic activation function:
 # $$ f(x) = \frac{1}{1+e^{-x}} $$
@@ -67,7 +67,7 @@ import ipywidgets as widgets
 # %load_ext lab_black
 
 # %% [markdown]
-# ## Main options:
+# ## Main options
 
 # %%
 dropdown = widgets.Dropdown(
