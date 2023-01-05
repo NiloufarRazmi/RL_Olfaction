@@ -12,28 +12,60 @@
 #     name: python3
 # ---
 
+# %% [markdown]
+# # Function approximation notebook
+
+# %% [markdown]
+# ## Initialization
+
 # %%
+# Import packages
 import numpy as np
 from tqdm import tqdm
-import matplotlib.pyplot as plt
 import pandas as pd
 
-# %load_ext lab_black
-# %run utils.py
-# %run environment.py
-# %run agent.py
-# %run plotting.py
-
-sns.set_theme()
+# %%
+# # Load custom functions
+# # %run utils.py
+# # %run environment.py
+# # %run agent.py
+# # %run plotting.py
 
 # %%
-params = Params(epsilon=0.1, n_runs=5, numEpisodes=100)
+# Load custom functions
+from utils import Params
+from environment import Environment
+from agent import Qlearning, EpsilonGreedy
+from plotting import (
+    qtable_directions_map,
+    plot_steps_and_rewards,
+    plot_q_values_map,
+    plot_rotated_q_values_map,
+)
+
+# %%
+# Formatting & autoreload stuff
+# %load_ext lab_black
+# %load_ext autoreload
+# %autoreload 2
+
+# %% [markdown]
+# ## Choose the task parameters
+
+# %%
+# Choose the parameters for the task
+params = Params(epsilon=0.1, n_runs=3, numEpisodes=100)
 params
 
+# %% [markdown]
+# ## Load the environment and the agent algorithms
+
 # %%
+# Load the environment
 env = Environment(params)
 
 # %%
+# Load the agent algorithms
 learner = Qlearning(
     learning_rate=params.alpha,
     gamma=params.gamma,
@@ -42,10 +74,14 @@ learner = Qlearning(
 )
 explorer = EpsilonGreedy(epsilon=params.epsilon)
 
+# %% [markdown]
+# ## Main loop
+
 # %%
 rewards = np.zeros((params.numEpisodes, params.n_runs))
 steps = np.zeros((params.numEpisodes, params.n_runs))
 episodes = np.arange(params.numEpisodes)
+qtables = np.zeros((params.n_runs, *learner.qtable.shape))
 
 for run in range(params.n_runs):  # Run several times to account for stochasticity
     for episode in tqdm(
@@ -79,6 +115,10 @@ for run in range(params.n_runs):  # Run several times to account for stochastici
 
         rewards[episode, run] = total_rewards
         steps[episode, run] = step_count
+    qtables[run, :, :] = learner.qtable
+
+# %% [markdown]
+# ## Postprocessing
 
 # %%
 res = pd.DataFrame(
@@ -90,11 +130,22 @@ res = pd.DataFrame(
 )
 res["cum_rewards"] = rewards.cumsum(axis=0).flatten(order="F")
 # st = pd.DataFrame(data={"Episodes": episodes, "Steps": steps.mean(axis=1)})
+qtable = qtables.mean(axis=0)  # Average the Q-table between runs
 
 # %%
 res
 
 # %%
+qtable_directions_map(qtable, env.rows, env.cols)
+
+# %% [markdown]
+# ## Visualization
+
+# %%
 plot_steps_and_rewards(res)
 
 # %%
+plot_q_values_map(qtable, env.rows, env.cols)
+
+# %%
+plot_rotated_q_values_map(qtable, env.rows, env.cols)

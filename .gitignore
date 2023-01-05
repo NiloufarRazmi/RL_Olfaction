@@ -6,3 +6,4 @@ tmp/
 X.csv
 *.eps
 wtMatrix.json
+**/__pycache__/
