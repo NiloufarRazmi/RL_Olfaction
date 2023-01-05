@@ -16,12 +16,18 @@
 import numpy as np
 from tqdm import tqdm
 import matplotlib.pyplot as plt
+import pandas as pd
 
 # %load_ext lab_black
 # %run utils.py
+# %run environment.py
+# %run agent.py
+# %run plotting.py
+
+sns.set_theme()
 
 # %%
-params = Params()
+params = Params(epsilon=0.1, n_runs=5, numEpisodes=100)
 params
 
 # %%
@@ -73,3 +79,22 @@ for run in range(params.n_runs):  # Run several times to account for stochastici
 
         rewards[episode, run] = total_rewards
         steps[episode, run] = step_count
+
+# %%
+res = pd.DataFrame(
+    data={
+        "Episodes": np.tile(episodes, reps=params.n_runs),
+        "Rewards": rewards.flatten(),
+        "Steps": steps.flatten(),
+    }
+)
+res["cum_rewards"] = rewards.cumsum(axis=0).flatten(order="F")
+# st = pd.DataFrame(data={"Episodes": episodes, "Steps": steps.mean(axis=1)})
+
+# %%
+res
+
+# %%
+plot_steps_and_rewards(res)
+
+# %%
