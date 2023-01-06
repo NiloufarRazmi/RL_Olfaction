@@ -7,6 +7,7 @@ jupytext: ## Convert JSON notebook to plain text
 	# eval "$(conda shell.bash hook)"
 	# conda activate rl-olfaction
 	jupytext --to py:percent backprop/backprop.ipynb
+	jupytext --to py:percent FuncApprox/QLearning.ipynb
 	jupytext --to py:percent FuncApprox/FuncApprox.ipynb
 
 black-format:
