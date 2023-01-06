@@ -13,7 +13,7 @@
 # ---
 
 # %% [markdown]
-# # Function approximation notebook
+# # Q-learning notebook
 
 # %% [markdown]
 # ## Initialization
@@ -23,13 +23,6 @@
 import numpy as np
 from tqdm import tqdm
 import pandas as pd
-
-# %%
-# # Load custom functions
-# # %run utils.py
-# # %run environment.py
-# # %run agent.py
-# # %run plotting.py
 
 # %%
 # Load custom functions
@@ -63,6 +56,10 @@ params
 # %%
 # Load the environment
 env = Environment(params)
+
+# %%
+# State space
+np.reshape(list(env.state_space), (env.rows, env.cols))
 
 # %%
 # Load the agent algorithms
