@@ -21,20 +21,20 @@
 # %%
 # Import packages
 import numpy as np
-from tqdm import tqdm
 import pandas as pd
+from agent import EpsilonGreedy, Qlearning
+from environment import Environment
+from plotting import (
+    plot_q_values_map,
+    plot_rotated_q_values_map,
+    plot_steps_and_rewards,
+    qtable_directions_map,
+)
+from tqdm import tqdm
 
 # %%
 # Load custom functions
 from utils import Params
-from environment import Environment
-from agent import Qlearning, EpsilonGreedy
-from plotting import (
-    qtable_directions_map,
-    plot_steps_and_rewards,
-    plot_q_values_map,
-    plot_rotated_q_values_map,
-)
 
 # %%
 # Formatting & autoreload stuff

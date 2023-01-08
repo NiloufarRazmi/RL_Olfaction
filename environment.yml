@@ -22,4 +22,5 @@ dependencies:
   # - pre-commit
   - tqdm
   - pandas
-  # - pip:
+  - isort
+  # pip:

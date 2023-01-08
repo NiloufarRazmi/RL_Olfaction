@@ -51,6 +51,12 @@
 # plt.show()
 # ```
 
+import ipywidgets as widgets
+
+# Replace `%matplotlib ipympl` by `%matplotlib inline` in case you get javascript issues
+# %matplotlib ipympl
+import matplotlib.pyplot as plt
+
 # %%
 # Import packages
 import numpy as np
@@ -59,10 +65,6 @@ from tqdm import tqdm
 # import pandas as pd
 # import json
 
-# Replace `%matplotlib ipympl` by `%matplotlib inline` in case you get javascript issues
-# %matplotlib ipympl
-import matplotlib.pyplot as plt
-import ipywidgets as widgets
 
 # %load_ext lab_black
 

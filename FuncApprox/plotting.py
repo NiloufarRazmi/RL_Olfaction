@@ -1,9 +1,9 @@
 import itertools
-import numpy as np
+
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-import seaborn as sns
 import numpy as np
+import seaborn as sns
 
 sns.set_theme()
 
