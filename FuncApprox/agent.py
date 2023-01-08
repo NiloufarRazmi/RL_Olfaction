@@ -1,4 +1,5 @@
 import numpy as np
+import numpy.matlib
 
 
 class Qlearning:
@@ -9,12 +10,44 @@ class Qlearning:
 
     def update(self, state, action, reward, new_state):
         """Update Q(s,a):= Q(s,a) + lr [R(s,a) + gamma * max Q(s',a') - Q(s,a)]"""
-        q_updated = self.qtable[state, action] + self.learning_rate * (
+        delta = (
             reward
             + self.gamma * np.max(self.qtable[new_state, :])
             - self.qtable[state, action]
         )
-        return q_updated
+        q_update = self.qtable[state, action] + self.learning_rate * delta
+        return q_update
+
+
+class QLearningFuncApprox:
+    def __init__(self, learning_rate, gamma, state_size, action_size, jointRep):
+        self.learning_rate = learning_rate
+        self.gamma = gamma
+        if jointRep:
+            self.features = np.eye(state_size * action_size, state_size * action_size)
+        else:
+            tmp = np.eye(state_size, state_size)
+            self.features = np.matlib.repmat(tmp, action_size, action_size)
+        self.weights = np.zeros((self.features.shape[0], action_size))
+        self.qtable = np.zeros((self.weights.shape))
+
+    def Q_hat(self, weights, features):
+        """Compute the approximated Q-value."""
+        Q_hat = (weights.T @ features).T
+        return Q_hat
+
+    def update_weights(self, state, action, reward, new_state):
+        """Update the weights."""
+        delta = (
+            reward
+            + self.gamma * np.max(self.qtable[new_state, :])
+            - self.qtable[state, action]
+        )
+        weights_update = (
+            self.weights[:, action].T
+            + self.learning_rate * delta * self.features[:, state]
+        )
+        return weights_update
 
 
 class EpsilonGreedy:

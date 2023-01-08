@@ -13,7 +13,7 @@
 # ---
 
 # %% [markdown]
-# # Q-learning notebook
+# # Function approximation notebook
 
 # %% [markdown]
 # ## Initialization
@@ -21,20 +21,21 @@
 # %%
 # Import packages
 import numpy as np
-from tqdm import tqdm
 import pandas as pd
+from agent import EpsilonGreedy, QLearningFuncApprox
+from environment import Environment
+from plotting import (
+    plot_features,
+    plot_q_values_map,
+    plot_rotated_q_values_map,
+    plot_steps_and_rewards,
+    qtable_directions_map,
+)
+from tqdm import tqdm
 
 # %%
 # Load custom functions
 from utils import Params
-from environment import Environment
-from agent import Qlearning, EpsilonGreedy
-from plotting import (
-    qtable_directions_map,
-    plot_steps_and_rewards,
-    plot_q_values_map,
-    plot_rotated_q_values_map,
-)
 
 # %%
 # Formatting & autoreload stuff
@@ -63,11 +64,12 @@ np.reshape(list(env.state_space), (env.rows, env.cols))
 
 # %%
 # Load the agent algorithms
-learner = Qlearning(
+learner = QLearningFuncApprox(
     learning_rate=params.alpha,
     gamma=params.gamma,
     state_size=env.numStates,
     action_size=env.numActions,
+    jointRep=False,
 )
 explorer = EpsilonGreedy(epsilon=params.epsilon)
 
@@ -91,6 +93,8 @@ for run in range(params.n_runs):  # Run several times to account for stochastici
 
         while not done:
 
+            learner.qtable = learner.Q_hat(learner.weights, learner.features)
+
             action = explorer.choose_action(
                 action_space=env.action_space, state=state, qtable=learner.qtable
             )
@@ -98,7 +102,7 @@ for run in range(params.n_runs):  # Run several times to account for stochastici
             # Take the action (a) and observe the outcome state(s') and reward (r)
             new_state, reward, done = env.step(action, state)
 
-            learner.qtable[state, action] = learner.update(
+            learner.weights[:, action] = learner.update_weights(
                 state, action, reward, new_state
             )
 
@@ -137,6 +141,9 @@ qtable_directions_map(qtable, env.rows, env.cols)
 
 # %% [markdown]
 # ## Visualization
+
+# %%
+plot_features(learner.features)
 
 # %%
 plot_steps_and_rewards(res)
