@@ -135,11 +135,13 @@ def plot_rotated_q_values_map(qtable, rows, cols):
     plt.show()
 
 
-def plot_features(features):
+def plot_heatmap(matrix, title=None):
     fig, ax = plt.subplots(figsize=(9, 9))
     cmap = sns.light_palette("seagreen", as_cmap=True)
     # cmap = sns.color_palette("light:b", as_cmap=True)
-    sns.heatmap(features, cmap=cmap, ax=ax).set(title="Features")
+    chart = sns.heatmap(matrix, cmap=cmap, ax=ax)
+    if title:
+        chart.set(title=title)
     ax.tick_params(axis="x", rotation=90)
     ax.tick_params(axis="y", rotation=0)
     ax.tick_params(left=True)

@@ -10,6 +10,7 @@ class Params:
     # QLearning parameters
     gamma: float = 0.8
     alpha: float = 0.05
+    jointRep: bool = True
 
     n_runs: int = 5
     numEpisodes: int = 100  # Set up the task

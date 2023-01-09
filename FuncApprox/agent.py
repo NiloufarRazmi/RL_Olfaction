@@ -29,7 +29,7 @@ class QLearningFuncApprox:
             tmp = np.eye(state_size, state_size)
             self.features = np.matlib.repmat(tmp, action_size, action_size)
         self.weights = np.zeros((self.features.shape[0], action_size))
-        self.qtable = np.zeros((self.weights.shape))
+        self.Q_hat_table = np.zeros((self.weights.shape))
 
     def Q_hat(self, weights, features):
         """Compute the approximated Q-value."""
@@ -40,8 +40,8 @@ class QLearningFuncApprox:
         """Update the weights."""
         delta = (
             reward
-            + self.gamma * np.max(self.qtable[new_state, :])
-            - self.qtable[state, action]
+            + self.gamma * np.max(self.Q_hat_table[new_state, :])
+            - self.Q_hat_table[state, action]
         )
         weights_update = (
             self.weights[:, action].T
