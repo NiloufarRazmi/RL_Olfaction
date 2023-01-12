@@ -8,23 +8,24 @@ numStates = params.numStates;
 rows = params.rows;
 cols = params.cols;
 walls = params.walls;
-totNumStates = 400;
+totNumStates = numStates * numContexts;
 start = params.start;
 num_odor= params.condition;
 
 % Build grid of zeros, true values
 GW = zeros(totNumStates,1);
 
-% To store action-value estimates (4 for each basis function)
-Q = zeros(totNumStates, 4);
+% To store action-value estimates 
+Q = zeros(totNumStates, params.numActions);
 
 % Create matrix of states 1 ... n
-states = reshape(1:25, rows, cols*numContexts);
+states = reshape(1:25, rows, cols);
 
 % Create transition list
 transitionList = egoTransitionList(params, states, walls);
 a = transitionList;
-transitionList = [transitionList ; a+100 ;a+200 ;a+300];
+
+transitionList = [transitionList ; a+numStates ;a+numStates*2 ;a+numStates*3];
 
 % assign odor identity:
 
