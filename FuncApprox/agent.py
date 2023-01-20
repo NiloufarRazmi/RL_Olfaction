@@ -8,7 +8,7 @@ class Qlearning:
         self.action_size = action_size
         self.learning_rate = learning_rate
         self.gamma = gamma
-        self.qtable = np.zeros((state_size, action_size))
+        self.reset_qtable()
 
     def update(self, state, action, reward, new_state):
         """Update Q(s,a):= Q(s,a) + lr [R(s,a) + gamma * max Q(s',a') - Q(s,a)]"""
@@ -35,7 +35,7 @@ class QLearningFuncApprox:
             tmp = np.eye(state_size, state_size)
             self.features = np.matlib.repmat(tmp, action_size, action_size)
         self.weights = np.zeros((self.features.shape[0], action_size))
-        self.Q_hat_table = np.zeros((self.weights.shape))
+        self.reset_Q_hat_table()
 
     def Q_hat(self, weights, features):
         """Compute the approximated Q-value."""
@@ -51,9 +51,14 @@ class QLearningFuncApprox:
         )
         weights_update = (
             self.weights[:, action].T
+            # + self.learning_rate * delta * self.features[:, state].T
             + self.learning_rate * delta * self.features[:, state]
         )
         return weights_update
+
+    def reset_Q_hat_table(self):
+        """Reset the approximated Q-table."""
+        self.Q_hat_table = np.zeros((self.weights.shape))
 
 
 class EpsilonGreedy:

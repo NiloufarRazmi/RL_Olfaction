@@ -53,6 +53,7 @@ params
 env = WrappedEnvironment(params)
 
 # %%
+# State space
 for idx, label in enumerate(CONTEXTS_LABELS):
     plotting.plot_tiles_locations(
         np.array(list(env.tiles_locations)) + idx * len(env.tiles_locations),
@@ -79,7 +80,6 @@ rewards = np.zeros((params.numEpisodes, params.n_runs))
 steps = np.zeros((params.numEpisodes, params.n_runs))
 episodes = np.arange(params.numEpisodes)
 qtables = np.zeros((params.n_runs, env.numStates, env.numActions))
-
 all_states = []
 all_actions = []
 
@@ -100,6 +100,7 @@ for run in range(params.n_runs):  # Run several times to account for stochastici
                 action_space=env.action_space, state=state, qtable=learner.qtable
             )
 
+            # Record states and actions
             all_states.append(state)
             all_actions.append(Actions(action).name)
 
