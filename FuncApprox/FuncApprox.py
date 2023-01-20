@@ -67,8 +67,7 @@ for idx, label in enumerate(CONTEXTS_LABELS):
 learner = QLearningFuncApprox(
     learning_rate=params.alpha,
     gamma=params.gamma,
-    # state_size=env.numStates[0] * env.numStates[1],
-    state_size=env.numStates,
+    state_size=len(env.tiles_locations),
     action_size=env.numActions,
     jointRep=params.jointRep,
 )
