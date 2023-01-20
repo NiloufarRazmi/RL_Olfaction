@@ -22,14 +22,9 @@
 # Import packages
 import numpy as np
 import pandas as pd
+import plotting
 from agent import EpsilonGreedy, Qlearning
-from environment import Environment
-from plotting import (
-    plot_q_values_map,
-    plot_rotated_q_values_map,
-    plot_steps_and_rewards,
-    qtable_directions_map,
-)
+from environment import Actions, WrappedEnvironment
 from tqdm import tqdm
 
 # %%
@@ -55,11 +50,30 @@ params
 
 # %%
 # Load the environment
-env = Environment(params)
+env = WrappedEnvironment(params)
 
 # %%
-# State space
-np.reshape(list(env.state_space), (env.rows, env.cols))
+plotting.plot_tiles_locations(
+    env.tiles_locations, env.rows, env.cols, title="Pre odor - North port"
+)
+plotting.plot_tiles_locations(
+    np.array(list(env.tiles_locations)) + len(env.tiles_locations),
+    env.rows,
+    env.cols,
+    title="Pre odor - South port",
+)
+plotting.plot_tiles_locations(
+    np.array(list(env.tiles_locations)) + 2 * len(env.tiles_locations),
+    env.rows,
+    env.cols,
+    title="Post odor - North port",
+)
+plotting.plot_tiles_locations(
+    np.array(list(env.tiles_locations)) + 3 * len(env.tiles_locations),
+    env.rows,
+    env.cols,
+    title="Post odor - South port",
+)
 
 # %%
 # Load the agent algorithms
@@ -78,9 +92,15 @@ explorer = EpsilonGreedy(epsilon=params.epsilon)
 rewards = np.zeros((params.numEpisodes, params.n_runs))
 steps = np.zeros((params.numEpisodes, params.n_runs))
 episodes = np.arange(params.numEpisodes)
-qtables = np.zeros((params.n_runs, *learner.qtable.shape))
+qtables = np.zeros((params.n_runs, env.numStates, env.numActions))
+
+all_states = []
+all_actions = []
 
 for run in range(params.n_runs):  # Run several times to account for stochasticity
+
+    learner.reset_qtable()  # Reset the Q-table between runs
+
     for episode in tqdm(
         episodes, desc=f"Run {run+1}/{params.n_runs} - Episodes", leave=False
     ):
@@ -90,10 +110,12 @@ for run in range(params.n_runs):  # Run several times to account for stochastici
         total_rewards = 0
 
         while not done:
-
             action = explorer.choose_action(
                 action_space=env.action_space, state=state, qtable=learner.qtable
             )
+
+            all_states.append(state)
+            all_actions.append(Actions(action).name)
 
             # Take the action (a) and observe the outcome state(s') and reward (r)
             new_state, reward, done = env.step(action, state)
@@ -133,16 +155,22 @@ qtable = qtables.mean(axis=0)  # Average the Q-table between runs
 res
 
 # %%
-qtable_directions_map(qtable, env.rows, env.cols)
+# plotting.qtable_directions_map(qtable, env.rows, env.cols)
 
 # %% [markdown]
 # ## Visualization
 
 # %%
-plot_steps_and_rewards(res)
+plotting.plot_heatmap(matrix=qtable, title="Q-table")
 
 # %%
-plot_q_values_map(qtable, env.rows, env.cols)
+plotting.plot_states_actions_distribution(all_states, all_actions)
 
 # %%
-plot_rotated_q_values_map(qtable, env.rows, env.cols)
+plotting.plot_steps_and_rewards(res)
+
+# %%
+plotting.plot_q_values_maps(qtable, env.rows, env.cols)
+
+# %%
+plotting.plot_rotated_q_values_map(qtable[0:25, :], env.rows, env.cols)

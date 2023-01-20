@@ -147,3 +147,88 @@ def plot_heatmap(matrix, title=None):
     ax.tick_params(left=True)
     ax.xaxis.tick_top()
     plt.show()
+
+
+def plot_tiles_locations(tiles_list, rows, cols, title=None):
+    """Simple plot to show the states/tiles numbers."""
+    tiles_annot = np.reshape(list(tiles_list), (rows, cols))
+    tiles_val = np.zeros_like(tiles_annot)
+
+    f, ax = plt.subplots()
+    chart = sns.heatmap(
+        tiles_val,
+        annot=tiles_annot,
+        fmt="",
+        ax=ax,
+        cbar=False,
+        # cmap=sns.color_palette("Blues", as_cmap=True),
+        linewidths=0.7,
+        linecolor="white",
+        xticklabels=[],
+        yticklabels=[],
+        annot_kws={"fontsize": "xx-large"},
+    )
+    if title:
+        chart.set(title=title)
+    else:
+        chart.set(title="Tiles numbers")
+    # for _, spine in ax.spines.items():
+    #     spine.set_visible(True)
+    #     spine.set_linewidth(0.7)
+    #     spine.set_color("black")
+
+    plt.show()
+
+
+def plot_q_values_maps(qtable, rows, cols):
+    """Plot the heatmap of the Q-values.
+
+    Also plot the best action's direction with arrows."""
+
+    font_name = "DejaVu Math TeX Gyre"
+    mpl.rcParams["font.family"] = font_name
+
+    f, ax = plt.subplots(2, 2, figsize=(12, 10))
+    maps = [
+        np.arange(0, rows * cols),
+        np.arange(rows * cols, 2 * rows * cols),
+        np.arange(2 * rows * cols, 3 * rows * cols),
+        np.arange(3 * rows * cols, 4 * rows * cols),
+    ]
+    titles = [
+        "Pre odor - North port",
+        "Pre odor - South port",
+        "Post odor - North port",
+        "Post odor - South port",
+    ]
+    for idx, _ in enumerate(titles):
+        qtable_val_max, qtable_directions = qtable_directions_map(
+            qtable[maps[idx], :], rows, cols
+        )
+        sns.heatmap(
+            qtable_val_max,
+            annot=qtable_directions,
+            fmt="",
+            ax=ax.flatten()[idx],
+            cmap=sns.color_palette("Blues", as_cmap=True),
+            linewidths=0.7,
+            linecolor="black",
+            xticklabels=[],
+            yticklabels=[],
+            annot_kws={"fontsize": "xx-large"},
+        ).set(title=titles[idx])
+        for _, spine in ax.flatten()[idx].spines.items():
+            spine.set_visible(True)
+            spine.set_linewidth(0.7)
+            spine.set_color("black")
+    plt.show()
+
+
+def plot_states_actions_distribution(states, actions):
+    """Plot the distributions of states and actions."""
+    fig, ax = plt.subplots(2, 1, figsize=(15, 8))
+    sns.histplot(data=states, ax=ax[0], kde=True)
+    ax[0].set_title("States")
+    sns.histplot(data=actions, ax=ax[1])
+    ax[1].set_title("Actions")
+    plt.show()

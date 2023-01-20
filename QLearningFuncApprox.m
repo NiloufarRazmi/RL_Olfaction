@@ -44,7 +44,7 @@ for ses = 1:numSessions
         else
             reward = 0;
         end
-  
+    
         % Update weights
         w(:, a) = w(:, a)' + alpha ./ (size(x,1)./(size(x,2)./2)) * (reward + gamma * max(Q(state, :)) - Q(prevState, a)) * (x(:, prevState)');
         
