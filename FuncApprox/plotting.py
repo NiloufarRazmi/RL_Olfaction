@@ -177,7 +177,7 @@ def plot_tiles_locations(tiles_list, rows, cols, title=None):
     #     spine.set_visible(True)
     #     spine.set_linewidth(0.7)
     #     spine.set_color("black")
-    f.facecolor = "white"
+    f.set_facecolor("white")
     plt.show()
 
 
@@ -226,4 +226,84 @@ def plot_states_actions_distribution(states, actions):
     ax[0].set_title("States")
     sns.histplot(data=actions, ax=ax[1])
     ax[1].set_title("Actions")
+    plt.show()
+
+
+def plot_rotated_q_values_maps(qtable, rows, cols):
+    # See https://stackoverflow.com/q/12848581/4129062
+
+    fig, ax = plt.subplots(2, 2, figsize=(12, 10))
+    maps = [
+        np.arange(0, rows * cols),
+        np.arange(rows * cols, 2 * rows * cols),
+        np.arange(2 * rows * cols, 3 * rows * cols),
+        np.arange(3 * rows * cols, 4 * rows * cols),
+    ]
+    for idx, title in enumerate(CONTEXTS_LABELS):
+        qtable_val_max, qtable_directions = qtable_directions_map(
+            qtable[maps[idx], :], rows, cols
+        )
+
+        # im = ax.imshow(qtable_val_max, cmap="Blues")
+        # im = ax.pcolormesh(np.flip(qtable_val_max, axis=0), cmap="Blues")
+
+        def pcolormesh_45deg(C):
+            n = C.shape[0]
+            # create rotation/scaling matrix
+            t = np.array([[1, 0.5], [-1, 0.5]])
+            # create coordinate matrix and transform it
+            A = np.dot(
+                np.array(
+                    [
+                        (i[1], i[0])
+                        for i in itertools.product(range(n, -1, -1), range(0, n + 1, 1))
+                    ]
+                ),
+                t,
+            )
+            # plot
+            return (
+                A[:, 1].reshape(n + 1, n + 1),
+                A[:, 0].reshape(n + 1, n + 1),
+                np.flipud(C),
+            )
+
+        X, Y, C = pcolormesh_45deg(qtable_val_max)
+        im = ax.flatten()[idx].pcolormesh(X, Y, C, cmap="Blues")
+        ax.flatten()[idx].figure.colorbar(im, ax=ax.flatten()[idx])
+
+        def arrow_color(table, val):
+            if val > table.mean():
+                color = "white"
+            else:
+                color = "black"
+            return color
+
+        # Loop over data dimensions and create text annotations.
+        for i in range(rows):
+            for j in range(cols):
+                ax.flatten()[idx].text(
+                    # j,
+                    # i,
+                    np.flipud(X)[i, j] + 0.5,
+                    np.flipud(Y)[i, j],
+                    qtable_directions[i, j],
+                    ha="center",
+                    va="center",
+                    color=arrow_color(qtable_val_max, qtable_val_max[i, j]),
+                    rotation=45,
+                )
+
+        ax.flatten()[idx].set_title(title)
+        # ax.set_xticks(np.arange(qtable_val_max.shape[1] + 1) - 0.5, minor=True)
+        # ax.set_yticks(np.arange(qtable_val_max.shape[0] + 1) - 0.5, minor=True)
+        # ax.grid(which="minor", color="black", linestyle="-", linewidth=0.7)
+        ax.flatten()[idx].set_xticks([])
+        ax.flatten()[idx].set_yticks([])
+        # for _, spine in ax.spines.items():
+        #     spine.set_visible(True)
+        #     spine.set_linewidth(0.7)
+        #     spine.set_color("black")
+
+    fig.tight_layout()
     plt.show()

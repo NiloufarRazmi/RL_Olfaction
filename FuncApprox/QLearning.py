@@ -160,4 +160,4 @@ plotting.plot_steps_and_rewards(res)
 plotting.plot_q_values_maps(qtable, env.rows, env.cols)
 
 # %%
-plotting.plot_rotated_q_values_map(qtable[0:25, :], env.rows, env.cols)
+plotting.plot_rotated_q_values_maps(qtable, env.rows, env.cols)
