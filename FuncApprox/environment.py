@@ -27,6 +27,14 @@ class Actions(Enum):
     RIGHT = 3
 
 
+CONTEXTS_LABELS = [
+    "Pre odor - North port",
+    "Pre odor - South port",
+    "Post odor - North port",
+    "Post odor - South port",
+]
+
+
 class Environment:
     """Environment logic."""
 

@@ -24,7 +24,7 @@ import numpy as np
 import pandas as pd
 import plotting
 from agent import EpsilonGreedy, Qlearning
-from environment import Actions, WrappedEnvironment
+from environment import CONTEXTS_LABELS, Actions, WrappedEnvironment
 from tqdm import tqdm
 
 # %%
@@ -53,27 +53,13 @@ params
 env = WrappedEnvironment(params)
 
 # %%
-plotting.plot_tiles_locations(
-    env.tiles_locations, env.rows, env.cols, title="Pre odor - North port"
-)
-plotting.plot_tiles_locations(
-    np.array(list(env.tiles_locations)) + len(env.tiles_locations),
-    env.rows,
-    env.cols,
-    title="Pre odor - South port",
-)
-plotting.plot_tiles_locations(
-    np.array(list(env.tiles_locations)) + 2 * len(env.tiles_locations),
-    env.rows,
-    env.cols,
-    title="Post odor - North port",
-)
-plotting.plot_tiles_locations(
-    np.array(list(env.tiles_locations)) + 3 * len(env.tiles_locations),
-    env.rows,
-    env.cols,
-    title="Post odor - South port",
-)
+for idx, label in enumerate(CONTEXTS_LABELS):
+    plotting.plot_tiles_locations(
+        np.array(list(env.tiles_locations)) + idx * len(env.tiles_locations),
+        env.rows,
+        env.cols,
+        title=label,
+    )
 
 # %%
 # Load the agent algorithms

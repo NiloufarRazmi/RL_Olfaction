@@ -4,6 +4,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
+from environment import CONTEXTS_LABELS
 
 sns.set_theme()
 
@@ -176,7 +177,7 @@ def plot_tiles_locations(tiles_list, rows, cols, title=None):
     #     spine.set_visible(True)
     #     spine.set_linewidth(0.7)
     #     spine.set_color("black")
-
+    f.facecolor = "white"
     plt.show()
 
 
@@ -195,13 +196,7 @@ def plot_q_values_maps(qtable, rows, cols):
         np.arange(2 * rows * cols, 3 * rows * cols),
         np.arange(3 * rows * cols, 4 * rows * cols),
     ]
-    titles = [
-        "Pre odor - North port",
-        "Pre odor - South port",
-        "Post odor - North port",
-        "Post odor - South port",
-    ]
-    for idx, _ in enumerate(titles):
+    for idx, title in enumerate(CONTEXTS_LABELS):
         qtable_val_max, qtable_directions = qtable_directions_map(
             qtable[maps[idx], :], rows, cols
         )
@@ -216,7 +211,7 @@ def plot_q_values_maps(qtable, rows, cols):
             xticklabels=[],
             yticklabels=[],
             annot_kws={"fontsize": "xx-large"},
-        ).set(title=titles[idx])
+        ).set(title=title)
         for _, spine in ax.flatten()[idx].spines.items():
             spine.set_visible(True)
             spine.set_linewidth(0.7)
