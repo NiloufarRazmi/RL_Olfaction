@@ -13,7 +13,13 @@
 # ---
 
 # %% [markdown]
-# # Function approximation notebook
+# # Q-learning with function approximation
+
+# %% [markdown]
+# ## The task
+
+# %% [markdown]
+# <img src='./img/task.png' width="400">
 
 # %% [markdown]
 # ## Initialization
@@ -24,7 +30,7 @@ import numpy as np
 import pandas as pd
 import plotting
 from agent import EpsilonGreedy, QLearningFuncApprox
-from environment import CONTEXTS_LABELS, Actions, WrappedEnvironment
+from environment import CONTEXTS_LABELS, Actions, LightCues, WrappedEnvironment
 from tqdm import tqdm
 
 # %%
@@ -53,16 +59,6 @@ params
 env = WrappedEnvironment(params)
 
 # %%
-# State space
-for idx, label in enumerate(CONTEXTS_LABELS):
-    plotting.plot_tiles_locations(
-        np.array(list(env.tiles_locations)) + idx * len(env.tiles_locations),
-        env.rows,
-        env.cols,
-        title=label,
-    )
-
-# %%
 # Load the agent algorithms
 learner = QLearningFuncApprox(
     learning_rate=params.alpha,
@@ -72,6 +68,36 @@ learner = QLearningFuncApprox(
     jointRep=params.jointRep,
 )
 explorer = EpsilonGreedy(epsilon=params.epsilon)
+
+# %% [markdown]
+# ## States and actions meaning
+
+# %% tags=[]
+# State space
+for idx, label in enumerate(CONTEXTS_LABELS):
+    plotting.plot_tiles_locations(
+        np.array(list(env.tiles_locations)) + idx * len(env.tiles_locations),
+        env.rows,
+        env.cols,
+        title=label,
+    )
+
+# %% [markdown]
+# ### Correspondance between flat states and (internal) composite states
+
+# %%
+state = 63
+env.convert_flat_state_to_composite(state)
+
+# %%
+env.convert_composite_to_flat_state({"location": 13, "cue": LightCues.North})
+
+# %% [markdown]
+# ### Action meaning
+
+# %%
+action = 0
+Actions(action)
 
 # %% [markdown]
 # ## Main loop

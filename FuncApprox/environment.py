@@ -8,6 +8,11 @@ class OdorCondition(Enum):
     post = 2
 
 
+class OdorID(Enum):
+    A = 1
+    B = 2
+
+
 class Ports(Enum):
     North = 4
     South = 20
@@ -15,7 +20,7 @@ class Ports(Enum):
     East = 24
 
 
-class Cues(Enum):
+class LightCues(Enum):
     North = Ports.North.value
     South = Ports.South.value
 
@@ -28,10 +33,10 @@ class Actions(Enum):
 
 
 CONTEXTS_LABELS = [
-    "Pre odor - North port",
-    "Pre odor - South port",
-    "Post odor - North port",
-    "Post odor - South port",
+    "Pre odor - North light",
+    "Pre odor - South light",
+    "Post odor - Odor A",
+    "Post odor - Odor B",
 ]
 
 
@@ -48,7 +53,10 @@ class Environment:
         self.action_space = set([item.value for item in Actions])
         self.numActions = len(self.action_space)
 
-        self.state_space = {"location": self.tiles_locations, "cue": Cues}
+        self.state_space = {
+            "location": self.tiles_locations,
+            "cue": set(OdorID).union(LightCues),
+        }
         self.numStates = tuple(len(item) for item in self.state_space.values())
         self.reset()
 
@@ -59,13 +67,10 @@ class Environment:
                 low=min(self.tiles_locations),
                 high=max(self.tiles_locations) + 1,
             ),
-            # "location": 12,
-            "cue": np.random.choice(Cues).value,
-            # "cue": Cues.South.value,
-            # "cue": Cues.North.value,
+            "cue": np.random.choice(LightCues),
         }
         self.odor_condition = OdorCondition.pre
-        # self.odor_condition = OdorCondition.post
+        self.odor_ID = np.random.choice(OdorID)
         return start_state
 
     def is_terminated(self, state):
@@ -82,15 +87,9 @@ class Environment:
         """Observe the reward."""
         reward = 0
         if self.odor_condition == OdorCondition.post:
-            if (
-                state["cue"] == Cues.North.value
-                and state["location"] == Ports.West.value
-            ):
+            if state["cue"] == OdorID.A and state["location"] == Ports.West.value:
                 reward = 10
-            elif (
-                state["cue"] == Cues.South.value
-                and state["location"] == Ports.East.value
-            ):
+            elif state["cue"] == OdorID.B and state["location"] == Ports.East.value:
                 reward = 10
         return reward
 
@@ -102,9 +101,10 @@ class Environment:
         newrow, newcol = self.move(row, col, action)
         new_state["location"] = self.to_state_location(newrow, newcol)
 
-        # Update odor condition
-        if new_state["location"] == new_state["cue"]:
+        # Update internal states
+        if new_state["location"] == new_state["cue"].value:
             self.odor_condition = OdorCondition.post
+            new_state["cue"] = self.odor_ID
 
         reward = self.reward(new_state)
         done = self.is_terminated(new_state)
@@ -145,7 +145,7 @@ class WrappedEnvironment(Environment):
         super().__init__(params, rng=None)
 
         self.state_space = set(
-            np.arange(self.rows * self.cols * len(Cues) * len(OdorCondition))
+            np.arange(self.rows * self.cols * len(LightCues) * len(OdorCondition))
         )
         self.numStates = len(self.state_space)
         self.reset()
@@ -155,15 +155,15 @@ class WrappedEnvironment(Environment):
         conv_state = None
         tiles_num = len(self.tiles_locations)
 
-        if self.odor_condition == OdorCondition.pre:  # Is that cheating??
-            if state["cue"] == Cues.North.value:
+        if self.odor_condition == OdorCondition.pre:
+            if state["cue"] == LightCues.North:
                 conv_state = state["location"]
-            elif state["cue"] == Cues.South.value:
+            elif state["cue"] == LightCues.South:
                 conv_state = state["location"] + tiles_num
-        elif self.odor_condition == OdorCondition.post:  # Is that cheating??
-            if state["cue"] == Cues.North.value:
+        elif self.odor_condition == OdorCondition.post:
+            if state["cue"] == OdorID.A:
                 conv_state = state["location"] + 2 * tiles_num
-            elif state["cue"] == Cues.South.value:
+            elif state["cue"] == OdorID.B:
                 conv_state = state["location"] + 3 * tiles_num
 
         if conv_state is None:
@@ -175,26 +175,22 @@ class WrappedEnvironment(Environment):
         """Convert back flattened state to original composite state."""
         tiles_num = len(self.tiles_locations)
         if state >= 3 * tiles_num and state < 4 * tiles_num:
-            conv_state = {"location": state - 3 * tiles_num, "cue": Cues.South.value}
+            conv_state = {
+                "location": state - 3 * tiles_num,
+                "cue": OdorID.B,
+            }
         elif state >= 2 * tiles_num and state < 3 * tiles_num:
-            conv_state = {"location": state - 2 * tiles_num, "cue": Cues.North.value}
+            conv_state = {
+                "location": state - 2 * tiles_num,
+                "cue": OdorID.A,
+            }
         elif state >= tiles_num and state < 2 * tiles_num:
-            conv_state = {"location": state - tiles_num, "cue": Cues.South.value}
+            conv_state = {"location": state - tiles_num, "cue": LightCues.South}
         elif state < tiles_num:
-            conv_state = {"location": state, "cue": Cues.North.value}
+            conv_state = {"location": state, "cue": LightCues.North}
         else:
             raise ValueError("Impossible number for flat state")
         return conv_state
-
-    # def is_terminated(self, state):
-    #     """Wrapper around the base method."""
-    #     conv_state = self.convert_flat_state_to_composite(state)
-    #     return super().is_terminated(conv_state)
-
-    # def reward(self, state):
-    #     """Wrapper around the base method."""
-    #     conv_state = self.convert_flat_state_to_composite(state)
-    #     return super().reward(conv_state)
 
     def step(self, action, current_state):
         """Wrapper around the base method."""
@@ -202,11 +198,6 @@ class WrappedEnvironment(Environment):
         new_state, reward, done = super().step(action, current_conv_state)
         new_state_conv = self.convert_composite_to_flat_state(new_state)
         return new_state_conv, reward, done
-
-    # def to_row_col(self, state):
-    #     """Wrapper around the base method."""
-    #     conv_state = self.convert_flat_state_to_composite(state)
-    #     return super().to_row_col(conv_state)
 
     def reset(self):
         """Wrapper around the base method."""
