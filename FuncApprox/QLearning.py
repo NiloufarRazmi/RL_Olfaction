@@ -16,6 +16,9 @@
 # # Standard Q-learning
 
 # %% [markdown]
+# [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/NiloufarRazmi/RL_Olfaction/HEAD?labpath=FuncApprox%2FQLearning.ipynb)
+
+# %% [markdown]
 # ## The task
 
 # %% [markdown]

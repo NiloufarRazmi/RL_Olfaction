@@ -16,6 +16,9 @@
 # # Q-learning with function approximation
 
 # %% [markdown]
+# [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/NiloufarRazmi/RL_Olfaction/HEAD?labpath=FuncApprox%2FFuncApprox.ipynb)
+
+# %% [markdown]
 # ## The task
 
 # %% [markdown]

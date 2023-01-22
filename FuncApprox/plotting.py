@@ -44,8 +44,8 @@ def plot_q_values_map(qtable, rows, cols):
     Also plot the best action's direction with arrows."""
     qtable_val_max, qtable_directions = qtable_directions_map(qtable, rows, cols)
 
-    font_name = "DejaVu Math TeX Gyre"
-    mpl.rcParams["font.family"] = font_name
+    # font_name = "DejaVu Math TeX Gyre"
+    # mpl.rcParams["font.family"] = font_name
     f, ax = plt.subplots()
     sns.heatmap(
         qtable_val_max,
@@ -186,8 +186,8 @@ def plot_q_values_maps(qtable, rows, cols):
 
     Also plot the best action's direction with arrows."""
 
-    font_name = "DejaVu Math TeX Gyre"
-    mpl.rcParams["font.family"] = font_name
+    # font_name = "DejaVu Math TeX Gyre"
+    # mpl.rcParams["font.family"] = font_name
 
     f, ax = plt.subplots(2, 2, figsize=(12, 10))
     maps = [
