@@ -22,5 +22,9 @@ format: ## Autoformat everything
 flake8:
 	flake8 --max-line-length 88 --extend-ignore E203 --exclude="**/.ipynb_checkpoints/" .
 
+ruff:
+	ruff .
+
 lint: ## Lint all files
-	make flake8
+	# make flake8
+	make ruff

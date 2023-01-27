@@ -33,7 +33,7 @@ import numpy as np
 import pandas as pd
 import plotting
 from agent import EpsilonGreedy, Qlearning
-from environment import CONTEXTS_LABELS, Actions, LightCues, WrappedEnvironment
+from environment_allo import CONTEXTS_LABELS, Actions, LightCues, WrappedEnvironment
 from tqdm import tqdm
 
 # %%

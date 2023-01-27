@@ -15,12 +15,13 @@ dependencies:
   - jupyterlab-git
   - ipdb
   - black[jupyter]
-  - flake8
+  # - flake8
+  - ruff
   - ipywidgets
   - seaborn
   - nb_black
   # - pre-commit
   - tqdm
   - pandas
-  - isort
+  # - isort
   # pip:
