@@ -7,3 +7,4 @@ X.csv
 *.eps
 wtMatrix.json
 **/__pycache__/
+.~lock.*

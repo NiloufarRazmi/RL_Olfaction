@@ -60,6 +60,7 @@ import matplotlib.pyplot as plt
 # %%
 # Import packages
 import numpy as np
+from IPython.display import display
 from tqdm import tqdm
 
 # import pandas as pd

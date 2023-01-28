@@ -3,7 +3,6 @@ import itertools
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
-from environment import CONTEXTS_LABELS
 
 sns.set_theme()
 
@@ -180,7 +179,7 @@ def plot_tiles_locations(tiles_list, rows, cols, title=None):
     plt.show()
 
 
-def plot_q_values_maps(qtable, rows, cols):
+def plot_q_values_maps(qtable, rows, cols, labels):
     """Plot the heatmap of the Q-values.
 
     Also plot the best action's direction with arrows."""
@@ -195,7 +194,7 @@ def plot_q_values_maps(qtable, rows, cols):
         np.arange(2 * rows * cols, 3 * rows * cols),
         np.arange(3 * rows * cols, 4 * rows * cols),
     ]
-    for idx, title in enumerate(CONTEXTS_LABELS):
+    for idx, title in enumerate(labels):
         qtable_val_max, qtable_directions = qtable_directions_map(
             qtable[maps[idx], :], rows, cols
         )
@@ -228,7 +227,7 @@ def plot_states_actions_distribution(states, actions):
     plt.show()
 
 
-def plot_rotated_q_values_maps(qtable, rows, cols):
+def plot_rotated_q_values_maps(qtable, rows, cols, labels):
     # See https://stackoverflow.com/q/12848581/4129062
 
     fig, ax = plt.subplots(2, 2, figsize=(12, 10))
@@ -238,7 +237,7 @@ def plot_rotated_q_values_maps(qtable, rows, cols):
         np.arange(2 * rows * cols, 3 * rows * cols),
         np.arange(3 * rows * cols, 4 * rows * cols),
     ]
-    for idx, title in enumerate(CONTEXTS_LABELS):
+    for idx, title in enumerate(labels):
         qtable_val_max, qtable_directions = qtable_directions_map(
             qtable[maps[idx], :], rows, cols
         )
