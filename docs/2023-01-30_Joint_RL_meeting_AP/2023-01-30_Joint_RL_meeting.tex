@@ -1,0 +1,278 @@
+% Created 2023-01-30 Mon 00:18
+% Intended LaTeX compiler: lualatex
+\documentclass[bigger]{beamer}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{wrapfig}
+\usepackage{rotating}
+\usepackage[normalem]{ulem}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{capt-of}
+\usepackage{hyperref}
+\usetheme[progressbar=foot, sectionpage=none, numbering=fraction]{metropolis}
+\usepackage{tikz}
+\usepackage{booktabs}
+\usepackage{adjustbox}
+\usepackage{diagbox}
+\usepackage{latexcolors}
+\usetikzlibrary{automata, positioning, arrows, arrows.meta}
+\usepackage{diagbox}
+\usepackage{dsfont}
+\usepackage{amsmath}
+\usepackage{fontawesome5}
+\definecolor{RedBrown}{RGB}{192, 4, 4} \setbeamercolor{progress bar}{fg=RedBrown} \setbeamercolor{title separator}{fg=RedBrown}
+\setbeamercolor{progress bar in head/foot}{fg=RedBrown} \setbeamercolor{progress bar in section page}{fg=RedBrown} \setbeamercolor{alerted text}{fg=RedBrown}
+\pretocmd{\tableofcontents}{\thispagestyle{empty}}{}{}
+\addtocounter{framenumber}{-1}
+\usepackage{listings}
+\usepackage{xcolor}
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{HTML}{f0f0f0}
+\lstdefinestyle{mystyle}{
+backgroundcolor=\color{backcolour},
+commentstyle=\color{codegreen},
+keywordstyle=\color{magenta},
+numberstyle=\tiny\color{codegray},
+stringstyle=\color{codepurple},
+basicstyle=\ttfamily,
+breakatwhitespace=false,
+breaklines=true,
+captionpos=b,
+keepspaces=true,
+numbers=none,
+numbersep=5pt,
+showspaces=false,
+showstringspaces=false,
+showtabs=false,
+tabsize=2
+}
+\lstset{style=mystyle}
+\usetheme{default}
+\author{Andrea Pierré}
+\date{January 30\textsuperscript{th}, 2023}
+\title{Joint RL meeting}
+\subtitle{Gridworld implementation of Olivia's task}
+\institute{Brown University}
+\titlegraphic{\hfill\includegraphics[height=1.5cm]{img/Brown Logo_2016_2 Color Process ST_1300.png}}
+\setbeamercovered{transparent=10}
+\setbeamertemplate{section in toc}[sections numbered]
+\AtBeginSection[]{\begin{frame}[plain, noframenumbering]{Outline}    \setbeamertemplate{section in toc}[sections numbered]\setbeamertemplate{subsection in toc}[subsections numbered]\vspace{-0.8em}\tableofcontents[currentsection, currentsubsection]\end{frame}}
+\AtBeginSubsection[]{\begin{frame}[plain, noframenumbering]{Outline}\setbeamertemplate{section in toc}[sections numbered]\setbeamertemplate{subsection in toc}[subsections numbered]\tableofcontents[currentsection,currentsubsection]\end{frame}}
+\hypersetup{
+ pdfauthor={Andrea Pierré},
+ pdftitle={Joint RL meeting},
+ pdfkeywords={},
+ pdfsubject={},
+ pdfcreator={Emacs 28.2 (Org mode 9.6)}, 
+ pdflang={English}}
+\begin{document}
+
+\maketitle
+\begin{frame}{Outline}
+\tableofcontents
+\end{frame}
+
+\section{Implementation}
+\label{sec:org3de9fda}
+\begin{frame}[<+->][label={sec:org4471204},fragile]{Implementation}
+ \begin{itemize}
+\item RL concepts abstracted in high level functions :
+\begin{itemize}
+\item \texttt{reset()}: reset the environment at the end of the episode
+\item \texttt{reward()}: define in what conditions the agent get a reward and how much reward it gets
+\item \texttt{is\_terminated()}: define when the end of the episode has been reached
+\item \texttt{step()}: execute the defined action in the current state
+\scriptsize
+\begin{lstlisting}[language={Python}]
+new_state, reward, done = env.step(action, state)
+\end{lstlisting}
+\end{itemize}
+\end{itemize}
+\end{frame}
+\begin{frame}[<+->][label={sec:orgadb2eac}]{Implementation}
+\begin{itemize}
+\item Each step, the agent gets a composite observation:
+\end{itemize}
+\begin{center}
+\begin{tabular}{ll}
+\hline
+location & cue\\
+\hline
+\{0,\ldots{},24\} & North light\\
+ & South light\\
+ & Odor A\\
+ & Odor B\\
+\hline
+\end{tabular}
+\end{center}
+\begin{itemize}
+\item Convenience functions to translate the movements between the grid positions and the states
+\end{itemize}
+\end{frame}
+\begin{frame}[<+->][label={sec:orgeaead2b},fragile]{Implementation}
+\begin{itemize}
+\item Wrapper environment to translate the human readable environment (composite state) into a suitable environment for the Q-learning algorithm (flat state)
+\scriptsize
+\begin{lstlisting}[language={Python}]
+state = {"location": 13, "cue": LightCues.North}
+env.convert_composite_to_flat_state(state)
+# => 13
+\end{lstlisting}
+\begin{lstlisting}[language={Python}]
+state = 63
+env.convert_flat_state_to_composite(state)
+# => {"location": 13, "cue": <OdorID.A: 1>}
+\end{lstlisting}
+\item Human readable objects
+\scriptsize
+\begin{lstlisting}[language={Python}]
+action = 0
+Actions(action).name
+# => "UP"
+\end{lstlisting}
+\end{itemize}
+\end{frame}
+\section{Issues along the road}
+\label{sec:org65ac036}
+\begin{frame}[label={sec:orga4b3e9e}]{Not enough states to solve the task}
+\begin{columns}
+\begin{column}{0.45\columnwidth}
+\begin{center}
+\includegraphics[width=.9\linewidth]{img/state_space_1.png}
+\end{center}
+\begin{center}
+\includegraphics[width=.9\linewidth]{img/state_space_3.png}
+\end{center}
+\end{column}
+\begin{column}{0.45\columnwidth}
+\begin{center}
+\includegraphics[width=.9\linewidth]{img/state_space_2.png}
+\end{center}
+\begin{center}
+\includegraphics[width=.9\linewidth]{img/state_space_4.png}
+\end{center}
+\end{column}
+\end{columns}
+\end{frame}
+\begin{frame}[label={sec:orgc12e884}]{\(\epsilon\)-greedy when Q-values are identical}
+\begin{columns}
+\begin{column}{0.5\columnwidth}
+\centering
+Vanilla \epsilon-greedy\\[2em]
+\begin{center}
+\includegraphics[width=\textwidth]{img/hist_before.png}
+\end{center}
+\end{column}
+\begin{column}{0.5\columnwidth}
+\centering
+Randomly choosing actions with the same Q-values
+\begin{center}
+\includegraphics[width=\textwidth]{img/hist_after.png}
+\end{center}
+\end{column}
+\end{columns}
+\end{frame}
+\section{Results}
+\label{sec:org7126369}
+\begin{frame}[label={sec:org0b4d9a6}]{Standard Q-learning -- allocentric environment}
+\begin{center}
+\includegraphics[width=.9\linewidth]{img/q-learning_allo_steps_rewards.png}
+\end{center}
+\end{frame}
+\begin{frame}[label={sec:org166f475}]{Standard Q-learning -- allocentric environment}
+\begin{center}
+\includegraphics[width=.9\linewidth]{img/q-learning_allo_best_actions_maps.png}
+\end{center}
+\end{frame}
+\begin{frame}[label={sec:orgde36601}]{Q-learning with function approximation -- allocentric environment -- without joint representation}
+\begin{columns}
+\begin{column}{0.5\columnwidth}
+\begin{center}
+\includegraphics[height=0.4\textheight]{img/func_approx_allo_features_heatmap_nojointrep.png}
+\end{center}
+\end{column}
+\begin{column}{0.5\columnwidth}
+\begin{center}
+\includegraphics[width=\textwidth]{img/func_approx_allo_actions_states_hist_nojointrep.png}
+\end{center}
+\end{column}
+\end{columns}
+\begin{block}{~}
+\vspace{-2em}
+\begin{center}
+\includegraphics[height=0.4\textheight]{img/func_approx_allo_steps_rewards_nojointrep.png}
+\end{center}
+\end{block}
+\end{frame}
+\begin{frame}[label={sec:org8687aa1}]{Q-learning with function approximation -- allocentric environment -- without joint representation}
+\begin{center}
+\includegraphics[height=0.8\textheight]{img/func_approx_allo_best_actions_maps_nojointrep.png}
+\end{center}
+\end{frame}
+\begin{frame}[label={sec:org0f2f6f1}]{Q-learning with function approximation -- allocentric environment -- with joint representation}
+\begin{columns}
+\begin{column}{0.5\columnwidth}
+\begin{center}
+\includegraphics[height=0.4\textheight]{img/func_approx_allo_features_heatmap_jointrep.png}
+\end{center}
+\end{column}
+\begin{column}{0.5\columnwidth}
+\begin{center}
+\includegraphics[width=\textwidth]{img/func_approx_allo_actions_states_hist_jointrep.png}
+\end{center}
+\end{column}
+\end{columns}
+\begin{block}{~}
+\vspace{-2em}
+\begin{center}
+\includegraphics[height=0.4\textheight]{img/func_approx_allo_steps_rewards_jointrep.png}
+\end{center}
+\end{block}
+\end{frame}
+\begin{frame}[label={sec:org415d4ac}]{Q-learning with function approximation -- allocentric environment -- with joint representation}
+\begin{center}
+\includegraphics[height=0.8\textheight]{img/func_approx_allo_best_actions_maps_jointrep.png}
+\end{center}
+\end{frame}
+
+\begin{frame}[label={sec:org5e14e60}]{Standard Q-learning -- egocentric environment}
+\begin{center}
+\includegraphics[width=.9\linewidth]{img/q-learning_ego_steps_rewards.png}
+\end{center}
+\begin{block}{~}
+\centering
+\(\to\) Agent not learning (yet)
+\end{block}
+\end{frame}
+\begin{frame}[label={sec:org9ef76fe}]{Standard Q-learning -- egocentric environment}
+\begin{center}
+\includegraphics[height=0.9\textheight]{img/q-learning_ego_best_actions_maps.png}
+\end{center}
+\end{frame}
+\section{Main differences with Niloufar's model}
+\label{sec:org66c2eaa}
+\begin{frame}[label={sec:orge40f702}]{Main differences with Niloufar's model}
+\begin{columns}
+\begin{column}{0.7\columnwidth}
+\begin{itemize}
+\item The environment is \alert{closer to the real experiment} \(\to\)~ports are in the corners of the arena, not in the middle of the walls
+\item Code is clean, readable, and abstracted in high level functions/concepts
+\end{itemize}
+\end{column}
+\begin{column}{0.3\columnwidth}
+\begin{center}
+\includegraphics[width=\textwidth]{img/task.png}
+\end{center}
+\begin{center}
+\includegraphics[width=\textwidth]{img/q-learning_allo_best_actions_maps.png}
+\end{center}
+\end{column}
+\end{columns}
+\end{frame}
+\begin{frame}[label={sec:org62af5db},standout]{~}
+Questions ?
+\end{frame}
+\end{document}

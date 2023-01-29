@@ -1,0 +1,191 @@
+#+TITLE: Joint RL meeting
+#+SUBTITLE: Gridworld implementation of Olivia's task
+#+author: Andrea Pierré
+#+date: January 30^{th}, 2023
+* HEADER :noexport:
+#+SETUPFILE: ./style.org
+
+* Implementation
+** Implementation
+:PROPERTIES:
+:BEAMER_act: [<+->]
+:BEAMER_opt: fragile
+:END:
+- RL concepts abstracted in high level functions :
+  - ~reset()~: reset the environment at the end of the episode
+  - ~reward()~: define in what conditions the agent get a reward and how much reward it gets
+  - ~is_terminated()~: define when the end of the episode has been reached
+  - ~step()~: execute the defined action in the current state
+    #+begin_export latex
+    \scriptsize
+    \begin{lstlisting}[language={Python}]
+    new_state, reward, done = env.step(action, state)
+    \end{lstlisting}
+    #+end_export
+** Implementation
+:PROPERTIES:
+:BEAMER_act: [<+->]
+:END:
+- Each step, the agent gets a composite observation:
+|------------+-------------|
+| location   | cue         |
+|------------+-------------|
+| {0,...,24} | North light |
+|            | South light |
+|            | Odor A      |
+|            | Odor B      |
+|------------+-------------|
+- Convenience functions to translate the movements between the grid positions and the states
+** Implementation
+:PROPERTIES:
+:BEAMER_act: [<+->]
+:BEAMER_opt: fragile
+:END:
+- Wrapper environment to translate the human readable environment (composite state) into a suitable environment for the Q-learning algorithm (flat state)
+    #+begin_export latex
+    \scriptsize
+    \begin{lstlisting}[language={Python}]
+    state = {"location": 13, "cue": LightCues.North}
+    env.convert_composite_to_flat_state(state)
+    # => 13
+    \end{lstlisting}
+    \begin{lstlisting}[language={Python}]
+    state = 63
+    env.convert_flat_state_to_composite(state)
+    # => {"location": 13, "cue": <OdorID.A: 1>}
+    \end{lstlisting}
+    #+end_export
+- Human readable objects
+    #+begin_export latex
+    \scriptsize
+    \begin{lstlisting}[language={Python}]
+    action = 0
+    Actions(action).name
+    # => "UP"
+    \end{lstlisting}
+    #+end_export
+* Issues along the road
+** Not enough states to solve the task
+*** Left :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.45
+:END:
+[[file:img/state_space_1.png]]
+[[file:img/state_space_3.png]]
+*** Right :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.45
+:END:
+[[file:img/state_space_2.png]]
+[[file:img/state_space_4.png]]
+** \epsilon-greedy when Q-values are identical
+*** Left :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+#+begin_export latex
+\centering
+Vanilla \epsilon-greedy\\[2em]
+#+end_export
+#+ATTR_LaTeX: :width \textwidth
+  [[file:img/hist_before.png]]
+*** Right :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+#+begin_export latex
+\centering
+#+end_export
+Randomly choosing actions with the same Q-values
+#+ATTR_LaTeX: :width \textwidth
+[[file:img/hist_after.png]]
+* Results
+** Standard Q-learning -- allocentric environment
+[[file:img/q-learning_allo_steps_rewards.png]]
+** Standard Q-learning -- allocentric environment
+[[file:img/q-learning_allo_best_actions_maps.png]]
+** Q-learning with function approximation -- allocentric environment -- without joint representation
+*** Left :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+#+ATTR_LaTeX: :height 0.4\textheight
+[[file:img/func_approx_allo_features_heatmap_nojointrep.png]]
+*** Right :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+#+ATTR_LaTeX: :width \textwidth
+[[file:img/func_approx_allo_actions_states_hist_nojointrep.png]]
+*** \nbsp{}
+#+begin_export latex
+\vspace{-2em}
+#+end_export
+#+ATTR_LaTeX: :height 0.4\textheight
+[[file:img/func_approx_allo_steps_rewards_nojointrep.png]]
+** Q-learning with function approximation -- allocentric environment -- without joint representation
+#+ATTR_LaTeX: :height 0.8\textheight
+[[file:img/func_approx_allo_best_actions_maps_nojointrep.png]]
+** Q-learning with function approximation -- allocentric environment -- with joint representation
+*** Left :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+#+ATTR_LaTeX: :height 0.4\textheight
+[[file:img/func_approx_allo_features_heatmap_jointrep.png]]
+*** Right :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+#+ATTR_LaTeX: :width \textwidth
+[[file:img/func_approx_allo_actions_states_hist_jointrep.png]]
+*** \nbsp{}
+#+begin_export latex
+\vspace{-2em}
+#+end_export
+#+ATTR_LaTeX: :height 0.4\textheight
+[[file:img/func_approx_allo_steps_rewards_jointrep.png]]
+** Q-learning with function approximation -- allocentric environment -- with joint representation
+#+ATTR_LaTeX: :height 0.8\textheight
+[[file:img/func_approx_allo_best_actions_maps_jointrep.png]]
+
+** Standard Q-learning -- egocentric environment
+[[file:img/q-learning_ego_steps_rewards.png]]
+*** \nbsp{}
+#+begin_export latex
+\centering
+#+end_export
+\to Agent not learning (yet)
+** Standard Q-learning -- egocentric environment
+#+ATTR_LaTeX: :height 0.9\textheight
+[[file:img/q-learning_ego_best_actions_maps.png]]
+* Main differences with Niloufar's model
+** Main differences with Niloufar's model
+*** Left :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.7
+:END:
+- The environment is *closer to the real experiment* \to\nbsp{}ports are in the corners of the arena, not in the middle of the walls
+- Code is clean, readable, and abstracted in high level functions/concepts
+*** Right :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.3
+:END:
+#+ATTR_LaTeX: :width \textwidth
+  [[file:img/task.png]]
+#+ATTR_LaTeX: :width \textwidth
+[[file:img/q-learning_allo_best_actions_maps.png]]
+** \nbsp{}
+:PROPERTIES:
+:BEAMER_opt: standout
+:END:
+Questions ?
+* Feedback :noexport:
+** Implement new version of the task?
+** Intrinsic motivation
+** Some evidence neurons are tuned to single odors in LEC
+** RNN because memory of odor
+** Bob Datta Nature paper use RRN
+Recurrence learns to categorize
+** Neurons \to binary features mapping states to actions
+** Slide 16: why 75 instead 100 squared features activated ?

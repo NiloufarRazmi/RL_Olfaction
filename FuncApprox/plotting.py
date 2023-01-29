@@ -5,6 +5,7 @@ import numpy as np
 import seaborn as sns
 
 sns.set_theme()
+sns.set(font_scale=1.5)
 
 
 def plot_steps_and_rewards(df):
