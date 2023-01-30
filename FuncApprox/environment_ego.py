@@ -48,16 +48,17 @@ class Environment:
         self.rows = 5
         self.cols = 5
         self.tiles_locations = set(np.arange(self.rows * self.cols))
+        self.head_angle_space = [0, 90, 180, 270]  # In degrees, 0° being north
 
         self.action_space = set([item.value for item in Actions])
         self.numActions = len(self.action_space)
 
         self.state_space = {
             "location": self.tiles_locations,
+            "direction": self.head_angle_space,
             "cue": set(OdorID).union(LightCues),
         }
         self.numStates = tuple(len(item) for item in self.state_space.values())
-        self.head_angle_space = [0, 90, 180, 270]  # In degrees, 0° being north
         self.reset()
 
     def reset(self):
@@ -67,11 +68,11 @@ class Environment:
                 low=min(self.tiles_locations),
                 high=max(self.tiles_locations) + 1,
             ),
+            "direction": np.random.choice(self.head_angle_space),
             "cue": np.random.choice(LightCues),
         }
         self.odor_condition = OdorCondition.pre
         self.odor_ID = np.random.choice(OdorID)
-        self.head_direction = np.random.choice(self.head_angle_space)
         return start_state
 
     def is_terminated(self, state):
@@ -99,8 +100,8 @@ class Environment:
         new_state = {}
         new_state["cue"] = current_state["cue"]
         row, col = self.to_row_col(current_state)
-        newrow, newcol, self.head_direction = self.move(
-            row, col, action, self.head_direction
+        newrow, newcol, new_state["direction"] = self.move(
+            row, col, action, current_state["direction"]
         )
         new_state["location"] = self.to_state_location(newrow, newcol)
 
@@ -197,7 +198,13 @@ class WrappedEnvironment(Environment):
         super().__init__(params, rng=None)
 
         self.state_space = set(
-            np.arange(self.rows * self.cols * len(LightCues) * len(OdorCondition))
+            np.arange(
+                self.rows
+                * self.cols
+                * len(self.head_angle_space)
+                * len(LightCues)
+                * len(OdorCondition)
+            )
         )
         self.numStates = len(self.state_space)
         self.reset()
@@ -209,14 +216,42 @@ class WrappedEnvironment(Environment):
 
         if self.odor_condition == OdorCondition.pre:
             if state["cue"] == LightCues.North:
-                conv_state = state["location"]
+                if state["direction"] == 0:
+                    conv_state = state["location"] + 0 * tiles_num
+                elif state["direction"] == 90:
+                    conv_state = state["location"] + 1 * tiles_num
+                elif state["direction"] == 180:
+                    conv_state = state["location"] + 2 * tiles_num
+                elif state["direction"] == 270:
+                    conv_state = state["location"] + 3 * tiles_num
             elif state["cue"] == LightCues.South:
-                conv_state = state["location"] + tiles_num
+                if state["direction"] == 0:
+                    conv_state = state["location"] + 4 * tiles_num
+                elif state["direction"] == 90:
+                    conv_state = state["location"] + 5 * tiles_num
+                elif state["direction"] == 180:
+                    conv_state = state["location"] + 6 * tiles_num
+                elif state["direction"] == 270:
+                    conv_state = state["location"] + 7 * tiles_num
         elif self.odor_condition == OdorCondition.post:
             if state["cue"] == OdorID.A:
-                conv_state = state["location"] + 2 * tiles_num
+                if state["direction"] == 0:
+                    conv_state = state["location"] + 8 * tiles_num
+                elif state["direction"] == 90:
+                    conv_state = state["location"] + 9 * tiles_num
+                elif state["direction"] == 180:
+                    conv_state = state["location"] + 10 * tiles_num
+                elif state["direction"] == 270:
+                    conv_state = state["location"] + 11 * tiles_num
             elif state["cue"] == OdorID.B:
-                conv_state = state["location"] + 3 * tiles_num
+                if state["direction"] == 0:
+                    conv_state = state["location"] + 12 * tiles_num
+                elif state["direction"] == 90:
+                    conv_state = state["location"] + 13 * tiles_num
+                elif state["direction"] == 180:
+                    conv_state = state["location"] + 14 * tiles_num
+                elif state["direction"] == 270:
+                    conv_state = state["location"] + 15 * tiles_num
 
         if conv_state is None:
             raise ValueError("Impossible value for composite state")
@@ -226,20 +261,103 @@ class WrappedEnvironment(Environment):
     def convert_flat_state_to_composite(self, state):
         """Convert back flattened state to original composite state."""
         tiles_num = len(self.tiles_locations)
-        if state >= 3 * tiles_num and state < 4 * tiles_num:
+        if state >= 15 * tiles_num and state < 16 * tiles_num:
+            conv_state = {
+                "location": state - 15 * tiles_num,
+                "direction": 270,
+                "cue": OdorID.B,
+            }
+        elif state >= 14 * tiles_num and state < 15 * tiles_num:
+            conv_state = {
+                "location": state - 14 * tiles_num,
+                "direction": 180,
+                "cue": OdorID.B,
+            }
+        elif state >= 13 * tiles_num and state < 14 * tiles_num:
+            conv_state = {
+                "location": state - 13 * tiles_num,
+                "direction": 90,
+                "cue": OdorID.B,
+            }
+        elif state >= 12 * tiles_num and state < 13 * tiles_num:
+            conv_state = {
+                "location": state - 12 * tiles_num,
+                "direction": 0,
+                "cue": OdorID.B,
+            }
+        elif state >= 11 * tiles_num and state < 12 * tiles_num:
+            conv_state = {
+                "location": state - 11 * tiles_num,
+                "direction": 270,
+                "cue": OdorID.A,
+            }
+        elif state >= 10 * tiles_num and state < 11 * tiles_num:
+            conv_state = {
+                "location": state - 10 * tiles_num,
+                "direction": 180,
+                "cue": OdorID.A,
+            }
+        elif state >= 9 * tiles_num and state < 10 * tiles_num:
+            conv_state = {
+                "location": state - 9 * tiles_num,
+                "direction": 90,
+                "cue": OdorID.A,
+            }
+        elif state >= 8 * tiles_num and state < 9 * tiles_num:
+            conv_state = {
+                "location": state - 8 * tiles_num,
+                "direction": 0,
+                "cue": OdorID.A,
+            }
+        elif state >= 7 * tiles_num and state < 8 * tiles_num:
+            conv_state = {
+                "location": state - 7 * tiles_num,
+                "direction": 270,
+                "cue": LightCues.South,
+            }
+        elif state >= 6 * tiles_num and state < 7 * tiles_num:
+            conv_state = {
+                "location": state - 6 * tiles_num,
+                "direction": 180,
+                "cue": LightCues.South,
+            }
+        elif state >= 5 * tiles_num and state < 6 * tiles_num:
+            conv_state = {
+                "location": state - 5 * tiles_num,
+                "direction": 90,
+                "cue": LightCues.South,
+            }
+        elif state >= 4 * tiles_num and state < 5 * tiles_num:
+            conv_state = {
+                "location": state - 4 * tiles_num,
+                "direction": 0,
+                "cue": LightCues.South,
+            }
+        elif state >= 3 * tiles_num and state < 4 * tiles_num:
             conv_state = {
                 "location": state - 3 * tiles_num,
-                "cue": OdorID.B,
+                "direction": 270,
+                "cue": LightCues.North,
             }
         elif state >= 2 * tiles_num and state < 3 * tiles_num:
             conv_state = {
                 "location": state - 2 * tiles_num,
-                "cue": OdorID.A,
+                "direction": 180,
+                "cue": LightCues.North,
             }
-        elif state >= tiles_num and state < 2 * tiles_num:
-            conv_state = {"location": state - tiles_num, "cue": LightCues.South}
-        elif state < tiles_num:
-            conv_state = {"location": state, "cue": LightCues.North}
+        elif state >= 1 * tiles_num and state < 2 * tiles_num:
+            conv_state = {
+                "location": state - 1 * tiles_num,
+                "direction": 90,
+                "cue": LightCues.North,
+            }
+        elif state >= 0 and state < 1 * tiles_num:
+            conv_state = {
+                "location": state - 0 * tiles_num,
+                "direction": 0,
+                "cue": LightCues.North,
+            }
+
         else:
             raise ValueError("Impossible number for flat state")
         return conv_state

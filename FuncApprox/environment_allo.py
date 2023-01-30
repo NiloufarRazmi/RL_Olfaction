@@ -186,7 +186,7 @@ class WrappedEnvironment(Environment):
             }
         elif state >= tiles_num and state < 2 * tiles_num:
             conv_state = {"location": state - tiles_num, "cue": LightCues.South}
-        elif state < tiles_num:
+        elif state >= 0 and state < tiles_num:
             conv_state = {"location": state, "cue": LightCues.North}
         else:
             raise ValueError("Impossible number for flat state")
