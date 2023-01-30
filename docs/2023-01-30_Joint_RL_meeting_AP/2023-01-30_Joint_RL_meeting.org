@@ -150,24 +150,31 @@ Randomly choosing actions with the same Q-values
 [[file:img/func_approx_allo_best_actions_maps_jointrep.png]]
 
 ** Standard Q-learning -- egocentric environment
+#+ATTR_LaTeX: :height 0.4\textheight
+[[file:img/q-learning_ego_hist.png]]
 [[file:img/q-learning_ego_steps_rewards.png]]
-*** \nbsp{}
+*** \nbsp{} :noexport:
 #+begin_export latex
 \centering
 #+end_export
 \to Agent not learning (yet)
-** Standard Q-learning -- egocentric environment
+** Standard Q-learning -- egocentric environment :noexport:
 #+ATTR_LaTeX: :height 0.9\textheight
 [[file:img/q-learning_ego_best_actions_maps.png]]
+** Q-learning with function approximation -- egocentric environment
+#+ATTR_LaTeX: :height 0.5\textheight
+[[file:img/work-in-progress.png]]
+
 * Summary
 ** Summary
 :PROPERTIES:
 :BEAMER_act: [<+->]
 :END:
-- Standard Q-learning can learn the task in the allocentric environment
+- Standard Q-learning can learn the task in the *allocentric* environment in ~50 episodes
+- Standard Q-learning can learn the task in the *egocentric* environment in ~100 episodes
 - Niloufar's results with function approximation on the allocentric environment are reproducible :
   - The agent is *not able to learn* the task *without* having a place-odor joint representation
-  - *With* a place-odor joint representation, the agent is *able to learn the task*
+  - *With* a place-odor joint representation, the agent is *able to learn the task* in ~60 episodes
 ** Main differences with Niloufar's model
 *** Left :BMCOL:
 :PROPERTIES:
@@ -187,7 +194,7 @@ Randomly choosing actions with the same Q-values
 :PROPERTIES:
 :BEAMER_act: [<+->]
 :END:
-- Fix the issue(s) on the egocentric environment
+- Finish the egocentric environment
 - Replace the manually crafted features matrix by an artificial neural network, which should learn the necessary representations to solve the task from scratch
 ** \nbsp{}
 :PROPERTIES:
