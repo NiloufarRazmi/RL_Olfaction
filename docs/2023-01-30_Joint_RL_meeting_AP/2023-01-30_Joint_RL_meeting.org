@@ -26,7 +26,7 @@
 :PROPERTIES:
 :BEAMER_act: [<+->]
 :END:
-- Each step, the agent gets a composite observation:
+- At each step, the agent gets a composite observation:
 |------------+-------------|
 | location   | cue         |
 |------------+-------------|
@@ -41,13 +41,13 @@
 :BEAMER_act: [<+->]
 :BEAMER_opt: fragile
 :END:
-- Wrapper environment to translate the human readable environment (composite state) into a suitable environment for the Q-learning algorithm (flat state)
+- Wrapper environment to translate the human readable environment (*composite states*) into a suitable environment for the Q-learning algorithm (*flat states*)
     #+begin_export latex
     \scriptsize
     \begin{lstlisting}[language={Python}]
-    state = {"location": 13, "cue": LightCues.North}
+    state = {"location": 13, "cue": LightCues.South}
     env.convert_composite_to_flat_state(state)
-    # => 13
+    # => 38
     \end{lstlisting}
     \begin{lstlisting}[language={Python}]
     state = 63
@@ -159,7 +159,15 @@ Randomly choosing actions with the same Q-values
 ** Standard Q-learning -- egocentric environment
 #+ATTR_LaTeX: :height 0.9\textheight
 [[file:img/q-learning_ego_best_actions_maps.png]]
-* Main differences with Niloufar's model
+* Summary
+** Summary
+:PROPERTIES:
+:BEAMER_act: [<+->]
+:END:
+- Standard Q-learning can learn the task in the allocentric environment
+- Niloufar's results with function approximation on the allocentric environment are reproducible :
+  - The agent is *not able to learn* the task *without* having a place-odor joint representation
+  - *With* a place-odor joint representation, the agent is *able to learn the task*
 ** Main differences with Niloufar's model
 *** Left :BMCOL:
 :PROPERTIES:
@@ -175,6 +183,12 @@ Randomly choosing actions with the same Q-values
   [[file:img/task.png]]
 #+ATTR_LaTeX: :width \textwidth
 [[file:img/q-learning_allo_best_actions_maps.png]]
+** Next steps
+:PROPERTIES:
+:BEAMER_act: [<+->]
+:END:
+- Fix the issue(s) on the egocentric environment
+- Replace the manually crafted features matrix by an artificial neural network, which should learn the necessary representations to solve the task from scratch
 ** \nbsp{}
 :PROPERTIES:
 :BEAMER_opt: standout
@@ -187,5 +201,7 @@ Questions ?
 ** RNN because memory of odor
 ** Bob Datta Nature paper use RRN
 Recurrence learns to categorize
-** Neurons \to binary features mapping states to actions
+** Correct to call them neurons?
+\to binary features mapping states to actions ?
 ** Slide 16: why 75 instead 100 squared features activated ?
+** Why all this focus on the egocentric version ?

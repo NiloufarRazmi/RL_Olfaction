@@ -1,4 +1,4 @@
-% Created 2023-01-30 Mon 00:18
+% Created 2023-01-30 Mon 03:59
 % Intended LaTeX compiler: lualatex
 \documentclass[bigger]{beamer}
 \usepackage{graphicx}
@@ -76,8 +76,8 @@ tabsize=2
 \end{frame}
 
 \section{Implementation}
-\label{sec:org3de9fda}
-\begin{frame}[<+->][label={sec:org4471204},fragile]{Implementation}
+\label{sec:org931709c}
+\begin{frame}[<+->][label={sec:org43a5470},fragile]{Implementation}
  \begin{itemize}
 \item RL concepts abstracted in high level functions :
 \begin{itemize}
@@ -92,9 +92,9 @@ new_state, reward, done = env.step(action, state)
 \end{itemize}
 \end{itemize}
 \end{frame}
-\begin{frame}[<+->][label={sec:orgadb2eac}]{Implementation}
+\begin{frame}[<+->][label={sec:org154f7d3}]{Implementation}
 \begin{itemize}
-\item Each step, the agent gets a composite observation:
+\item At each step, the agent gets a composite observation:
 \end{itemize}
 \begin{center}
 \begin{tabular}{ll}
@@ -112,14 +112,14 @@ location & cue\\
 \item Convenience functions to translate the movements between the grid positions and the states
 \end{itemize}
 \end{frame}
-\begin{frame}[<+->][label={sec:orgeaead2b},fragile]{Implementation}
+\begin{frame}[<+->][label={sec:org3e4e6f7},fragile]{Implementation}
 \begin{itemize}
-\item Wrapper environment to translate the human readable environment (composite state) into a suitable environment for the Q-learning algorithm (flat state)
+\item Wrapper environment to translate the human readable environment (\alert{composite states}) into a suitable environment for the Q-learning algorithm (\alert{flat states})
 \scriptsize
 \begin{lstlisting}[language={Python}]
-state = {"location": 13, "cue": LightCues.North}
+state = {"location": 13, "cue": LightCues.South}
 env.convert_composite_to_flat_state(state)
-# => 13
+# => 38
 \end{lstlisting}
 \begin{lstlisting}[language={Python}]
 state = 63
@@ -136,8 +136,8 @@ Actions(action).name
 \end{itemize}
 \end{frame}
 \section{Issues along the road}
-\label{sec:org65ac036}
-\begin{frame}[label={sec:orga4b3e9e}]{Not enough states to solve the task}
+\label{sec:org9d3099e}
+\begin{frame}[label={sec:org105268c}]{Not enough states to solve the task}
 \begin{columns}
 \begin{column}{0.45\columnwidth}
 \begin{center}
@@ -157,7 +157,7 @@ Actions(action).name
 \end{column}
 \end{columns}
 \end{frame}
-\begin{frame}[label={sec:orgc12e884}]{\(\epsilon\)-greedy when Q-values are identical}
+\begin{frame}[label={sec:org111bb06}]{\(\epsilon\)-greedy when Q-values are identical}
 \begin{columns}
 \begin{column}{0.5\columnwidth}
 \centering
@@ -176,18 +176,18 @@ Randomly choosing actions with the same Q-values
 \end{columns}
 \end{frame}
 \section{Results}
-\label{sec:org7126369}
-\begin{frame}[label={sec:org0b4d9a6}]{Standard Q-learning -- allocentric environment}
+\label{sec:org5755321}
+\begin{frame}[label={sec:org157858e}]{Standard Q-learning -- allocentric environment}
 \begin{center}
 \includegraphics[width=.9\linewidth]{img/q-learning_allo_steps_rewards.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org166f475}]{Standard Q-learning -- allocentric environment}
+\begin{frame}[label={sec:org6a94ded}]{Standard Q-learning -- allocentric environment}
 \begin{center}
 \includegraphics[width=.9\linewidth]{img/q-learning_allo_best_actions_maps.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:orgde36601}]{Q-learning with function approximation -- allocentric environment -- without joint representation}
+\begin{frame}[label={sec:org67ecb85}]{Q-learning with function approximation -- allocentric environment -- without joint representation}
 \begin{columns}
 \begin{column}{0.5\columnwidth}
 \begin{center}
@@ -207,12 +207,12 @@ Randomly choosing actions with the same Q-values
 \end{center}
 \end{block}
 \end{frame}
-\begin{frame}[label={sec:org8687aa1}]{Q-learning with function approximation -- allocentric environment -- without joint representation}
+\begin{frame}[label={sec:org51292cd}]{Q-learning with function approximation -- allocentric environment -- without joint representation}
 \begin{center}
 \includegraphics[height=0.8\textheight]{img/func_approx_allo_best_actions_maps_nojointrep.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org0f2f6f1}]{Q-learning with function approximation -- allocentric environment -- with joint representation}
+\begin{frame}[label={sec:org2c2b773}]{Q-learning with function approximation -- allocentric environment -- with joint representation}
 \begin{columns}
 \begin{column}{0.5\columnwidth}
 \begin{center}
@@ -232,13 +232,13 @@ Randomly choosing actions with the same Q-values
 \end{center}
 \end{block}
 \end{frame}
-\begin{frame}[label={sec:org415d4ac}]{Q-learning with function approximation -- allocentric environment -- with joint representation}
+\begin{frame}[label={sec:org9af107b}]{Q-learning with function approximation -- allocentric environment -- with joint representation}
 \begin{center}
 \includegraphics[height=0.8\textheight]{img/func_approx_allo_best_actions_maps_jointrep.png}
 \end{center}
 \end{frame}
 
-\begin{frame}[label={sec:org5e14e60}]{Standard Q-learning -- egocentric environment}
+\begin{frame}[label={sec:org698ab6d}]{Standard Q-learning -- egocentric environment}
 \begin{center}
 \includegraphics[width=.9\linewidth]{img/q-learning_ego_steps_rewards.png}
 \end{center}
@@ -247,14 +247,24 @@ Randomly choosing actions with the same Q-values
 \(\to\) Agent not learning (yet)
 \end{block}
 \end{frame}
-\begin{frame}[label={sec:org9ef76fe}]{Standard Q-learning -- egocentric environment}
+\begin{frame}[label={sec:org7fc92e0}]{Standard Q-learning -- egocentric environment}
 \begin{center}
 \includegraphics[height=0.9\textheight]{img/q-learning_ego_best_actions_maps.png}
 \end{center}
 \end{frame}
-\section{Main differences with Niloufar's model}
-\label{sec:org66c2eaa}
-\begin{frame}[label={sec:orge40f702}]{Main differences with Niloufar's model}
+\section{Summary}
+\label{sec:orgc93c3a5}
+\begin{frame}[<+->][label={sec:org52d6489}]{Summary}
+\begin{itemize}
+\item Standard Q-learning can learn the task in the allocentric environment
+\item Niloufar's results with function approximation on the allocentric environment are reproducible :
+\begin{itemize}
+\item The agent is \alert{not able to learn} the task \alert{without} having a place-odor joint representation
+\item \alert{With} a place-odor joint representation, the agent is \alert{able to learn the task}
+\end{itemize}
+\end{itemize}
+\end{frame}
+\begin{frame}[label={sec:org1eefb35}]{Main differences with Niloufar's model}
 \begin{columns}
 \begin{column}{0.7\columnwidth}
 \begin{itemize}
@@ -272,7 +282,13 @@ Randomly choosing actions with the same Q-values
 \end{column}
 \end{columns}
 \end{frame}
-\begin{frame}[label={sec:org62af5db},standout]{~}
+\begin{frame}[<+->][label={sec:org7d8d44e}]{Next steps}
+\begin{itemize}
+\item Fix the issue(s) on the egocentric environment
+\item Replace the manually crafted features matrix by an artificial neural network, which should learn the necessary representations to solve the task from scratch
+\end{itemize}
+\end{frame}
+\begin{frame}[label={sec:org46965e5},standout]{~}
 Questions ?
 \end{frame}
 \end{document}
