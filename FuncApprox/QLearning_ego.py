@@ -92,7 +92,8 @@ state = 63
 env.convert_flat_state_to_composite(state)
 
 # %%
-env.convert_composite_to_flat_state({"location": 13, "cue": LightCues.North})
+state = {"location": 13, "direction": 90, "cue": LightCues.North}
+env.convert_composite_to_flat_state(state)
 
 # %% [markdown]
 # ### Action meaning

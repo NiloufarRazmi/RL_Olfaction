@@ -98,14 +98,14 @@ plotting.plot_heatmap(matrix=learner.features, title="Features")
 # ## States and actions meaning
 
 # %% tags=[]
-# State space
-for idx, label in enumerate(CONTEXTS_LABELS):
-    plotting.plot_tiles_locations(
-        np.array(list(env.tiles_locations)) + idx * len(env.tiles_locations),
-        env.rows,
-        env.cols,
-        title=label,
-    )
+# # State space
+# for idx, label in enumerate(CONTEXTS_LABELS):
+#     plotting.plot_tiles_locations(
+#         np.array(list(env.tiles_locations)) + idx * len(env.tiles_locations),
+#         env.rows,
+#         env.cols,
+#         title=label,
+#     )
 
 # %% [markdown]
 # ### Correspondance between flat states and (internal) composite states
@@ -115,7 +115,8 @@ state = 63
 env.convert_flat_state_to_composite(state)
 
 # %%
-env.convert_composite_to_flat_state({"location": 13, "cue": LightCues.North})
+state = {"location": 13, "direction": 90, "cue": LightCues.North}
+env.convert_composite_to_flat_state(state)
 
 # %% [markdown]
 # ### Action meaning
