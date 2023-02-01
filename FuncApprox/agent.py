@@ -26,14 +26,15 @@ class Qlearning:
 
 
 class QLearningFuncApprox:
-    def __init__(self, learning_rate, gamma, state_size, action_size, jointRep):
+    def __init__(
+        self, learning_rate, gamma, state_size, action_size, features_matrix=None
+    ):
         self.learning_rate = learning_rate
         self.gamma = gamma
-        if jointRep:
-            self.features = np.eye(state_size * action_size, state_size * action_size)
+        if features_matrix is None:
+            self.features = np.eye(state_size, state_size)
         else:
-            tmp = np.eye(state_size, state_size)
-            self.features = np.matlib.repmat(tmp, action_size, action_size)
+            self.features = features_matrix
         self.weights = np.zeros((self.features.shape[0], action_size))
         self.reset_Q_hat_table()
 

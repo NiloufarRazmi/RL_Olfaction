@@ -186,7 +186,7 @@ plotting.plot_states_actions_distribution(all_states, all_actions)
 plotting.plot_steps_and_rewards(res)
 
 # %%
-plotting.plot_q_values_maps(qtable, env.rows, env.cols, CONTEXTS_LABELS)
+# plotting.plot_q_values_maps(qtable, env.rows, env.cols, CONTEXTS_LABELS)
 
 # %%
-plotting.plot_rotated_q_values_maps(qtable, env.rows, env.cols, CONTEXTS_LABELS)
+# plotting.plot_rotated_q_values_maps(qtable, env.rows, env.cols, CONTEXTS_LABELS)

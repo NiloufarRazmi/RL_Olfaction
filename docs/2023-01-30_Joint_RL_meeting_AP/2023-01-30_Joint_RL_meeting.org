@@ -212,3 +212,7 @@ Recurrence learns to categorize
 \to binary features mapping states to actions ?
 ** Slide 16: why 75 instead 100 squared features activated ?
 ** Why all this focus on the egocentric version ?
+** Work on representations
+** What about the neural data?
+** Worth combining ego + allo?
+** Compare the representations learned from scratch from the neural data

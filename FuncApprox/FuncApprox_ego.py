@@ -33,7 +33,13 @@ import numpy as np
 import pandas as pd
 import plotting
 from agent import EpsilonGreedy, QLearningFuncApprox
-from environment_ego import CONTEXTS_LABELS, Actions, LightCues, WrappedEnvironment
+from environment_ego import (
+    CONTEXTS_LABELS,
+    Actions,
+    LightCues,
+    OdorID,
+    WrappedEnvironment,
+)
 from tqdm import tqdm
 
 # %%
@@ -51,7 +57,7 @@ from utils import Params
 
 # %%
 # Choose the parameters for the task
-params = Params(epsilon=0.1, n_runs=3, numEpisodes=100, jointRep=True, alpha=0.025)
+params = Params(epsilon=0.1, n_runs=3, numEpisodes=200, alpha=0.025)
 params
 
 # %% [markdown]
@@ -62,15 +68,31 @@ params
 env = WrappedEnvironment(params)
 
 # %%
+# Manually engineered features, optional
+# if `None`, a diagonal matrix of features will be created automatically
+features = np.matlib.repmat(
+    np.eye(
+        len(env.tiles_locations) * len(env.head_angle_space),
+        len(env.tiles_locations) * len(env.head_angle_space),
+    ),
+    len(LightCues) * len(OdorID),
+    len(LightCues) * len(OdorID),
+)
+features = None
+
+# %%
 # Load the agent algorithms
 learner = QLearningFuncApprox(
     learning_rate=params.alpha,
     gamma=params.gamma,
-    state_size=len(env.tiles_locations),
+    state_size=env.numStates,
     action_size=env.numActions,
-    jointRep=params.jointRep,
+    features_matrix=features,
 )
 explorer = EpsilonGreedy(epsilon=params.epsilon)
+
+# %%
+plotting.plot_heatmap(matrix=learner.features, title="Features")
 
 # %% [markdown]
 # ## States and actions meaning
@@ -182,9 +204,6 @@ res
 # ## Visualization
 
 # %%
-plotting.plot_heatmap(matrix=learner.features, title="Features")
-
-# %%
 plotting.plot_heatmap(matrix=learner.weights, title="Weights")
 
 # %%
@@ -197,7 +216,7 @@ plotting.plot_states_actions_distribution(all_states, all_actions)
 plotting.plot_steps_and_rewards(res)
 
 # %%
-plotting.plot_q_values_maps(qtable, env.rows, env.cols, CONTEXTS_LABELS)
+# plotting.plot_q_values_maps(qtable, env.rows, env.cols, CONTEXTS_LABELS)
 
 # %%
-plotting.plot_rotated_q_values_maps(qtable, env.rows, env.cols, CONTEXTS_LABELS)
+# plotting.plot_rotated_q_values_maps(qtable, env.rows, env.cols, CONTEXTS_LABELS)
