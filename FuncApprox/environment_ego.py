@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from enum import Enum
 
 import numpy as np
@@ -31,12 +32,14 @@ class Actions(Enum):
     LEFT = 2
 
 
-CONTEXTS_LABELS = [
-    "Pre odor - North light",
-    "Pre odor - South light",
-    "Post odor - Odor A",
-    "Post odor - Odor B",
-]
+CONTEXTS_LABELS = OrderedDict(
+    [
+        (str(LightCues.North), "Pre odor - North light"),
+        (str(LightCues.South), "Pre odor - South light"),
+        (str(OdorID.A), "Post odor - Odor A"),
+        (str(OdorID.B), "Post odor - Odor B"),
+    ]
+)
 
 
 class Environment:
@@ -49,6 +52,7 @@ class Environment:
         self.cols = 5
         self.tiles_locations = set(np.arange(self.rows * self.cols))
         self.head_angle_space = [0, 90, 180, 270]  # In degrees, 0° being north
+        self.cues = set(OdorID).union(LightCues)
 
         self.action_space = set([item.value for item in Actions])
         self.numActions = len(self.action_space)
@@ -56,7 +60,7 @@ class Environment:
         self.state_space = {
             "location": self.tiles_locations,
             "direction": self.head_angle_space,
-            "cue": set(OdorID).union(LightCues),
+            "cue": self.cues,
         }
         self.numStates = tuple(len(item) for item in self.state_space.values())
         self.reset()

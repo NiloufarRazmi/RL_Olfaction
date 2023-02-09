@@ -16,6 +16,7 @@ def plot_steps_and_rewards(df):
 
     sns.lineplot(data=df, x="Episodes", y="Steps", ax=ax[1])
     # ax[1].set(ylabel="Averaged steps number")
+    fig.tight_layout()
 
     plt.show()
 
@@ -220,11 +221,12 @@ def plot_q_values_maps(qtable, rows, cols, labels):
 
 def plot_states_actions_distribution(states, actions):
     """Plot the distributions of states and actions."""
-    fig, ax = plt.subplots(2, 1, figsize=(15, 8))
+    fig, ax = plt.subplots(2, 1, figsize=(12, 5))
     sns.histplot(data=states, ax=ax[0], kde=True)
     ax[0].set_title("States")
     sns.histplot(data=actions, ax=ax[1])
     ax[1].set_title("Actions")
+    fig.tight_layout()
     plt.show()
 
 

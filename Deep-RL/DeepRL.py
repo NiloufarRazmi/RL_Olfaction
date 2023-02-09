@@ -92,7 +92,6 @@ allError = np.nan * np.ones(nTot)
 catPredict = np.nan * np.ones(nTot)
 
 for i in tqdm(range(nTrain)):
-
     # Generate model prediction (forward pass of activity through units):
     activity = [np.array([]) for _ in range(p.nLayers)]
     for j in range(p.nLayers):

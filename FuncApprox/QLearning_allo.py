@@ -113,7 +113,6 @@ all_states = []
 all_actions = []
 
 for run in range(params.n_runs):  # Run several times to account for stochasticity
-
     learner.reset_qtable()  # Reset the Q-table between runs
 
     for episode in tqdm(
