@@ -52,7 +52,7 @@ class Environment:
         self.cols = 5
         self.tiles_locations = set(np.arange(self.rows * self.cols))
         self.head_angle_space = [0, 90, 180, 270]  # In degrees, 0° being north
-        self.cues = set(OdorID).union(LightCues)
+        self.cues = [*LightCues, *OdorID]
 
         self.action_space = set([item.value for item in Actions])
         self.numActions = len(self.action_space)
