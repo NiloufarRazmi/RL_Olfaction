@@ -30,7 +30,6 @@
 # %%
 # Import packages
 # from pprint import pprint
-from collections import OrderedDict
 
 import numpy as np
 import pandas as pd
@@ -102,20 +101,7 @@ plotting.plot_heatmap(matrix=learner.features, title="Features")
 # ## States and actions meaning
 
 # %%
-idx = 0
-rows = env.rows
-cols = env.cols
-states = OrderedDict()
-count = 0
-for idx, cue in enumerate(env.cues):
-    states[str(cue)] = OrderedDict()
-    for jdx, angle in enumerate(env.head_angle_space):
-        states[str(cue)][angle] = np.arange(
-            (idx + jdx + count) * rows * cols,
-            (idx + jdx + count + 1) * rows * cols,
-        )
-    count += jdx
-states
+env.get_states_structure()
 
 # %% [markdown]
 # ### Correspondance between flat states and (internal) composite states
@@ -226,7 +212,9 @@ plotting.plot_states_actions_distribution(all_states, all_actions)
 plotting.plot_steps_and_rewards(res)
 
 # %%
-q_val_best = plotting_ego.qtable_directions_map_ego(qtable, rows, cols, states)
+q_val_best = plotting_ego.qtable_directions_map_ego(
+    qtable, env.rows, env.cols, env.get_states_structure()
+)
 # pprint(q_val_best)
 
 # %%

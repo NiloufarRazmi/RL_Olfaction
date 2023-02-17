@@ -213,9 +213,16 @@ Recurrence learns to categorize
 ** Slide 16: why 75 instead 100 squared features activated ?
 ** Why all this focus on the egocentric version ?
 ** TODO Work on representations
-*** TODO Ask Olivia for the literature references from her presentation
+*** DONE Ask Olivia for the literature references from her presentation
 ** What about the neural data?
 *** Compare the representations learned from scratch from the neural data
 ** [?] Worth combining ego + allo?
 - [[https://studywolf.wordpress.com/2015/04/09/reinforcement-learning-part-4-combining-egocentric-and-allocentric/][Reinforcement Learning part 4: Combining egocentric and allocentric]]
 - [[https://github.com/studywolf/blog/blob/master/RL/combination%20allo%20and%20ego/egoalloBasic.py#L53][egoalloBasic.py]]
+** Egocentric *action* space
+or ego agent
+** Allocentric *action* space instead of environment?
+** Check first trial why it learns
+** Break tile in 4?
+** Heatmap of states occupancy?
+** Don't randomize the start of the episode, make it continue from the previous episode

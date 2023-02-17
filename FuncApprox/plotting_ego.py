@@ -30,8 +30,8 @@ def arrow_right(x, y):
 def arrow_down(x, y):
     x_tail = x
     x_head = x
-    y_tail = y - 0.25 * 0.75
-    y_head = y + 0.25 * 0.75
+    y_tail = y + 0.25 * 0.75
+    y_head = y - 0.25 * 0.75
     res = pd.DataFrame(
         {
             "x_tail": [x_tail],
@@ -46,8 +46,8 @@ def arrow_down(x, y):
 def arrow_up(x, y):
     x_tail = x
     x_head = x
-    y_tail = y + 0.25 * 0.75
-    y_head = y - 0.25 * 0.75
+    y_tail = y - 0.25 * 0.75
+    y_head = y + 0.25 * 0.75
     res = pd.DataFrame(
         {
             "x_tail": [x_tail],
@@ -75,42 +75,54 @@ def arrow_left(x, y):
     return res
 
 
+def convert_row_origin(row, rows):
+    """Convert row and column for plotting.
+
+    In the environment, row and col starts in the top left corner,
+    but for plotting the origin is in the bottom left corner."""
+    max_row_idx = rows - 1
+    conv_row = max_row_idx - row
+    return conv_row
+
+
 def draw_single_tile_arrows(row, col, arrows_tile, ax):
     coord_center_arrows = pd.DataFrame(
         {
-            "x": [0.5 + col, 0.25 + col, 0.5 + col, 0.75 + col],
-            "y": [0.25 + row, 0.5 + row, 0.75 + row, 0.5 + row],
+            "x": [0.5 + col, 0.75 + col, 0.5 + col, 0.25 + col],
+            "y": [0.75 + row, 0.5 + row, 0.25 + row, 0.5 + row],
+            "angle": arrows_tile.keys(),
         }
-    )
+    ).set_index("angle")
 
     arrows_coords = pd.DataFrame(
-        {"x_tail": [], "y_tail": [], "x_head": [], "y_head": []}
+        {"x_tail": [], "y_tail": [], "x_head": [], "y_head": [], "angle": []}
     )
-    for angle_idx, angle in enumerate(arrows_tile):
-        direction = arrows_tile[angle]["direction"]
+
+    for angle in arrows_tile:
+        direction = arrows_tile[angle]["direction"]  # Get the `partial` function
+        x = coord_center_arrows.loc[angle].x
+        y = coord_center_arrows.loc[angle].y
+        direction_df = direction(x, y)  # Apply the `partial` function
+        direction_df["angle"] = angle
         arrows_coords = pd.concat(
-            [
-                arrows_coords,
-                direction(
-                    coord_center_arrows.x[angle_idx],
-                    coord_center_arrows.y[angle_idx],
-                ),
-            ],
+            [arrows_coords, direction_df],
             ignore_index=True,
         )
-    arrows_coords["angle"] = arrows_tile.keys()
+    arrows_coords["angle"] = coord_center_arrows.index
+    arrows_coords.set_index("angle", inplace=True)
 
-    for jdx, coord in arrows_coords.iterrows():
+    for angle, coord in arrows_coords.iterrows():
         arrow = mpatches.FancyArrowPatch(
             (coord.x_tail, coord.y_tail),
             (coord.x_head, coord.y_head),
             mutation_scale=10,
-            color=arrows_tile[coord.angle]["color"],
+            color=arrows_tile[angle]["color"],
         )
         ax.add_patch(arrow)
 
 
 def map_action_to_direction(action, head_direction):
+    """Map egocentric action to its corresponding allocentric arrow direction."""
     arrow_directions = {
         "up": partial(arrow_up),
         "down": partial(arrow_down),
@@ -175,10 +187,11 @@ def qtable_directions_map_ego(qtable, rows, cols, states):
     return q_val_best
 
 
-def plot_ego_q_values_maps(qtable, rows, cols, labels, q_val_best):
+def plot_ego_q_values_maps(qtable, rows, cols, labels, states):
     """Plot the heatmap of the Q-values.
 
     Also plot the best action's direction with arrows."""
+    q_val_best = qtable_directions_map_ego(qtable, rows, cols, states)
 
     cmap = sns.color_palette("Blues", as_cmap=True)
     norm = mpl.colors.Normalize(vmin=qtable.min(), vmax=qtable.max())
@@ -203,8 +216,10 @@ def plot_ego_q_values_maps(qtable, rows, cols, labels, q_val_best):
         ax[idx].set_title(labels[cue])
 
         for row in range(rows):
+            conv_row = convert_row_origin(row, rows)
             for col in range(cols):
-                arrows_tile = {}
+                # Get the data to plot for each angle
+                arrows_tile = OrderedDict()
                 for angle in q_val_best[cue]:
                     arrows_tile[angle] = {}
                     arrows_tile[angle]["direction"] = np.array(
@@ -214,13 +229,15 @@ def plot_ego_q_values_maps(qtable, rows, cols, labels, q_val_best):
                         rows, cols
                     )[row, col]
                     arrows_tile[angle]["color"] = cmap(norm(q_max))
+
+                # Plot arrows for all 4 angles for a single tile
                 draw_single_tile_arrows(
-                    row=row,
+                    row=conv_row,
                     col=col,
                     arrows_tile=arrows_tile,
                     ax=ax[idx],
                 )
 
     clb = fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap), cax=ax_clb)
-    clb.ax.set_title('Q-value')
+    clb.ax.set_title("Q-value")
     plt.show()
