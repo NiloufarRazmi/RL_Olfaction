@@ -193,7 +193,7 @@ def plot_ego_q_values_maps(qtable, rows, cols, labels, states):
     Also plot the best action's direction with arrows."""
     q_val_best = qtable_directions_map_ego(qtable, rows, cols, states)
 
-    cmap = sns.color_palette("Blues", as_cmap=True)
+    cmap = mpl.colormaps["PuRd"]
     norm = mpl.colors.Normalize(vmin=qtable.min(), vmax=qtable.max())
 
     fig = plt.figure(figsize=(12, 10))

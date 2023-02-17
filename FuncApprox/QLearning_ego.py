@@ -32,8 +32,9 @@
 import numpy as np
 import pandas as pd
 import plotting
+import plotting_ego
 from agent import EpsilonGreedy, Qlearning
-from environment_ego import Actions, LightCues, WrappedEnvironment
+from environment_ego import CONTEXTS_LABELS, Actions, LightCues, WrappedEnvironment
 from tqdm import tqdm
 
 # %%
@@ -51,7 +52,7 @@ from utils import Params
 
 # %%
 # Choose the parameters for the task
-params = Params(epsilon=0.1, n_runs=3, numEpisodes=200)
+params = Params(epsilon=0.1, n_runs=3, numEpisodes=2000)
 params
 
 # %% [markdown]
@@ -75,14 +76,7 @@ explorer = EpsilonGreedy(epsilon=params.epsilon)
 # ## States and actions meaning
 
 # %% tags=[]
-# # State space
-# for idx, label in enumerate(CONTEXTS_LABELS):
-#     plotting.plot_tiles_locations(
-#         np.array(list(env.tiles_locations)) + idx * len(env.tiles_locations),
-#         env.rows,
-#         env.cols,
-#         title=label,
-#     )
+env.get_states_structure()
 
 # %% [markdown]
 # ### Correspondance between flat states and (internal) composite states
@@ -184,3 +178,8 @@ plotting.plot_states_actions_distribution(all_states, all_actions)
 
 # %%
 plotting.plot_steps_and_rewards(res)
+
+# %% tags=[]
+plotting_ego.plot_ego_q_values_maps(
+    qtable, env.rows, env.cols, CONTEXTS_LABELS, env.get_states_structure()
+)
