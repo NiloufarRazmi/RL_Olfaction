@@ -60,7 +60,7 @@ from utils import Params
 
 # %%
 # Choose the parameters for the task
-params = Params(epsilon=0.1, n_runs=3, numEpisodes=2000, alpha=0.025)
+params = Params(epsilon=0.1, n_runs=3, numEpisodes=1000, alpha=0.025)
 params
 
 # %% [markdown]
@@ -215,30 +215,3 @@ plotting.plot_steps_and_rewards(res)
 plotting_ego.plot_ego_q_values_maps(
     qtable, env.rows, env.cols, CONTEXTS_LABELS, env.get_states_structure()
 )
-
-# %%
-q_val_best = plotting_ego.qtable_directions_map_ego(
-    qtable, env.rows, env.cols, env.get_states_structure()
-)
-# pprint(q_val_best)
-
-# %% tags=[]
-env.get_states_structure()[OdorID.B]
-
-# %% tags=[]
-env.get_states_structure()[OdorID.B][90].reshape(5, 5)
-
-# %% tags=[]
-np.argmax(qtable, axis=0)
-
-# %% tags=[]
-qtable[329, :], qtable[280, :], qtable[373, :]
-
-# %% tags=[]
-Actions(0), Actions(1), Actions(2)
-
-# %% tags=[]
-q_val_best[OdorID.B][90]["q_max"][4], q_val_best[OdorID.B][90]["best_action"][4]
-
-# %% tags=[]
-plotting_ego.map_action_to_direction(Actions(0), 90)

@@ -171,7 +171,7 @@ class Environment:
             elif action == Actions.RIGHT.value:
                 head_direction, row = DOWN(row)
             elif action == Actions.FORWARD.value:
-                head_direction, row = RIGHT(col)
+                head_direction, col = RIGHT(col)
 
         elif head_direction == 180:  # Facing south
             if action == Actions.LEFT.value:

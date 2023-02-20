@@ -6,7 +6,6 @@ import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import seaborn as sns
 from environment_ego import Actions
 from matplotlib.gridspec import GridSpec
 
@@ -213,7 +212,7 @@ def plot_ego_q_values_maps(qtable, rows, cols, labels, states):
         ax[idx].xaxis.grid(True, which="major")
         ax[idx].axes.xaxis.set_ticklabels([])
         ax[idx].axes.yaxis.set_ticklabels([])
-        ax[idx].set_title(labels[cue])
+        ax[idx].set_title(labels[cue], pad=10)
 
         for row in range(rows):
             conv_row = convert_row_origin(row, rows)
@@ -239,5 +238,5 @@ def plot_ego_q_values_maps(qtable, rows, cols, labels, states):
                 )
 
     clb = fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap), cax=ax_clb)
-    clb.ax.set_title("Q-value")
+    clb.ax.set_title("Q-value", pad=10)
     plt.show()
