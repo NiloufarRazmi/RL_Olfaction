@@ -193,11 +193,78 @@ qtable = qtables.mean(axis=0)  # Average the Q-table between runs
 # %%
 res
 
-# %%
-# plotting.qtable_directions_map(qtable, env.rows, env.cols)
+# %% tags=[]
+tmp = []
+for idx, st in enumerate(tqdm(all_states)):
+    tmp.append(env.convert_flat_state_to_composite(st))
+all_state_composite = pd.DataFrame(tmp)
+all_state_composite
+
+
+# %% tags=[]
+def get_location_count(all_state_composite, cue=None):
+    """Count the occurences for each tile location.
+
+    Optionally filter by `cue`"""
+    location_count = np.zeros(len(env.tiles_locations))
+    for tile in env.tiles_locations:
+        if cue:  # Select based on chosen cue
+            location_count[tile] = len(
+                all_state_composite[
+                    (all_state_composite.location == tile)
+                    & (all_state_composite.cue == cue)
+                ]
+            )
+        else:  # Select
+            location_count[tile] = len(
+                all_state_composite[all_state_composite.location == tile]
+            )
+    location_count = location_count.reshape((env.rows, env.cols))
+    return location_count
+
+
+# %% tags=[]
+get_location_count(all_state_composite, cue=OdorID.B)
 
 # %% [markdown]
 # ## Visualization
+
+import matplotlib as mpl
+
+# %% tags=[]
+import matplotlib.pyplot as plt
+
+
+def plot_location_count(all_state_composite, cues=None):
+    # cmap = sns.color_palette("Blues", as_cmap=True)
+    cmap = sns.color_palette("rocket_r", as_cmap=True)
+
+    if cues:
+        fig, ax = plt.subplots(2, 2, figsize=(10, 8))
+        for idx, cue in enumerate(cues):
+            location_count = get_location_count(all_state_composite, cue=cue)
+            chart = sns.heatmap(location_count, cmap=cmap, ax=ax.flatten()[idx])
+            chart.set(title=CONTEXTS_LABELS[cue])
+            ax.flatten()[idx].set_xticks([])
+            ax.flatten()[idx].set_yticks([])
+        fig.suptitle("Locations counts during training", fontsize="xx-large")
+
+    else:  # Plot everything
+        location_count = get_location_count(all_state_composite, cue=cues)
+        fig, ax = plt.subplots()
+        chart = sns.heatmap(location_count, cmap=cmap, ax=ax)
+        chart.set(title="Total locations count during training")
+        ax.set_xticks([])
+        ax.set_yticks([])
+    # fig.tight_layout()
+    plt.show()
+
+
+# %% tags=[]
+plot_location_count(all_state_composite)
+
+# %% tags=[]
+plot_location_count(all_state_composite, cues=env.cues)
 
 # %%
 plotting.plot_heatmap(matrix=learner.weights, title="Weights")
