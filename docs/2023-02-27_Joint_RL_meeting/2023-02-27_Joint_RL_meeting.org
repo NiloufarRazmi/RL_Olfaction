@@ -1,0 +1,240 @@
+#+TITLE: Joint RL meeting
+#+SUBTITLE: Gridworld implementation of Olivia's task (bis)
+#+author: Andrea Pierré
+#+date: February 27^{th}, 2023
+* HEADER :noexport:
+#+SETUPFILE: ./style.org
+
+* Implementation
+** Composite state space
+#+begin_export latex
+\small
+#+end_export
+- Allocentric setting:
+|------------+-------------|
+| location   | cue         |
+|------------+-------------|
+| {0,...,24} | North light |
+|            | South light |
+|            | Odor A      |
+|            | Odor B      |
+|------------+-------------|
+#+begin_export latex
+\pause
+#+end_export
+- Egocentric setting:
+|------------+--------------------+-------------|
+| location   | head direction [°] | cue         |
+|------------+--------------------+-------------|
+| {0,...,24} |                  0 | North light |
+|            |                 90 | South light |
+|            |                180 | Odor A      |
+|            |                270 | Odor B      |
+|------------+--------------------+-------------|
+** Flattened state space -- allocentric setting
+*** Left :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.45
+:END:
+[[file:img/state_space_1.png]]
+[[file:img/state_space_3.png]]
+*** Right :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.45
+:END:
+[[file:img/state_space_2.png]]
+[[file:img/state_space_4.png]]
+** Flattened state space -- egocentric setting
+#+ATTR_LaTeX: :height 0.9\textheight
+[[file:img/state_space_ego.png]]
+** States & actions translation
+:PROPERTIES:
+:BEAMER_act: [<+->]
+:BEAMER_opt: fragile
+:END:
+- Wrapper environment to translate the human readable environment (*composite states*) into a suitable environment for the Q-learning algorithm (*flat states*)
+    #+begin_export latex
+    \scriptsize
+    \begin{lstlisting}[language={Python}]
+    state = {"location": 13, "cue": LightCues.South}
+    env.convert_composite_to_flat_state(state)
+    # => 38
+    \end{lstlisting}
+    \begin{lstlisting}[language={Python}]
+    state = 63
+    env.convert_flat_state_to_composite(state)
+    # => {"location": 13, "cue": <OdorID.A: 1>}
+    \end{lstlisting}
+    #+end_export
+- Machine & human friendly actions
+    #+begin_export latex
+    \scriptsize
+    \begin{lstlisting}[language={Python}]
+    action = 0
+    Actions(action).name
+    # => "UP"
+    \end{lstlisting}
+    #+end_export
+** Algorithm troubleshooting
+Subtle bug using \epsilon-greedy when Q-values are identical:
+#+begin_export latex
+\\[2em]
+#+end_export
+*** Left :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+#+begin_export latex
+\centering
+Vanilla \epsilon-greedy\\[2em]
+#+end_export
+#+ATTR_LaTeX: :width \textwidth
+  [[file:img/hist_before.png]]
+*** Right :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+#+begin_export latex
+\centering
+#+end_export
+Randomly choosing between actions with the same Q-values
+#+ATTR_LaTeX: :width \textwidth
+[[file:img/hist_after.png]]
+* Results
+** Standard Q-learning -- allocentric setting
+#+ATTR_LaTeX: :height 0.4\textheight
+[[file:img/q-learning_allo_hist.png]]
+[[file:img/q-learning_allo_steps_rewards.png]]
+** Standard Q-learning -- allocentric setting
+[[file:img/q-learning_allo_best_actions_maps.png]]
+** Q-learning with function approximation -- allocentric setting -- without joint representation
+*** Left :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+#+ATTR_LaTeX: :height 0.4\textheight
+[[file:img/func_approx_allo_features_heatmap_nojointrep.png]]
+*** Right :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+#+ATTR_LaTeX: :width \textwidth
+[[file:img/func_approx_allo_actions_states_hist_nojointrep.png]]
+*** \nbsp{}
+#+begin_export latex
+\vspace{-2em}
+#+end_export
+#+ATTR_LaTeX: :height 0.4\textheight
+[[file:img/func_approx_allo_steps_rewards_nojointrep.png]]
+** Q-learning with function approximation -- allocentric setting -- without joint representation
+#+ATTR_LaTeX: :height 0.8\textheight
+[[file:img/func_approx_allo_best_actions_maps_nojointrep.png]]
+** Q-learning with function approximation -- allocentric setting -- with joint representation
+*** Left :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+#+ATTR_LaTeX: :height 0.4\textheight
+[[file:img/func_approx_allo_features_heatmap_jointrep.png]]
+*** Right :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+#+ATTR_LaTeX: :width \textwidth
+[[file:img/func_approx_allo_actions_states_hist_jointrep.png]]
+*** \nbsp{}
+#+begin_export latex
+\vspace{-2em}
+#+end_export
+#+ATTR_LaTeX: :height 0.4\textheight
+[[file:img/func_approx_allo_steps_rewards_jointrep.png]]
+** Q-learning with function approximation -- allocentric setting -- with joint representation
+#+ATTR_LaTeX: :height 0.8\textheight
+[[file:img/func_approx_allo_best_actions_maps_jointrep.png]]
+
+** Standard Q-learning -- egocentric setting
+#+ATTR_LaTeX: :height 0.4\textheight
+[[file:img/q-learning_ego_hist.png]]
+[[file:img/q-learning_ego_steps_rewards.png]]
+** Standard Q-learning -- egocentric setting
+#+ATTR_LaTeX: :height 0.9\textheight
+[[file:img/q-learning_ego_best_actions_maps.png]]
+** Q-learning with function approximation -- egocentric setting
+#+ATTR_LaTeX: :height 0.4\textheight
+[[file:img/func_approx_ego_actions_states_hist_jointrep.png]]
+[[file:img/func_approx_ego_steps_rewards_jointrep.png]]
+** Q-learning with function approximation -- egocentric setting
+#+ATTR_LaTeX: :height 0.85\textheight
+[[file:img/func_approx_ego_best_actions_maps_jointrep.png]]
+** Location occupancy -- naive animal
+*** Left :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+[[file:img/C01_d0p0_2022-01-12_15.58_coordinates.png]]
+*** Right :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+[[file:img/C01_d0p0_2022-01-12_15.58_locations_count.png]]
+*** \nbsp{}
+\to Locations around the ports are the most visited zones in the arena
+** Location occupancy -- animal vs. agent
+*** Left :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+#+begin_export latex
+\vspace{-0.5em}
+\footnotesize
+#+end_export
+#+ATTR_LaTeX: :height 0.43\textheight
+[[file:img/C01_d0p0_2022-01-12_15.58_locations_count.png]]
+- Naive agent explores the space more uniformly than a real animal
+- Agent spends most of its time at the walls during training
+*** Right :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+#+ATTR_LaTeX: :height 0.4\textheight
+[[file:img/func_approx_ego_locations_count_500steps_all_cues.png]]
+#+ATTR_LaTeX: :height 0.4\textheight
+[[file:img/func_approx_ego_locations_count_all_steps_all_cues.png]]
+* Summary
+** Summary
+:PROPERTIES:
+:BEAMER_act: [<+->]
+:END:
+- Standard Q-learning can learn the task in ~90 episodes in the *allocentric* setting, and in ~400 episodes in the *egocentric* setting
+- Niloufar's results with function approximation in both allocentric/egocentric settings are reproducible:
+  - The agent is *not able to learn* the task *without* having a place-odor joint representation
+  - *With* a place-odor joint representation, the agent is *able to learn the task* in ~60 episodes in the *allocentric* setting, and in ~300 episodes in the *egocentric* setting
+** Main differences with Niloufar's model
+*** Left :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.7
+:END:
+- The environment is *geometrically closer to the real experiment* \to\nbsp{}ports are in the corners of the arena, not in the middle of the walls
+- Code is clean, readable, and abstracted in high level functions/concepts
+*** Right :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.3
+:END:
+#+ATTR_LaTeX: :width \textwidth
+  [[file:img/task.png]]
+#+ATTR_LaTeX: :width \textwidth
+[[file:img/q-learning_allo_best_actions_maps.png]]
+** Next steps
+:PROPERTIES:
+:BEAMER_act: [<+->]
+:END:
+- Implement Olivia's new version of the task ?
+- Try to reduce the feature space (Jason's suggestion) \to\nbsp{}need to fix function approximation algorithm ?
+- Replace the manually crafted features matrix by an artificial neural network, which should learn the necessary representations to solve the task from scratch
+- *NSGP seminar in ~1 month*
+** \nbsp{}
+:PROPERTIES:
+:BEAMER_opt: standout
+:END:
+Questions ?
+* Feedback :noexport:

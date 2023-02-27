@@ -23,5 +23,6 @@ dependencies:
   # - pre-commit
   - tqdm
   - pandas
+  - scikit-learn
   # - isort
   # pip:

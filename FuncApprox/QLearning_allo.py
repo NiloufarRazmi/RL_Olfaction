@@ -5,7 +5,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.14.4
+#       jupytext_version: 1.14.5
 #   kernelspec:
 #     display_name: Python 3 (ipykernel)
 #     language: python
@@ -51,7 +51,7 @@ from utils import Params
 
 # %%
 # Choose the parameters for the task
-params = Params(epsilon=0.1, n_runs=3, numEpisodes=100)
+params = Params(epsilon=0.1, n_runs=3, numEpisodes=200)
 params
 
 # %% [markdown]
@@ -74,7 +74,7 @@ explorer = EpsilonGreedy(epsilon=params.epsilon)
 # %% [markdown]
 # ## States and actions meaning
 
-# %% tags=[]
+# %%
 # State space
 for idx, label in enumerate(CONTEXTS_LABELS):
     plotting.plot_tiles_locations(
@@ -101,7 +101,7 @@ env.convert_composite_to_flat_state({"location": 13, "cue": LightCues.North})
 action = 0
 Actions(action)
 
-# %% [markdown] tags=[]
+# %% [markdown]
 # ## Main loop
 
 # %%

@@ -49,6 +49,7 @@ class Environment:
         self.rows = 5
         self.cols = 5
         self.tiles_locations = set(np.arange(self.rows * self.cols))
+        self.cues = [*LightCues, *OdorID]
 
         self.action_space = set([item.value for item in Actions])
         self.numActions = len(self.action_space)

@@ -5,7 +5,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.14.4
+#       jupytext_version: 1.14.5
 #   kernelspec:
 #     display_name: Python 3 (ipykernel)
 #     language: python
@@ -75,7 +75,7 @@ explorer = EpsilonGreedy(epsilon=params.epsilon)
 # %% [markdown]
 # ## States and actions meaning
 
-# %% tags=[]
+# %%
 env.get_states_structure()
 
 # %% [markdown]
@@ -96,7 +96,7 @@ env.convert_composite_to_flat_state(state)
 action = 0
 Actions(action)
 
-# %% [markdown] tags=[]
+# %% [markdown]
 # ## Main loop
 
 # %%
@@ -179,7 +179,7 @@ plotting.plot_states_actions_distribution(all_states, all_actions)
 # %%
 plotting.plot_steps_and_rewards(res)
 
-# %% tags=[]
+# %%
 plotting_ego.plot_ego_q_values_maps(
     qtable, env.rows, env.cols, CONTEXTS_LABELS, env.get_states_structure()
 )

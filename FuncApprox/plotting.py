@@ -9,6 +9,7 @@ sns.set(font_scale=1.5)
 
 
 def plot_steps_and_rewards(df):
+    sns.set(font_scale=1.5)
     fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(15, 5))
     # ax[0].set(ylabel="Cummulated rewards")
     sns.lineplot(data=df, x="Episodes", y="Rewards", ax=ax[0])
@@ -151,6 +152,7 @@ def plot_q_values_maps(qtable, rows, cols, labels):
 
 def plot_states_actions_distribution(states, actions):
     """Plot the distributions of states and actions."""
+    sns.set(font_scale=1.5)
     fig, ax = plt.subplots(2, 1, figsize=(12, 5))
     sns.histplot(data=states, ax=ax[0], kde=True)
     ax[0].set_title("States")

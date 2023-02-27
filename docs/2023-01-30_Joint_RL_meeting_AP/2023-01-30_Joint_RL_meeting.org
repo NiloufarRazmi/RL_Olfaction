@@ -219,15 +219,3 @@ Recurrence learns to categorize
 ** [?] Worth combining ego + allo?
 - [[https://studywolf.wordpress.com/2015/04/09/reinforcement-learning-part-4-combining-egocentric-and-allocentric/][Reinforcement Learning part 4: Combining egocentric and allocentric]]
 - [[https://github.com/studywolf/blog/blob/master/RL/combination%20allo%20and%20ego/egoalloBasic.py#L53][egoalloBasic.py]]
-** Egocentric *action* space
-or ego agent
-** Allocentric *action* space instead of environment?
-** DONE Check first trial why it learns
-** Break tile in 4?
-** TODO Heatmap of states occupancy?
-** Experiments
-*** Don't randomize the start of the episode, make it continue from the previous episode
-** Literature review on XAI and representation learning
-*** [[https://doi.org/10.48550/arxiv.2208.14226][Unsupervised Representation Learning in Deep Reinforcement Learning: A Review]]
-*** [[https://doi.org/10.1007/978-3-030-28954-6][Explainable AI: Interpreting, Explaining and Visualizing Deep Learning]]
-*** [[https://doi.org/10.1007/978-3-030-83356-5][Explainable Artificial Intelligence: An Introduction to Interpretable Machine Learning]]

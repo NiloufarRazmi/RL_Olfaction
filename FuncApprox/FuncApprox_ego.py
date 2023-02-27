@@ -5,7 +5,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.14.4
+#       jupytext_version: 1.14.5
 #   kernelspec:
 #     display_name: Python 3 (ipykernel)
 #     language: python
@@ -43,6 +43,7 @@ from environment_ego import (
     OdorID,
     WrappedEnvironment,
 )
+from sklearn.preprocessing import minmax_scale
 from tqdm import tqdm
 
 # %%
@@ -81,6 +82,8 @@ features = np.matlib.repmat(
     len(LightCues) * len(OdorID),
     len(LightCues) * len(OdorID),
 )
+
+# %%
 features = None
 
 # %%
@@ -102,6 +105,14 @@ plotting.plot_heatmap(matrix=learner.features, title="Features")
 
 # %%
 env.get_states_structure()
+
+# %%
+plotting_ego.plot_tiles_locations(
+    states_structure=env.get_states_structure(),
+    rows=env.rows,
+    cols=env.cols,
+    contexts_labels=CONTEXTS_LABELS,
+)
 
 # %% [markdown]
 # ### Correspondance between flat states and (internal) composite states
@@ -193,7 +204,7 @@ qtable = qtables.mean(axis=0)  # Average the Q-table between runs
 # %%
 res
 
-# %% tags=[]
+# %%
 tmp = []
 for idx, st in enumerate(tqdm(all_states)):
     tmp.append(env.convert_flat_state_to_composite(st))
@@ -201,7 +212,7 @@ all_state_composite = pd.DataFrame(tmp)
 all_state_composite
 
 
-# %% tags=[]
+# %%
 def get_location_count(all_state_composite, cue=None):
     """Count the occurences for each tile location.
 
@@ -219,11 +230,16 @@ def get_location_count(all_state_composite, cue=None):
             location_count[tile] = len(
                 all_state_composite[all_state_composite.location == tile]
             )
-    location_count = location_count.reshape((env.rows, env.cols))
-    return location_count
+    # location_count = location_count.reshape((env.rows, env.cols))
+
+    # Scale to [0, 1]
+    locations_scaled = minmax_scale(location_count.flatten())
+    locations_scaled = locations_scaled.reshape((env.rows, env.cols))
+
+    return locations_scaled
 
 
-# %% tags=[]
+# %%
 get_location_count(all_state_composite, cue=OdorID.B)
 
 # %% [markdown]
@@ -231,8 +247,9 @@ get_location_count(all_state_composite, cue=OdorID.B)
 
 import matplotlib as mpl
 
-# %% tags=[]
+# %%
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 
 def plot_location_count(all_state_composite, cues=None):
@@ -247,23 +264,23 @@ def plot_location_count(all_state_composite, cues=None):
             chart.set(title=CONTEXTS_LABELS[cue])
             ax.flatten()[idx].set_xticks([])
             ax.flatten()[idx].set_yticks([])
-        fig.suptitle("Locations counts during training", fontsize="xx-large")
+        fig.suptitle("Locations counts during training")  # , fontsize="xx-large")
 
     else:  # Plot everything
         location_count = get_location_count(all_state_composite, cue=cues)
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(figsize=(10, 8))
         chart = sns.heatmap(location_count, cmap=cmap, ax=ax)
-        chart.set(title="Total locations count during training")
+        chart.set(title="Locations count during training")
         ax.set_xticks([])
         ax.set_yticks([])
     # fig.tight_layout()
     plt.show()
 
 
-# %% tags=[]
+# %%
 plot_location_count(all_state_composite)
 
-# %% tags=[]
+# %%
 plot_location_count(all_state_composite, cues=env.cues)
 
 # %%
@@ -282,3 +299,5 @@ plotting.plot_steps_and_rewards(res)
 plotting_ego.plot_ego_q_values_maps(
     qtable, env.rows, env.cols, CONTEXTS_LABELS, env.get_states_structure()
 )
+
+# %%
