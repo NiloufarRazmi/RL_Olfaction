@@ -47,7 +47,7 @@ from tqdm import tqdm
 
 # %%
 # Load custom functions
-from utils import Params, get_location_count
+from utils import Params
 
 # %%
 # Formatting & autoreload stuff

@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from enum import Enum
 
 import numpy as np
@@ -32,12 +33,14 @@ class Actions(Enum):
     RIGHT = 3
 
 
-CONTEXTS_LABELS = [
-    "Pre odor - North light",
-    "Pre odor - South light",
-    "Post odor - Odor A",
-    "Post odor - Odor B",
-]
+CONTEXTS_LABELS = OrderedDict(
+    [
+        (LightCues.North, "Pre odor - North light"),
+        (LightCues.South, "Pre odor - South light"),
+        (OdorID.A, "Post odor - Odor A"),
+        (OdorID.B, "Post odor - Odor B"),
+    ]
+)
 
 
 class Environment:

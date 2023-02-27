@@ -34,6 +34,7 @@ import pandas as pd
 import plotting
 from agent import EpsilonGreedy, Qlearning
 from environment_allo import CONTEXTS_LABELS, Actions, LightCues, WrappedEnvironment
+from plotting_ego import plot_location_count
 from tqdm import tqdm
 
 # %%
@@ -76,12 +77,12 @@ explorer = EpsilonGreedy(epsilon=params.epsilon)
 
 # %%
 # State space
-for idx, label in enumerate(CONTEXTS_LABELS):
+for idx, cue in enumerate(CONTEXTS_LABELS):
     plotting.plot_tiles_locations(
         np.array(list(env.tiles_locations)) + idx * len(env.tiles_locations),
         env.rows,
         env.cols,
-        title=label,
+        title=CONTEXTS_LABELS[cue],
     )
 
 # %% [markdown]
@@ -170,7 +171,11 @@ qtable = qtables.mean(axis=0)  # Average the Q-table between runs
 res
 
 # %%
-# plotting.qtable_directions_map(qtable, env.rows, env.cols)
+tmp = []
+for idx, st in enumerate(tqdm(all_states)):
+    tmp.append(env.convert_flat_state_to_composite(st))
+all_state_composite = pd.DataFrame(tmp)
+all_state_composite
 
 # %% [markdown]
 # ## Visualization
@@ -189,3 +194,23 @@ plotting.plot_q_values_maps(qtable, env.rows, env.cols, CONTEXTS_LABELS)
 
 # %%
 plotting.plot_rotated_q_values_maps(qtable, env.rows, env.cols, CONTEXTS_LABELS)
+
+# %%
+plot_location_count(
+    all_state_composite,
+    tiles_locations=env.tiles_locations,
+    cols=env.cols,
+    rows=env.rows,
+    cues=None,
+    contexts_labels=None,
+)
+
+# %%
+plot_location_count(
+    all_state_composite,
+    tiles_locations=env.tiles_locations,
+    cols=env.cols,
+    rows=env.rows,
+    cues=env.cues,
+    contexts_labels=CONTEXTS_LABELS,
+)

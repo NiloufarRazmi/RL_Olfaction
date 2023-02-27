@@ -127,7 +127,7 @@ def plot_q_values_maps(qtable, rows, cols, labels):
         np.arange(2 * rows * cols, 3 * rows * cols),
         np.arange(3 * rows * cols, 4 * rows * cols),
     ]
-    for idx, title in enumerate(labels):
+    for idx, cue in enumerate(labels):
         qtable_val_max, qtable_directions = qtable_directions_map(
             qtable[maps[idx], :], rows, cols
         )
@@ -142,7 +142,7 @@ def plot_q_values_maps(qtable, rows, cols, labels):
             xticklabels=[],
             yticklabels=[],
             annot_kws={"fontsize": "xx-large"},
-        ).set(title=title)
+        ).set(title=labels[cue])
         for _, spine in ax.flatten()[idx].spines.items():
             spine.set_visible(True)
             spine.set_linewidth(0.7)
@@ -172,7 +172,7 @@ def plot_rotated_q_values_maps(qtable, rows, cols, labels):
         np.arange(2 * rows * cols, 3 * rows * cols),
         np.arange(3 * rows * cols, 4 * rows * cols),
     ]
-    for idx, title in enumerate(labels):
+    for idx, cue in enumerate(labels):
         qtable_val_max, qtable_directions = qtable_directions_map(
             qtable[maps[idx], :], rows, cols
         )
@@ -227,7 +227,7 @@ def plot_rotated_q_values_maps(qtable, rows, cols, labels):
                     rotation=45,
                 )
 
-        ax.flatten()[idx].set_title(title)
+        ax.flatten()[idx].set_title(labels[cue])
         # ax.set_xticks(np.arange(qtable_val_max.shape[1] + 1) - 0.5, minor=True)
         # ax.set_yticks(np.arange(qtable_val_max.shape[0] + 1) - 0.5, minor=True)
         # ax.grid(which="minor", color="black", linestyle="-", linewidth=0.7)
