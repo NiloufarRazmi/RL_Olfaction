@@ -100,7 +100,7 @@ Vanilla \epsilon-greedy\\[2em]
 Randomly choosing between actions with the same Q-values
 #+ATTR_LaTeX: :width \textwidth
 [[file:img/hist_after.png]]
-* Results
+* Results & experiments
 ** Standard Q-learning -- allocentric setting
 #+ATTR_LaTeX: :height 0.4\textheight
 [[file:img/q-learning_allo_hist.png]]
@@ -178,37 +178,79 @@ Randomly choosing between actions with the same Q-values
 :END:
 [[file:img/C01_d0p0_2022-01-12_15.58_locations_count.png]]
 *** \nbsp{}
-\to Locations around the ports are the most visited zones in the arena
+\to The locations around the ports are the most visited zones in the arena
 ** Location occupancy -- animal vs. agent
 *** Left :BMCOL:
 :PROPERTIES:
 :BEAMER_col: 0.5
 :END:
-#+begin_export latex
-\vspace{-0.5em}
-\footnotesize
-#+end_export
 #+ATTR_LaTeX: :height 0.43\textheight
 [[file:img/C01_d0p0_2022-01-12_15.58_locations_count.png]]
-- Naive agent explores the space more uniformly than a real animal
-- Agent spends most of its time at the walls during training
+\to The naive agent explores the space more uniformly than a real animal
 *** Right :BMCOL:
 :PROPERTIES:
 :BEAMER_col: 0.5
 :END:
 #+ATTR_LaTeX: :height 0.4\textheight
-[[file:img/func_approx_ego_locations_count_500steps_all_cues.png]]
+[[file:img/q-learning_allo_locations_count_500steps_all_cues.png]]
+[[file:img/q-learning_ego_locations_count_500steps_all_cues.png]]
 #+ATTR_LaTeX: :height 0.4\textheight
-[[file:img/func_approx_ego_locations_count_all_steps_all_cues.png]]
+** Location occupancy -- allocentric vs. egocentric
+*** Left :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+#+begin_export latex
+\footnotesize
+\center
+\vspace{-1em}
+#+end_export
+Allocentric
+#+begin_export latex
+\vspace{-1em}
+#+end_export
+#+ATTR_LaTeX: :height 0.2\textheight
+[[file:img/q-learning_allo_locations_count_all_steps_all_cues.png]]
+
+[[file:img/q-learning_allo_locations_count_all_steps_by_cues.png]]
+*** Right :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+#+begin_export latex
+\footnotesize
+\center
+\vspace{-1em}
+#+end_export
+Egocentric
+#+begin_export latex
+\vspace{-1em}
+#+end_export
+#+ATTR_LaTeX: :height 0.2\textheight
+[[file:img/q-learning_ego_locations_count_all_steps_all_cues.png]]
+
+[[file:img/q-learning_ego_locations_count_all_steps_by_cues.png]]
+*** \nbsp{}
+#+begin_export latex
+\footnotesize
+\vspace{-2em}
+#+end_export
+\to The egocentric agent spend more time along the walls, whereas the allocentric agent has a more homogeneous exploration of the space
 * Summary
 ** Summary
 :PROPERTIES:
 :BEAMER_act: [<+->]
 :END:
 - Standard Q-learning can learn the task in ~90 episodes in the *allocentric* setting, and in ~400 episodes in the *egocentric* setting
-- Niloufar's results with function approximation in both allocentric/egocentric settings are reproducible:
+- Niloufar's results with function approximation in both allocentric/egocentric settings are *reproducible*:
   - The agent is *not able to learn* the task *without* having a place-odor joint representation
-  - *With* a place-odor joint representation, the agent is *able to learn the task* in ~60 episodes in the *allocentric* setting, and in ~300 episodes in the *egocentric* setting
+  - *With* a place-odor joint representation, the agent is *able to learn the task* in ~60 episodes in the allocentric setting, and in ~300 episodes in the egocentric setting
+** Summary
+:PROPERTIES:
+:BEAMER_act: [<+->]
+:END:
+- A naive *animal* spends most of its time at the ports, whereas a naive *agent* has a more uniform exploration
+- The *egocentric* agent spend more time along the *walls*, whereas the *allocentric* agent has a more *homogeneous* exploration
 ** Main differences with Niloufar's model
 *** Left :BMCOL:
 :PROPERTIES:
