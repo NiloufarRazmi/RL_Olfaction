@@ -165,7 +165,11 @@ qtable = qtables.mean(axis=0)  # Average the Q-table between runs
 res
 
 # %%
-# plotting.qtable_directions_map(qtable, env.rows, env.cols)
+tmp = []
+for idx, st in enumerate(tqdm(all_states)):
+    tmp.append(env.convert_flat_state_to_composite(st))
+all_state_composite = pd.DataFrame(tmp)
+all_state_composite
 
 # %% [markdown]
 # ## Visualization
@@ -182,4 +186,22 @@ plotting.plot_steps_and_rewards(res)
 # %%
 plotting_ego.plot_ego_q_values_maps(
     qtable, env.rows, env.cols, CONTEXTS_LABELS, env.get_states_structure()
+)
+
+# %%
+plotting_ego.plot_location_count(
+    all_state_composite=all_state_composite,
+    tiles_locations=env.tiles_locations,
+    cols=env.cols,
+    rows=env.rows,
+)
+
+# %%
+plotting_ego.plot_location_count(
+    all_state_composite=all_state_composite,
+    tiles_locations=env.tiles_locations,
+    cols=env.cols,
+    rows=env.rows,
+    cues=env.cues,
+    contexts_labels=CONTEXTS_LABELS,
 )

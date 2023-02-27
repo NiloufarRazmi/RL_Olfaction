@@ -43,12 +43,11 @@ from environment_ego import (
     OdorID,
     WrappedEnvironment,
 )
-from sklearn.preprocessing import minmax_scale
 from tqdm import tqdm
 
 # %%
 # Load custom functions
-from utils import Params
+from utils import Params, get_location_count
 
 # %%
 # Formatting & autoreload stuff
@@ -211,77 +210,8 @@ for idx, st in enumerate(tqdm(all_states)):
 all_state_composite = pd.DataFrame(tmp)
 all_state_composite
 
-
-# %%
-def get_location_count(all_state_composite, cue=None):
-    """Count the occurences for each tile location.
-
-    Optionally filter by `cue`"""
-    location_count = np.zeros(len(env.tiles_locations))
-    for tile in env.tiles_locations:
-        if cue:  # Select based on chosen cue
-            location_count[tile] = len(
-                all_state_composite[
-                    (all_state_composite.location == tile)
-                    & (all_state_composite.cue == cue)
-                ]
-            )
-        else:  # Select
-            location_count[tile] = len(
-                all_state_composite[all_state_composite.location == tile]
-            )
-    # location_count = location_count.reshape((env.rows, env.cols))
-
-    # Scale to [0, 1]
-    locations_scaled = minmax_scale(location_count.flatten())
-    locations_scaled = locations_scaled.reshape((env.rows, env.cols))
-
-    return locations_scaled
-
-
-# %%
-get_location_count(all_state_composite, cue=OdorID.B)
-
 # %% [markdown]
 # ## Visualization
-
-import matplotlib as mpl
-
-# %%
-import matplotlib.pyplot as plt
-import seaborn as sns
-
-
-def plot_location_count(all_state_composite, cues=None):
-    # cmap = sns.color_palette("Blues", as_cmap=True)
-    cmap = sns.color_palette("rocket_r", as_cmap=True)
-
-    if cues:
-        fig, ax = plt.subplots(2, 2, figsize=(10, 8))
-        for idx, cue in enumerate(cues):
-            location_count = get_location_count(all_state_composite, cue=cue)
-            chart = sns.heatmap(location_count, cmap=cmap, ax=ax.flatten()[idx])
-            chart.set(title=CONTEXTS_LABELS[cue])
-            ax.flatten()[idx].set_xticks([])
-            ax.flatten()[idx].set_yticks([])
-        fig.suptitle("Locations counts during training")  # , fontsize="xx-large")
-
-    else:  # Plot everything
-        location_count = get_location_count(all_state_composite, cue=cues)
-        fig, ax = plt.subplots(figsize=(10, 8))
-        chart = sns.heatmap(location_count, cmap=cmap, ax=ax)
-        chart.set(title="Locations count during training")
-        ax.set_xticks([])
-        ax.set_yticks([])
-    # fig.tight_layout()
-    plt.show()
-
-
-# %%
-plot_location_count(all_state_composite)
-
-# %%
-plot_location_count(all_state_composite, cues=env.cues)
 
 # %%
 plotting.plot_heatmap(matrix=learner.weights, title="Weights")
@@ -301,3 +231,19 @@ plotting_ego.plot_ego_q_values_maps(
 )
 
 # %%
+plotting_ego.plot_location_count(
+    all_state_composite=all_state_composite,
+    tiles_locations=env.tiles_locations,
+    cols=env.cols,
+    rows=env.rows,
+)
+
+# %%
+plotting_ego.plot_location_count(
+    all_state_composite=all_state_composite,
+    tiles_locations=env.tiles_locations,
+    cols=env.cols,
+    rows=env.rows,
+    cues=env.cues,
+    contexts_labels=CONTEXTS_LABELS,
+)

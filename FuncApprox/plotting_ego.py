@@ -6,8 +6,12 @@ import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import seaborn as sns
 from environment_ego import Actions
 from matplotlib.gridspec import GridSpec
+from utils import get_location_count
+
+sns.set(font_scale=1.5)
 
 
 def arrow_right(x, y):
@@ -239,4 +243,76 @@ def plot_ego_q_values_maps(qtable, rows, cols, labels, states):
 
     clb = fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap), cax=ax_clb)
     clb.ax.set_title("Q-value", pad=10)
+    plt.show()
+
+
+def plot_tiles_locations(states_structure, rows, cols, contexts_labels):
+    """Simple plot to show the states/tiles numbers."""
+    states_count = [len(item) for item in states_structure.values()]
+
+    f, ax = plt.subplots(states_count[0], states_count[0], figsize=(16, 16))
+    for idx, cue in enumerate(states_structure):
+        for jdx, angle in enumerate(states_structure[cue]):
+            tiles_annot = np.reshape(states_structure[cue][angle], (rows, cols))
+            tiles_val = np.zeros_like(tiles_annot)
+
+            chart = sns.heatmap(
+                tiles_val,
+                annot=tiles_annot,
+                fmt="",
+                ax=ax[idx][jdx],
+                cbar=False,
+                # cmap=sns.color_palette("Blues", as_cmap=True),
+                linewidths=0.7,
+                linecolor="white",
+                xticklabels=[],
+                yticklabels=[],
+                annot_kws={"fontsize": "medium"},
+            )
+            chart.set(title=f"{contexts_labels[cue]} - {angle}°")
+    # for _, spine in ax.spines.items():
+    #     spine.set_visible(True)
+    #     spine.set_linewidth(0.7)
+    #     spine.set_color("black")
+    f.set_facecolor("white")
+    f.tight_layout()
+    plt.show()
+
+
+def plot_location_count(
+    all_state_composite, tiles_locations, cols, rows, cues=None, contexts_labels=None
+):
+    # cmap = sns.color_palette("Blues", as_cmap=True)
+    cmap = sns.color_palette("rocket_r", as_cmap=True)
+
+    if cues and contexts_labels:
+        fig, ax = plt.subplots(2, 2, figsize=(10, 8))
+        for idx, cue in enumerate(cues):
+            location_count = get_location_count(
+                all_state_composite=all_state_composite,
+                tiles_locations=tiles_locations,
+                cols=cols,
+                rows=rows,
+                cue=cue,
+            )
+            chart = sns.heatmap(location_count, cmap=cmap, ax=ax.flatten()[idx])
+            chart.set(title=contexts_labels[cue])
+            ax.flatten()[idx].set_xticks([])
+            ax.flatten()[idx].set_yticks([])
+        fig.suptitle("Locations counts during training")  # , fontsize="xx-large")
+
+    else:  # Plot everything
+        location_count = get_location_count(
+            all_state_composite,
+            tiles_locations=tiles_locations,
+            cols=cols,
+            rows=rows,
+            cue=cues,
+        )
+        fig, ax = plt.subplots(figsize=(10, 8))
+        chart = sns.heatmap(location_count, cmap=cmap, ax=ax)
+        chart.set(title="Locations count during training")
+        ax.set_xticks([])
+        ax.set_yticks([])
+    # fig.tight_layout()
     plt.show()
