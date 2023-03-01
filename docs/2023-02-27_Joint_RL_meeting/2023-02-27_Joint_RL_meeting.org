@@ -2,6 +2,7 @@
 #+SUBTITLE: Gridworld implementation of Olivia's task (bis)
 #+author: Andrea Pierré
 #+date: February 27^{th}, 2023
+#+EMAIL: andrea_pierre@brown.edu
 * HEADER :noexport:
 #+SETUPFILE: ./style.org
 
@@ -279,4 +280,19 @@ Egocentric
 :BEAMER_opt: standout
 :END:
 Questions ?
+* COMMENT Add plain option to Beamer TOC
+% Local variables:
+% org-beamer-outline-frame-options: "plain"
+% End:
 * Feedback :noexport:
+** Egocentric agent, not egocentric task
+** Func approx like niloufar with square
+** Feed the experimental data to the model
+- Offline RL?
+- Fit animal behavior
+- Choose action based on what the animal chose
+- See policy the animal learned
+** Put higher weights at the ports?
+To be closer to the real animal
+** Label ports name
+** In Olivia's new task \to use replay instead of mirroring the Q-table

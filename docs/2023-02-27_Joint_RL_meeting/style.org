@@ -30,7 +30,7 @@
 # Show section number in the table of contents
 #+BEAMER_HEADER: \setbeamertemplate{section in toc}[sections numbered]
 # Show table of content between each section, do not increment the frame numbering and do not show the footer
-#+BEAMER_HEADER: \AtBeginSection[]{\begin{frame}[plain, noframenumbering]{Outline}    \setbeamertemplate{section in toc}[sections numbered]\setbeamertemplate{subsection in toc}[subsections numbered]\vspace{-1em}\tableofcontents[currentsection, currentsubsection]\end{frame}}
+#+BEAMER_HEADER: \AtBeginSection[]{\begin{frame}[plain, noframenumbering]{Outline}    \setbeamertemplate{section in toc}[sections numbered]\setbeamertemplate{subsection in toc}[subsections numbered]\tableofcontents[currentsection, currentsubsection]\end{frame}}
 #+BEAMER_HEADER: \AtBeginSubsection[]{\begin{frame}[plain, noframenumbering]{Outline}\setbeamertemplate{section in toc}[sections numbered]\setbeamertemplate{subsection in toc}[subsections numbered]\tableofcontents[currentsection,currentsubsection]\end{frame}}
 
 # Brown color styling
@@ -40,9 +40,10 @@
 # #+BEAMER_HEADER: \setbeamercolor{frametitle}{bg=black}
 
 # #+LaTeX_HEADER: \makeatletter\patchcmd{\beamer@sectionintoc}{\vfill}{\vskip\itemsep}{}{}\makeatother
+# Table of content without slide numbering
+# https://emacs.stackexchange.com/q/73562/2247
 #+LaTeX_HEADER: \pretocmd{\tableofcontents}{\thispagestyle{empty}}{}{}
 #+LaTeX_HEADER: \addtocounter{framenumber}{-1}
-# #+LaTeX_HEADER: \addtocontents{toc}{\vspace{2em}}
 
 
 # Source Code Listings

@@ -1,4 +1,4 @@
-% Created 2023-02-27 Mon 03:20
+% Created 2023-02-28 Tue 20:18
 % Intended LaTeX compiler: lualatex
 \documentclass[bigger]{beamer}
 \usepackage{graphicx}
@@ -59,25 +59,18 @@ tabsize=2
 \titlegraphic{\hfill\includegraphics[height=1.5cm]{img/Brown Logo_2016_2 Color Process ST_1300.png}}
 \setbeamercovered{transparent=10}
 \setbeamertemplate{section in toc}[sections numbered]
-\AtBeginSection[]{\begin{frame}[plain, noframenumbering]{Outline}    \setbeamertemplate{section in toc}[sections numbered]\setbeamertemplate{subsection in toc}[subsections numbered]\vspace{-1em}\tableofcontents[currentsection, currentsubsection]\end{frame}}
+\AtBeginSection[]{\begin{frame}[plain, noframenumbering]{Outline}    \setbeamertemplate{section in toc}[sections numbered]\setbeamertemplate{subsection in toc}[subsections numbered]\tableofcontents[currentsection, currentsubsection]\end{frame}}
 \AtBeginSubsection[]{\begin{frame}[plain, noframenumbering]{Outline}\setbeamertemplate{section in toc}[sections numbered]\setbeamertemplate{subsection in toc}[subsections numbered]\tableofcontents[currentsection,currentsubsection]\end{frame}}
-\hypersetup{
- pdfauthor={Andrea Pierré},
- pdftitle={Joint RL meeting},
- pdfkeywords={},
- pdfsubject={},
- pdfcreator={Emacs 28.2 (Org mode 9.6)}, 
- pdflang={English}}
 \begin{document}
 
 \maketitle
-\begin{frame}{Outline}
+\begin{frame}[plain]{Outline}
 \tableofcontents
 \end{frame}
 
 \section{Implementation}
-\label{sec:orgaaff6eb}
-\begin{frame}[label={sec:org33632c8}]{Composite state space}
+\label{sec:orgc93ba6d}
+\begin{frame}[label={sec:org3f2099d}]{Composite state space}
 \small
 \begin{itemize}
 \item Allocentric setting:
@@ -111,7 +104,7 @@ location & head direction [°] & cue\\
 \end{tabular}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:orge085c30}]{Flattened state space -- allocentric setting}
+\begin{frame}[label={sec:org46c4bbf}]{Flattened state space -- allocentric setting}
 \begin{columns}
 \begin{column}{0.45\columnwidth}
 \begin{center}
@@ -131,12 +124,12 @@ location & head direction [°] & cue\\
 \end{column}
 \end{columns}
 \end{frame}
-\begin{frame}[label={sec:orgb9f15af}]{Flattened state space -- egocentric setting}
+\begin{frame}[label={sec:orgcc8bd0b}]{Flattened state space -- egocentric setting}
 \begin{center}
 \includegraphics[height=0.9\textheight]{img/state_space_ego.png}
 \end{center}
 \end{frame}
-\begin{frame}[<+->][label={sec:orgc2f5fcf},fragile]{States \& actions translation}
+\begin{frame}[<+->][label={sec:orgd2ea278},fragile]{States \& actions translation}
 \begin{itemize}
 \item Wrapper environment to translate the human readable environment (\alert{composite states}) into a suitable environment for the Q-learning algorithm (\alert{flat states})
 \scriptsize
@@ -159,7 +152,7 @@ Actions(action).name
 \end{lstlisting}
 \end{itemize}
 \end{frame}
-\begin{frame}[label={sec:orgd70fe56}]{Algorithm troubleshooting}
+\begin{frame}[label={sec:orgeaf692f}]{Algorithm troubleshooting}
 Subtle bug using \(\epsilon\)-greedy when Q-values are identical:
 \\[2em]
 \begin{columns}
@@ -180,8 +173,8 @@ Randomly choosing between actions with the same Q-values
 \end{columns}
 \end{frame}
 \section{Results \& experiments}
-\label{sec:org0ce1b2a}
-\begin{frame}[label={sec:org296e313}]{Standard Q-learning -- allocentric setting}
+\label{sec:org2801ddb}
+\begin{frame}[label={sec:org15ddb8b}]{Standard Q-learning -- allocentric setting}
 \begin{center}
 \includegraphics[height=0.4\textheight]{img/q-learning_allo_hist.png}
 \end{center}
@@ -189,12 +182,12 @@ Randomly choosing between actions with the same Q-values
 \includegraphics[height=0.4\textheight]{img/q-learning_allo_steps_rewards.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:orgaf73fe4}]{Standard Q-learning -- allocentric setting}
+\begin{frame}[label={sec:org45203f9}]{Standard Q-learning -- allocentric setting}
 \begin{center}
 \includegraphics[width=.9\linewidth]{img/q-learning_allo_best_actions_maps.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org4d9b597}]{Q-learning with function approximation -- allocentric setting -- without joint representation}
+\begin{frame}[label={sec:orgd275405}]{Q-learning with function approximation -- allocentric setting -- without joint representation}
 \begin{columns}
 \begin{column}{0.5\columnwidth}
 \begin{center}
@@ -214,12 +207,12 @@ Randomly choosing between actions with the same Q-values
 \end{center}
 \end{block}
 \end{frame}
-\begin{frame}[label={sec:org8f28906}]{Q-learning with function approximation -- allocentric setting -- without joint representation}
+\begin{frame}[label={sec:orge388911}]{Q-learning with function approximation -- allocentric setting -- without joint representation}
 \begin{center}
 \includegraphics[height=0.8\textheight]{img/func_approx_allo_best_actions_maps_nojointrep.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org8d52deb}]{Q-learning with function approximation -- allocentric setting -- with joint representation}
+\begin{frame}[label={sec:org02b6431}]{Q-learning with function approximation -- allocentric setting -- with joint representation}
 \begin{columns}
 \begin{column}{0.5\columnwidth}
 \begin{center}
@@ -239,13 +232,13 @@ Randomly choosing between actions with the same Q-values
 \end{center}
 \end{block}
 \end{frame}
-\begin{frame}[label={sec:orgb30c803}]{Q-learning with function approximation -- allocentric setting -- with joint representation}
+\begin{frame}[label={sec:orga136f2d}]{Q-learning with function approximation -- allocentric setting -- with joint representation}
 \begin{center}
 \includegraphics[height=0.8\textheight]{img/func_approx_allo_best_actions_maps_jointrep.png}
 \end{center}
 \end{frame}
 
-\begin{frame}[label={sec:orgbc29dd0}]{Standard Q-learning -- egocentric setting}
+\begin{frame}[label={sec:orgb44444a}]{Standard Q-learning -- egocentric setting}
 \begin{center}
 \includegraphics[height=0.4\textheight]{img/q-learning_ego_hist.png}
 \end{center}
@@ -253,12 +246,12 @@ Randomly choosing between actions with the same Q-values
 \includegraphics[height=0.4\textheight]{img/q-learning_ego_steps_rewards.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org09d3cb9}]{Standard Q-learning -- egocentric setting}
+\begin{frame}[label={sec:orgada6f8d}]{Standard Q-learning -- egocentric setting}
 \begin{center}
 \includegraphics[height=0.9\textheight]{img/q-learning_ego_best_actions_maps.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:orgb9b6b6b}]{Q-learning with function approximation -- egocentric setting}
+\begin{frame}[label={sec:org4b7fc0d}]{Q-learning with function approximation -- egocentric setting}
 \begin{center}
 \includegraphics[height=0.4\textheight]{img/func_approx_ego_actions_states_hist_jointrep.png}
 \end{center}
@@ -266,12 +259,12 @@ Randomly choosing between actions with the same Q-values
 \includegraphics[height=0.4\textheight]{img/func_approx_ego_steps_rewards_jointrep.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org7adbf25}]{Q-learning with function approximation -- egocentric setting}
+\begin{frame}[label={sec:org4c0220a}]{Q-learning with function approximation -- egocentric setting}
 \begin{center}
 \includegraphics[height=0.85\textheight]{img/func_approx_ego_best_actions_maps_jointrep.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org63af8d6}]{Location occupancy -- naive animal}
+\begin{frame}[label={sec:org95a4104}]{Location occupancy -- naive animal}
 \begin{columns}
 \begin{column}{0.5\columnwidth}
 \begin{center}
@@ -288,7 +281,7 @@ Randomly choosing between actions with the same Q-values
 \(\to\) The locations around the ports are the most visited zones in the arena
 \end{block}
 \end{frame}
-\begin{frame}[label={sec:org25af807}]{Location occupancy -- animal vs. agent}
+\begin{frame}[label={sec:orga5015db}]{Location occupancy -- animal vs. agent}
 \begin{columns}
 \begin{column}{0.5\columnwidth}
 \begin{center}
@@ -306,7 +299,7 @@ Randomly choosing between actions with the same Q-values
 \end{column}
 \end{columns}
 \end{frame}
-\begin{frame}[label={sec:org2c2a3a1}]{Location occupancy -- allocentric vs. egocentric}
+\begin{frame}[label={sec:orge387630}]{Location occupancy -- allocentric vs. egocentric}
 \begin{columns}
 \begin{column}{0.5\columnwidth}
 \footnotesize
@@ -344,8 +337,8 @@ Egocentric
 \end{block}
 \end{frame}
 \section{Summary}
-\label{sec:org654fb2b}
-\begin{frame}[<+->][label={sec:orgf04f1a6}]{Summary}
+\label{sec:org818ea70}
+\begin{frame}[<+->][label={sec:org506b906}]{Summary}
 \begin{itemize}
 \item Standard Q-learning can learn the task in \textasciitilde{}90 episodes in the \alert{allocentric} setting, and in \textasciitilde{}400 episodes in the \alert{egocentric} setting
 \item Niloufar's results with function approximation in both allocentric/egocentric settings are \alert{reproducible}:
@@ -355,13 +348,13 @@ Egocentric
 \end{itemize}
 \end{itemize}
 \end{frame}
-\begin{frame}[<+->][label={sec:org1fa7639}]{Summary}
+\begin{frame}[<+->][label={sec:org77bf245}]{Summary}
 \begin{itemize}
 \item A naive \alert{animal} spends most of its time at the ports, whereas a naive \alert{agent} has a more uniform exploration
 \item The \alert{egocentric} agent spend more time along the \alert{walls}, whereas the \alert{allocentric} agent has a more \alert{homogeneous} exploration
 \end{itemize}
 \end{frame}
-\begin{frame}[label={sec:org13525ec}]{Main differences with Niloufar's model}
+\begin{frame}[label={sec:org709db45}]{Main differences with Niloufar's model}
 \begin{columns}
 \begin{column}{0.7\columnwidth}
 \begin{itemize}
@@ -379,7 +372,7 @@ Egocentric
 \end{column}
 \end{columns}
 \end{frame}
-\begin{frame}[<+->][label={sec:org382ba0e}]{Next steps}
+\begin{frame}[<+->][label={sec:orgd3d5cfa}]{Next steps}
 \begin{itemize}
 \item Implement Olivia's new version of the task ?
 \item Try to reduce the feature space (Jason's suggestion) \(\to\)~need to fix function approximation algorithm ?
@@ -387,7 +380,7 @@ Egocentric
 \item \alert{NSGP seminar in \textasciitilde{}1 month}
 \end{itemize}
 \end{frame}
-\begin{frame}[label={sec:org6ff2b05},standout]{~}
+\begin{frame}[label={sec:org9b23bdc},standout]{~}
 Questions ?
 \end{frame}
 \end{document}
