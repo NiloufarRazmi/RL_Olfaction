@@ -73,17 +73,86 @@ env = WrappedEnvironment(params)
 # %%
 # Manually engineered features, optional
 # if `None`, a diagonal matrix of features will be created automatically
-features = np.matlib.repmat(
+# features = np.matlib.repmat(
+#     np.eye(
+#         len(env.tiles_locations) * len(env.head_angle_space),
+#         len(env.tiles_locations) * len(env.head_angle_space),
+#     ),
+#     len(LightCues) * len(OdorID),
+#     len(LightCues) * len(OdorID),
+# )
+
+# %%
+tmp1 = np.matlib.repmat(
     np.eye(
         len(env.tiles_locations) * len(env.head_angle_space),
         len(env.tiles_locations) * len(env.head_angle_space),
     ),
-    len(LightCues) * len(OdorID),
-    len(LightCues) * len(OdorID),
+    len(env.cues),
+    1,
 )
+tmp1.shape
 
 # %%
-features = None
+tmp2 = np.vstack(
+    (
+        np.hstack(
+            (
+                np.ones((len(env.tiles_locations) * len(env.head_angle_space), 1)),
+                np.zeros(
+                    (
+                        len(env.tiles_locations) * len(env.head_angle_space),
+                        len(env.cues) - 1,
+                    )
+                ),
+            )
+        ),
+        np.hstack(
+            (
+                np.zeros((len(env.tiles_locations) * len(env.head_angle_space), 1)),
+                np.ones((len(env.tiles_locations) * len(env.head_angle_space), 1)),
+                np.zeros(
+                    (
+                        len(env.tiles_locations) * len(env.head_angle_space),
+                        len(env.cues) - 2,
+                    )
+                ),
+            )
+        ),
+        np.hstack(
+            (
+                np.zeros((len(env.tiles_locations) * len(env.head_angle_space), 2)),
+                np.ones((len(env.tiles_locations) * len(env.head_angle_space), 1)),
+                np.zeros(
+                    (
+                        len(env.tiles_locations) * len(env.head_angle_space),
+                        len(env.cues) - 3,
+                    )
+                ),
+            )
+        ),
+        np.hstack(
+            (
+                np.zeros(
+                    (
+                        len(env.tiles_locations) * len(env.head_angle_space),
+                        len(env.cues) - 1,
+                    )
+                ),
+                np.ones((len(env.tiles_locations) * len(env.head_angle_space), 1)),
+            )
+        ),
+    )
+)
+
+tmp2.shape
+
+# %%
+features = np.hstack((tmp1, tmp2))
+features.shape
+
+# %%
+# features = None
 
 # %%
 # Load the agent algorithms
@@ -97,7 +166,7 @@ learner = QLearningFuncApprox(
 explorer = EpsilonGreedy(epsilon=params.epsilon)
 
 # %%
-plotting.plot_heatmap(matrix=learner.features, title="Features")
+plotting.plot_heatmap(matrix=learner.features, title="Features", ylabel="States")
 
 # %% [markdown]
 # ## States and actions meaning
@@ -247,3 +316,5 @@ plotting_ego.plot_location_count(
     cues=env.cues,
     contexts_labels=CONTEXTS_LABELS,
 )
+
+# %%

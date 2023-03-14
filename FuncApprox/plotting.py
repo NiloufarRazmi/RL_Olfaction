@@ -67,13 +67,17 @@ def plot_q_values_map(qtable, rows, cols):
     plt.show()
 
 
-def plot_heatmap(matrix, title=None):
+def plot_heatmap(matrix, title=None, xlabel=None, ylabel=None):
     fig, ax = plt.subplots(figsize=(9, 9))
     cmap = sns.light_palette("seagreen", as_cmap=True)
     # cmap = sns.color_palette("light:b", as_cmap=True)
     chart = sns.heatmap(matrix, cmap=cmap, ax=ax)
     if title:
         chart.set(title=title)
+    if xlabel:
+        chart.set(xlabel=xlabel)
+    if ylabel:
+        chart.set(ylabel=ylabel)
     ax.tick_params(axis="x", rotation=90)
     ax.tick_params(axis="y", rotation=0)
     ax.tick_params(left=True)

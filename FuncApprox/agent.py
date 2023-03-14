@@ -35,12 +35,12 @@ class QLearningFuncApprox:
             self.features = np.eye(state_size, state_size)
         else:
             self.features = features_matrix
-        self.weights = np.zeros((self.features.shape[0], action_size))
+        self.weights = np.zeros((self.features.shape[1], action_size))
         self.reset_Q_hat_table()
 
     def Q_hat(self, weights, features):
         """Compute the approximated Q-value."""
-        Q_hat = (weights.T @ features).T
+        Q_hat = features @ weights
         return Q_hat
 
     def update_weights(self, state, action, reward, new_state):
@@ -51,15 +51,15 @@ class QLearningFuncApprox:
             - self.Q_hat_table[state, action]
         )
         weights_update = (
-            self.weights[:, action].T
+            self.weights[:, action]
             # + self.learning_rate * delta * self.features[:, state].T
-            + self.learning_rate * delta * self.features[:, state]
+            + self.learning_rate * delta * self.features[state, :]
         )
         return weights_update
 
     def reset_Q_hat_table(self):
         """Reset the approximated Q-table."""
-        self.Q_hat_table = np.zeros((self.weights.shape))
+        self.Q_hat_table = np.zeros((self.features.shape[0], self.weights.shape[1]))
 
 
 class EpsilonGreedy:

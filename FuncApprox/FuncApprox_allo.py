@@ -65,12 +65,58 @@ env = WrappedEnvironment(params)
 # %%
 # Manually engineered features, optional
 # if `None`, a diagonal matrix of features will be created automatically
-features = np.matlib.repmat(
-    np.eye(len(env.tiles_locations), len(env.tiles_locations)),
-    len(LightCues) * len(OdorID),
-    len(LightCues) * len(OdorID),
+# features = np.matlib.repmat(
+#     np.eye(len(env.tiles_locations), len(env.tiles_locations)),
+#     len(LightCues) * len(OdorID),
+#     len(LightCues) * len(OdorID),
+# )
+
+# %%
+tmp1 = np.matlib.repmat(
+    np.eye(len(env.tiles_locations), len(env.tiles_locations)), len(env.cues), 1
 )
-features = None
+tmp1.shape
+
+# %%
+tmp2 = np.vstack(
+    (
+        np.hstack(
+            (
+                np.ones((len(env.tiles_locations), 1)),
+                np.zeros((len(env.tiles_locations), len(env.cues) - 1)),
+            )
+        ),
+        np.hstack(
+            (
+                np.zeros((len(env.tiles_locations), 1)),
+                np.ones((len(env.tiles_locations), 1)),
+                np.zeros((len(env.tiles_locations), len(env.cues) - 2)),
+            )
+        ),
+        np.hstack(
+            (
+                np.zeros((len(env.tiles_locations), 2)),
+                np.ones((len(env.tiles_locations), 1)),
+                np.zeros((len(env.tiles_locations), len(env.cues) - 3)),
+            )
+        ),
+        np.hstack(
+            (
+                np.zeros((len(env.tiles_locations), len(env.cues) - 1)),
+                np.ones((len(env.tiles_locations), 1)),
+            )
+        ),
+    )
+)
+
+tmp2.shape
+
+# %%
+features = np.hstack((tmp1, tmp2))
+features.shape
+
+# %%
+# features = None
 
 # %%
 # Load the agent algorithms
@@ -82,19 +128,24 @@ learner = QLearningFuncApprox(
     features_matrix=features,
 )
 explorer = EpsilonGreedy(epsilon=params.epsilon)
-plotting.plot_heatmap(matrix=learner.features, title="Features")
+
+# %%
+plotting.plot_heatmap(matrix=learner.features, title="Features", ylabel="States")
+
+# %%
+learner.Q_hat_table.shape, learner.weights.shape, learner.features.shape
 
 # %% [markdown]
 # ## States and actions meaning
 
-# %% tags=[]
+# %%
 # State space
-for idx, label in enumerate(CONTEXTS_LABELS):
+for idx, cue in enumerate(CONTEXTS_LABELS):
     plotting.plot_tiles_locations(
         np.array(list(env.tiles_locations)) + idx * len(env.tiles_locations),
         env.rows,
         env.cols,
-        title=label,
+        title=CONTEXTS_LABELS[cue],
     )
 
 # %% [markdown]
