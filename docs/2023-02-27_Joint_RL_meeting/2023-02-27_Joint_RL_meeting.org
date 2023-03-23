@@ -287,12 +287,13 @@ Questions ?
 * Feedback :noexport:
 ** Egocentric agent, not egocentric task
 ** Func approx like niloufar with square
-** Feed the experimental data to the model
+** Fit the experimental data to the model
 - Offline RL?
 - Fit animal behavior
 - Choose action based on what the animal chose
 - See policy the animal learned
 ** Put higher weights at the ports?
-To be closer to the real animal
+- To be closer to the real animal
+- Have a *Port* feature
 ** Label ports name
 ** In Olivia's new task \to use replay instead of mirroring the Q-table

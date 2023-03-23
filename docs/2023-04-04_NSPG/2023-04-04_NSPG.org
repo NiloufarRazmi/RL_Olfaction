@@ -1,0 +1,273 @@
+#+TITLE: NSGP seminar
+#+SUBTITLE: Learning useful representations to solve a place-odor association task
+# #+SUBTITLE: (Reinforcement) learning of an odor-place association task
+#+author: Andrea Pierré
+#+date: April 4^{th}, 2023
+#+EMAIL: andrea_pierre@brown.edu
+* COMMENT Add plain option to Beamer TOC
+% Local variables:
+% org-beamer-outline-frame-options: "plain"
+% End:
+* HEADER :noexport:
+#+SETUPFILE: ./style.org
+
+* Context
+** Context
+** Rationale
+*** Why we record in the LEC?
+** Joint representation
+*** Feature selection
+Which features/representations are needed/the brain use to learn the task?
+** What is Reinforcement Learning and why we want to use it ?
+*** Diagram :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.6
+:END:
+#+ATTR_LaTeX: :width \textwidth
+
+#+INCLUDE: "./RL.tex" src latex
+
+*** Ideas :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.4
+:BEAMER_act: [<+->]
+:END:
+#+begin_export latex
+\small
+#+end_export
+- Goal of the agent : maximize rewards
+- Natural fit for behavioral experiments involving rewards and learning
+
+* Experimental setup and task
+** Olivia's diamond arena olfactory task
+*** Allocentric :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:BEAMER_opt: [t]
+:END:
+#+begin_export latex
+\center
+#+end_export
+Allocentric\\
+(go west/east)
+#+ATTR_LaTeX: :width 0.8\textwidth
+[[file:img/allocentric-task.png]]
+
+*** Egocentric :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:BEAMER_opt: [t]
+:END:
+#+begin_export latex
+\center
+#+end_export
+Egocentric\\
+(go right/left)
+#+ATTR_LaTeX: :width 0.8\textwidth
+[[file:img/egocentric-task.png]]
+
+#+begin_export latex
+\begin{textblock}{5}(-1,13)
+\center
+\includegraphics[width=3em]{img/olivia.jpg}\\
+\scriptsize
+Olivia McKissick
+\end{textblock}
+#+end_export
+
+# #+begin_export latex
+# \scriptsize
+# #+end_export
+# #+ATTR_LATEX: :center t  :align cp{3em}c
+# | Allocentric |   | Egocentric       |
+# | (go right)  |   | (always go west) |
+
+
+** Diamond arena experimental setup
+[[file:img/physical-diamond-arena.png]]
+* Hypothesis
+
+** Function approximation
+*** Equation :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+#+begin_export latex
+\begin{adjustbox}{max width=\columnwidth, keepaspectratio}
+Approximate the value function with a \alert{basis function}~:
+\end{adjustbox}
+\begin{adjustbox}{max width=\columnwidth, keepaspectratio}
+\(\hat{\upsilon}(s, \mathrm{\mathbf{w}}) \: \dot{=} \: \mathrm{\mathbf{w}}^T \mathrm{\mathbf{x}}(s) \: \dot{=} \: \displaystyle\sum_{i=1}^{d}  w_i x_i(s)\)
+\end{adjustbox}\\[1em]
+\begin{adjustbox}{max width=\columnwidth, keepaspectratio}
+\(
+  \begin{aligned}
+\hat{\upsilon} &: \text{approximate value of state $s$ given weight vector $w$}\\
+s &: \text{state}\\
+\mathrm{\mathbf{w}} &: \text{$d$-vector of weights underlying the approximate value function}\\
+\mathrm{\mathbf{x}} &: \text{vector of features visible when in state $s$}\\
+w &: \text{$i$th component of learnable weight vector}\\
+x &: \text{$i$th component of vector $x(s)$}\\
+  \end{aligned}
+\)
+\end{adjustbox}
+#+end_export
+*** Figures :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+#+begin_export latex
+\center
+\scriptsize
+Find some candidate patterns in the data~: place cells, grid cells~?
+\normalsize
+#+end_export
+#+ATTR_LaTeX: :height 0.25\textheight
+[[file:img/place-cells-grid-cells.jpg.png]]
+
+#+begin_export latex
+\center
+\scriptsize
+Approximate with coarse coding ? Tiling ?
+\normalsize
+#+end_export
+#+ATTR_LaTeX: :height 0.25\textheight
+[[file:img/coarse-coding.png]]
+# #+begin_export latex
+# \center
+# \tiny
+# Sutton \& Barto (2020)
+# \normalsize
+# #+end_export
+
+#+begin_export latex
+\begin{textblock}{5}(0,12)
+\begin{minipage}[t]{3em}
+\center
+\includegraphics[height=2em]{img/matt-nassar.jpg}\\
+\scriptsize
+Matt Nassar
+\end{minipage}
+\begin{minipage}[t]{3em}
+\center
+\includegraphics[height=2em]{img/niloufar-razmi.jpeg}\\
+\scriptsize
+Niloufar Razmi
+\end{minipage}
+\end{textblock}
+#+end_export
+
+* RL concepts
+
+** Temporal Difference learning
+*** Illustration :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+#+ATTR_LaTeX: :height 0.8\textheight
+[[./img/Schultz et al. (1997).png]]
+Schultz et al. (1997)
+*** Equation :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+#+begin_export latex
+\begin{adjustbox}{max width=\columnwidth, keepaspectratio}
+$V(S_t) = V(S_t) + \alpha(\underbrace{R_{t+1} + \gamma V(S_{t+1})}_\text{TD target} - V(S_t))$
+\end{adjustbox}\\[1em]
+\begin{adjustbox}{max width=\columnwidth, keepaspectratio}
+$NewEstimate \leftarrow OldEstimate + StepSize[Target - OldEstimate]$
+\end{adjustbox}
+#+end_export
+** What we're trying to model
+** General goal
+* Preliminary results
+** What did we learn at this point?
+* Experiments
+** The model
+*** Schema of mouse with possible actions
+**** Egocentric
+**** Allocentric
+** Split data in 2, learn on first half, predict on second half
+** With/without joint repr
+* What we plan to do next
+** What we expect to see
+* Summary
+#+begin_export latex
+{%
+\setbeamertemplate{background canvas}{\includegraphics[height=\paperheight]{img/grand-canyon.JPG}}
+\begin{frame}[fragile,t]{Acknowledgments}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{itemize}
+                \small
+                \item Fleischmann lab~:
+                \begin{itemize}
+                    \tiny
+                    \item \textbf{Alexander Fleischmann}
+                    \item Simon Daste
+                    \item Max Seppo
+                    \item Wilson Andrés Mena Orostica
+                    \item \colorbox{white}{\transparent{0.2}Sara Zeppilli}}
+                    \item Zach Levin
+                    \item Robin Attey
+                    \item Keeley Baker
+                    \item Olivia Mckissick
+                    \item Diego Rodriguez
+                    \item Shaun Kohli
+                    \item Andrew Aoun
+                    \item Eseosa Uwaifo
+                    \item Erin Meyers
+                \end{itemize}
+            \end{itemize}
+        \end{column}
+
+        \begin{column}{0.5\textwidth}
+            \begin{itemize}
+                \small
+                \item Collaborations~:
+                \begin{itemize}
+                    \tiny
+                    \item \textbf{Jason Ritt} (Carney Institute, Brown University)
+                    \item \textbf{Richard Gerkin} (Arizona State University)
+                    \item \textbf{Matt Nassar} (Brown University)
+                    \item Niloufar Razmi (Brown University)
+                \end{itemize}
+            \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+}
+#+end_export
+** Acknowledgments
+*** Lab :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+- Alexander Fleischmann
+- Sara Zepilli
+- Max Seppo
+- Olivia McKissick
+- Simon Daste
+- Keeley Baker
+- Nell Klimpert
+- Tuan Pham
+- Camille Donoho
+- Erin Meyers
+- Eseosa Uwaifo
+- Timothy Pyon
+
+*** Collaborations :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+- Jason Ritt
+- Matt Nassar
+- Niloufar Razmi
+** \nbsp{}
+:PROPERTIES:
+:BEAMER_opt: standout
+:END:
+Questions ?
+
+* Feedback :noexport:
