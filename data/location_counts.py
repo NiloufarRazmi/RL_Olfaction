@@ -12,7 +12,11 @@
 #     name: python3
 # ---
 
+# %% [markdown]
+# ## Init
+
 # %%
+import warnings
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -20,10 +24,18 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 from sklearn.preprocessing import minmax_scale
+from tqdm import tqdm
 
 # %%
 sns.set_theme(font_scale=1.5)
 # %load_ext lab_black
+
+# %%
+# Global variables
+rows = 5
+cols = 5
+tiles_locations = np.arange(rows * cols)
+tiles_locations.reshape((rows, cols))
 
 # %%
 # day = "d1"
@@ -47,7 +59,7 @@ sns.set_theme(font_scale=1.5)
 # eats
 
 # %% [markdown]
-# ## Naive
+# ## Naive locations
 
 # %%
 naive_coord_path = Path(
@@ -112,39 +124,6 @@ plt.show()
 # %%
 head_naive
 
-# %%
-rows = 5
-cols = 5
-tiles_locations = np.arange(rows * cols)
-tiles_locations
-
-# %%
-# x_bins = np.arange(cols)
-# y_bins = np.arange(rows)
-# for col in range(cols):
-#     x_bins[col] = (
-#         head_naive.x.max() - head_naive.x.min()
-#     ) / cols + col * head_naive.x.min()
-# for row in range(rows):
-#     y_bins[row] = (
-#         head_naive.y.max() - head_naive.y.min()
-#     ) / rows + row * head_naive.y.min()
-# x_bins, y_bins
-
-# %%
-# head_naive["col"] = np.digitize(head_naive.x, x_bins)
-# head_naive["row"] = np.digitize(head_naive.y, y_bins)
-# head_naive
-
-# %%
-hist2d_naive, xedges, yedges = np.histogram2d(
-    x=head_naive.x, y=head_naive.y, bins=[cols, rows]
-)
-hist2d_naive
-
-# %%
-hist2d_naive.T
-
 
 # %%
 def plot_locations_count(data, title, scale=False, cols=5, rows=5):
@@ -176,9 +155,9 @@ plot_locations_count(
 )
 
 # %%
-locations_scaled = minmax_scale(hist2d_naive.T.flatten())
-locations_scaled = locations_scaled.reshape((cols, rows))
-locations_scaled
+# locations_scaled = minmax_scale(hist2d_naive.T.flatten())
+# locations_scaled = locations_scaled.reshape((cols, rows))
+# locations_scaled
 
 # %%
 plot_locations_count(
@@ -190,7 +169,7 @@ plot_locations_count(
 )
 
 # %% [markdown]
-# ## Trained
+# ## Trained locations
 
 # %%
 trained_coord_path = Path("E02d49.csv")
@@ -246,3 +225,84 @@ plot_locations_count(
     cols=cols,
     rows=rows,
 )
+
+# %% [markdown]
+# ## Extract actions
+
+# %%
+# x_bins = np.arange(cols)
+# y_bins = np.arange(rows)
+# for col in range(cols):
+#     x_bins[col] = (
+#         head_naive.x.max() - head_naive.x.min()
+#     ) / cols + col * head_naive.x.min()
+# for row in range(rows):
+#     y_bins[row] = (
+#         head_naive.y.max() - head_naive.y.min()
+#     ) / rows + row * head_naive.y.min()
+# x_bins, y_bins
+
+# %%
+# head_naive["col"] = np.digitize(head_naive.x, x_bins)
+# head_naive["row"] = np.digitize(head_naive.y, y_bins)
+# head_naive
+
+# %%
+hist2d_naive, xedges_naive, yedges_naive = np.histogram2d(
+    x=head_naive.x, y=head_naive.y, bins=[cols, rows]
+)
+hist2d_naive, xedges_naive, yedges_naive
+
+# %%
+col = np.full(shape=len(head_naive), fill_value=np.nan)
+row = np.full(shape=len(head_naive), fill_value=np.nan)
+for idr, _ in enumerate(tqdm(head_naive.index)):
+    for idx, xedge in enumerate(xedges_naive[1:]):
+        if head_naive.iloc[idr].x <= xedge:
+            col[idr] = idx
+            break
+    for idy, yedge in enumerate(yedges_naive[1:]):
+        if head_naive.iloc[idr].y <= yedge:
+            row[idr] = idy
+            break
+head_naive["row"] = row.astype(np.int_)
+head_naive["col"] = col.astype(np.int_)
+head_naive
+
+# %%
+tiles_locations.reshape((rows, cols)).T
+
+# %%
+head_naive["tile"] = np.full(shape=len(head_naive), fill_value=np.nan)
+for row in range(rows):
+    for col in range(cols):
+        head_naive.loc[
+            (head_naive.row == row) & (head_naive.col == col), "tile"
+        ] = tiles_locations.reshape((rows, cols)).T[row, col]
+head_naive
+
+# %%
+tile_changes = head_naive.iloc[
+    np.concatenate(
+        [np.array([False]), (head_naive.tile.diff().dropna() != 0).to_numpy()]
+    )
+]
+tile_changes
+
+# %%
+row_conv = {1: "UP", -1: "DOWN"}
+col_conv = {1: "RIGHT", -1: "LEFT"}
+
+head_naive["action"] = np.full(shape=len(head_naive), fill_value=np.nan)
+diff_row = tile_changes.row.diff()
+diff_col = tile_changes.col.diff()
+for idx, row in tile_changes[1:].iterrows():
+    if diff_row[idx] != 0 and np.abs(diff_row[idx]) == 1:
+        head_naive.loc[idx, "action"] = row_conv[diff_row[idx]]
+    elif diff_col[idx] != 0 and np.abs(diff_col[idx]) == 1:
+        head_naive.loc[idx, "action"] = col_conv[diff_col[idx]]
+    else:
+        warnings.warn(
+            f"Issue with row: {idx} - row: {diff_row[idx]} - col: {diff_col[idx]}"
+        )
+head_naive.dropna()
