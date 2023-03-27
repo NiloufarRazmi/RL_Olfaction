@@ -11,13 +11,16 @@
 * HEADER :noexport:
 #+SETUPFILE: ./style.org
 
-* Context
-** Context
-** Rationale
-*** Why we record in the LEC?
+* Context of the project
+** Aims :noexport:
+*** Behavior only (theoretical)
+*** Fit behavior to data to be able to predict actual behavior
+*** Investigate neural representations needed to solve an olfactory task
+** Why we record in the LEC?
+- Hypothesised to encode local
 ** Joint representation
 *** Feature selection
-Which features/representations are needed/the brain use to learn the task?
+- Which features/representations are needed/the brain use to learn the task?
 ** What is Reinforcement Learning and why we want to use it ?
 *** Diagram :BMCOL:
 :PROPERTIES:
@@ -38,6 +41,33 @@ Which features/representations are needed/the brain use to learn the task?
 - Goal of the agent : maximize rewards
 - Natural fit for behavioral experiments involving rewards and learning
 
+** Temporal Difference learning
+*** Illustration :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+#+ATTR_LaTeX: :height 0.8\textheight
+[[./img/Schultz et al. (1997).png]]
+Schultz et al. (1997)
+*** Equation :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+#+begin_export latex
+\begin{adjustbox}{max width=\columnwidth, keepaspectratio}
+$V(S_t) = V(S_t) + \alpha(\underbrace{R_{t+1} + \gamma V(S_{t+1})}_\text{TD target} - V(S_t))$
+\end{adjustbox}\\[1em]
+\begin{adjustbox}{max width=\columnwidth, keepaspectratio}
+$NewEstimate \leftarrow OldEstimate + StepSize[Target - OldEstimate]$
+\end{adjustbox}
+#+end_export
+** Hypothesis
+#+begin_export latex
+\metroset{block=fill}
+\begin{exampleblock}{Hypothesis}
+LEC hypothesized to encode the conjunction of odor-place information
+\end{exampleblock}
+#+end_export
 * Experimental setup and task
 ** Olivia's diamond arena olfactory task
 *** Allocentric :BMCOL:
@@ -82,35 +112,105 @@ Olivia McKissick
 # | Allocentric |   | Egocentric       |
 # | (go right)  |   | (always go west) |
 
-
 ** Diamond arena experimental setup
 [[file:img/physical-diamond-arena.png]]
-* Hypothesis
-
-** Function approximation
+* Experiments & preliminary results
+** The model
+*** Allocentric :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+#+begin_export latex
+\center
+#+end_export
+Allocentric
+#+ATTR_LaTeX: :width \textwidth
+[[file:img/RL_environment-Allo.drawio.png]]
+*** Egocentric :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+#+begin_export latex
+\center
+#+end_export
+Egocentric
+#+ATTR_LaTeX: :width \textwidth
+[[file:img/RL_environment-Ego.drawio.png]]
+** Without joint representation
+*** Left :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+#+ATTR_LaTeX: :height 0.4\textheight
+[[file:img/features-allo-no-joint-repr.png]]
+*** Right :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+#+ATTR_LaTeX: :width \textwidth
+[[file:img/policy-allo-no-joint-repr.png]]
+*** \nbsp{}
+#+begin_export latex
+\vspace{-2em}
+#+end_export
+#+ATTR_LaTeX: :height 0.4\textheight
+[[file:img/rewards-steps-allo-no-joint-repr.png]]
+\to The agent is unable to solve the task
+** With joint representation
+*** Left :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+#+ATTR_LaTeX: :height 0.4\textheight
+[[file:img/features-ego-joint-repr.png]]
+*** Right :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+#+ATTR_LaTeX: :width \textwidth
+[[file:img/policy-allo-joint-repr.png]]
+*** \nbsp{}
+#+begin_export latex
+\vspace{-2em}
+#+end_export
+#+ATTR_LaTeX: :height 0.4\textheight
+[[file:img/rewards-steps-allo-joint-repr.png]]
+\to The agent learns to solve the task
+** States occupancy ?
+** Can we predict the behavioral data ?
+[[file:img/naive-mouse-coords.png]]
+* What we plan to do next
+** What we plan to do next
+** From tabular RL to deep RL
+#+ATTR_LaTeX: :height 0.7\textheight
+#+INCLUDE: "./RL-tab.tex" src latex
+** From tabular RL to deep RL
+#+ATTR_LaTeX: :height 0.7\textheight
+#+INCLUDE: "./RL-nn.tex" src latex
+** What we expect to see
 *** Equation :BMCOL:
 :PROPERTIES:
 :BEAMER_col: 0.5
 :END:
 #+begin_export latex
-\begin{adjustbox}{max width=\columnwidth, keepaspectratio}
-Approximate the value function with a \alert{basis function}~:
-\end{adjustbox}
-\begin{adjustbox}{max width=\columnwidth, keepaspectratio}
-\(\hat{\upsilon}(s, \mathrm{\mathbf{w}}) \: \dot{=} \: \mathrm{\mathbf{w}}^T \mathrm{\mathbf{x}}(s) \: \dot{=} \: \displaystyle\sum_{i=1}^{d}  w_i x_i(s)\)
-\end{adjustbox}\\[1em]
-\begin{adjustbox}{max width=\columnwidth, keepaspectratio}
-\(
-  \begin{aligned}
-\hat{\upsilon} &: \text{approximate value of state $s$ given weight vector $w$}\\
-s &: \text{state}\\
-\mathrm{\mathbf{w}} &: \text{$d$-vector of weights underlying the approximate value function}\\
-\mathrm{\mathbf{x}} &: \text{vector of features visible when in state $s$}\\
-w &: \text{$i$th component of learnable weight vector}\\
-x &: \text{$i$th component of vector $x(s)$}\\
-  \end{aligned}
-\)
-\end{adjustbox}
+% \begin{adjustbox}{max width=\columnwidth, keepaspectratio}
+% Approximate the value function with a \alert{basis function}~:
+% \end{adjustbox}
+% \begin{adjustbox}{max width=\columnwidth, keepaspectratio}
+% \(\hat{\upsilon}(s, \mathrm{\mathbf{w}}) \: \dot{=} \: \mathrm{\mathbf{w}}^T \mathrm{\mathbf{x}}(s) \: \dot{=} \: \displaystyle\sum_{i=1}^{d}  w_i x_i(s)\)
+% \end{adjustbox}\\[1em]
+% \begin{adjustbox}{max width=\columnwidth, keepaspectratio}
+% \(
+%   \begin{aligned}
+% \hat{\upsilon} &: \text{approximate value of state $s$ given weight vector $w$}\\
+% s &: \text{state}\\
+% \mathrm{\mathbf{w}} &: \text{$d$-vector of weights underlying the approximate value function}\\
+% \mathrm{\mathbf{x}} &: \text{vector of features visible when in state $s$}\\
+% w &: \text{$i$th component of learnable weight vector}\\
+% x &: \text{$i$th component of vector $x(s)$}\\
+%   \end{aligned}
+% \)
+% \end{adjustbox}
 #+end_export
 *** Figures :BMCOL:
 :PROPERTIES:
@@ -126,19 +226,13 @@ Find some candidate patterns in the data~: place cells, grid cells~?
 [[file:img/place-cells-grid-cells.jpg.png]]
 
 #+begin_export latex
-\center
-\scriptsize
-Approximate with coarse coding ? Tiling ?
-\normalsize
+% \center
+% \scriptsize
+% Approximate with coarse coding ? Tiling ?
+% \normalsize
 #+end_export
-#+ATTR_LaTeX: :height 0.25\textheight
-[[file:img/coarse-coding.png]]
-# #+begin_export latex
-# \center
-# \tiny
-# Sutton \& Barto (2020)
-# \normalsize
-# #+end_export
+# #+ATTR_LaTeX: :height 0.25\textheight
+# [[file:img/coarse-coding.png]]
 
 #+begin_export latex
 \begin{textblock}{5}(0,12)
@@ -157,46 +251,16 @@ Niloufar Razmi
 \end{textblock}
 #+end_export
 
-* RL concepts
-
-** Temporal Difference learning
-*** Illustration :BMCOL:
+** Summary
+* Acknowledgments
 :PROPERTIES:
-:BEAMER_col: 0.5
+:UNNUMBERED: notoc
 :END:
-#+ATTR_LaTeX: :height 0.8\textheight
-[[./img/Schultz et al. (1997).png]]
-Schultz et al. (1997)
-*** Equation :BMCOL:
-:PROPERTIES:
-:BEAMER_col: 0.5
-:END:
-#+begin_export latex
-\begin{adjustbox}{max width=\columnwidth, keepaspectratio}
-$V(S_t) = V(S_t) + \alpha(\underbrace{R_{t+1} + \gamma V(S_{t+1})}_\text{TD target} - V(S_t))$
-\end{adjustbox}\\[1em]
-\begin{adjustbox}{max width=\columnwidth, keepaspectratio}
-$NewEstimate \leftarrow OldEstimate + StepSize[Target - OldEstimate]$
-\end{adjustbox}
-#+end_export
-** What we're trying to model
-** General goal
-* Preliminary results
-** What did we learn at this point?
-* Experiments
-** The model
-*** Schema of mouse with possible actions
-**** Egocentric
-**** Allocentric
-** Split data in 2, learn on first half, predict on second half
-** With/without joint repr
-* What we plan to do next
-** What we expect to see
-* Summary
 #+begin_export latex
 {%
 \setbeamertemplate{background canvas}{\includegraphics[height=\paperheight]{img/grand-canyon.JPG}}
-\begin{frame}[fragile,t]{Acknowledgments}
+\begin{frame}[fragile,t, plain]{Acknowledgments}
+    \vspace{1em}
     \begin{columns}[T]
         \begin{column}{0.5\textwidth}
             \begin{itemize}
@@ -204,20 +268,19 @@ $NewEstimate \leftarrow OldEstimate + StepSize[Target - OldEstimate]$
                 \item Fleischmann lab~:
                 \begin{itemize}
                     \tiny
-                    \item \textbf{Alexander Fleischmann}
-                    \item Simon Daste
-                    \item Max Seppo
-                    \item Wilson Andrés Mena Orostica
-                    \item \colorbox{white}{\transparent{0.2}Sara Zeppilli}}
-                    \item Zach Levin
-                    \item Robin Attey
+                    \item Alexander Fleischmann
                     \item Keeley Baker
                     \item Olivia Mckissick
-                    \item Diego Rodriguez
-                    \item Shaun Kohli
-                    \item Andrew Aoun
-                    \item Eseosa Uwaifo
+                    \item Tuan Pham
+                    \item Simon Daste
+                    \item Max Seppo
+                    %\item \colorbox{white}{\transparent{0.2}Sara Zeppilli}}
+                    \item Sara Zeppilli
+                    \item Nell Klimpert
                     \item Erin Meyers
+                    \item Eseosa Uwaifo
+                    \item Camille Donoho
+                    \item Timothy Pyon
                 \end{itemize}
             \end{itemize}
         \end{column}
@@ -228,9 +291,8 @@ $NewEstimate \leftarrow OldEstimate + StepSize[Target - OldEstimate]$
                 \item Collaborations~:
                 \begin{itemize}
                     \tiny
-                    \item \textbf{Jason Ritt} (Carney Institute, Brown University)
-                    \item \textbf{Richard Gerkin} (Arizona State University)
-                    \item \textbf{Matt Nassar} (Brown University)
+                    \item Jason Ritt (Carney Institute, Brown University)
+                    \item Matt Nassar (Brown University)
                     \item Niloufar Razmi (Brown University)
                 \end{itemize}
             \end{itemize}
@@ -239,35 +301,4 @@ $NewEstimate \leftarrow OldEstimate + StepSize[Target - OldEstimate]$
 \end{frame}
 }
 #+end_export
-** Acknowledgments
-*** Lab :BMCOL:
-:PROPERTIES:
-:BEAMER_col: 0.5
-:END:
-- Alexander Fleischmann
-- Sara Zepilli
-- Max Seppo
-- Olivia McKissick
-- Simon Daste
-- Keeley Baker
-- Nell Klimpert
-- Tuan Pham
-- Camille Donoho
-- Erin Meyers
-- Eseosa Uwaifo
-- Timothy Pyon
-
-*** Collaborations :BMCOL:
-:PROPERTIES:
-:BEAMER_col: 0.5
-:END:
-- Jason Ritt
-- Matt Nassar
-- Niloufar Razmi
-** \nbsp{}
-:PROPERTIES:
-:BEAMER_opt: standout
-:END:
-Questions ?
-
 * Feedback :noexport:

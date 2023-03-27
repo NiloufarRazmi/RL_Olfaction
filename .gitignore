@@ -9,3 +9,4 @@ wtMatrix.json
 **/__pycache__/
 .~lock.*
 **/.auctex-auto
+*.bkp

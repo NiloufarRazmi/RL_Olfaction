@@ -36,6 +36,7 @@ rows = 5
 cols = 5
 tiles_locations = np.arange(rows * cols)
 tiles_locations.reshape((rows, cols))
+likelihood_threshold = 0.85
 
 # %%
 # day = "d1"
@@ -97,10 +98,15 @@ plot_coords(
 )
 
 # %%
-head_naive[head_naive.likelihood < 0.5]
+head_naive[head_naive.likelihood < likelihood_threshold]
 
 # %%
-sns.scatterplot(data=head_naive[head_naive.likelihood > 0.75], x="x", y="y", alpha=0.25)
+sns.scatterplot(
+    data=head_naive[head_naive.likelihood > likelihood_threshold],
+    x="x",
+    y="y",
+    alpha=0.25,
+)
 plt.show()
 
 # %%
@@ -111,7 +117,9 @@ sns.scatterplot(data=head_naive.query("x > 100 & x < 550"), x="x", y="y", alpha=
 plt.show()
 
 # %%
-head_naive.drop(head_naive[head_naive.likelihood < 0.5].index, inplace=True)
+head_naive.drop(
+    head_naive[head_naive.likelihood < likelihood_threshold].index, inplace=True
+)
 head_naive.drop(head_naive.query("x < 100 | x > 550").index, inplace=True)
 
 # %%
@@ -200,7 +208,9 @@ plot_coords(
 )
 
 # %%
-head_trained.drop(head_trained[head_trained.likelihood < 0.5].index, inplace=True)
+head_trained.drop(
+    head_trained[head_trained.likelihood < likelihood_threshold].index, inplace=True
+)
 head_trained.drop(head_trained.query("x < 80 or x > 550").index, inplace=True)
 head_trained
 
@@ -230,30 +240,14 @@ plot_locations_count(
 # ## Extract actions
 
 # %%
-# x_bins = np.arange(cols)
-# y_bins = np.arange(rows)
-# for col in range(cols):
-#     x_bins[col] = (
-#         head_naive.x.max() - head_naive.x.min()
-#     ) / cols + col * head_naive.x.min()
-# for row in range(rows):
-#     y_bins[row] = (
-#         head_naive.y.max() - head_naive.y.min()
-#     ) / rows + row * head_naive.y.min()
-# x_bins, y_bins
-
-# %%
-# head_naive["col"] = np.digitize(head_naive.x, x_bins)
-# head_naive["row"] = np.digitize(head_naive.y, y_bins)
-# head_naive
-
-# %%
+# Get the boundaries of the tiles
 hist2d_naive, xedges_naive, yedges_naive = np.histogram2d(
     x=head_naive.x, y=head_naive.y, bins=[cols, rows]
 )
 hist2d_naive, xedges_naive, yedges_naive
 
 # %%
+# Populate the row/col numbers
 col = np.full(shape=len(head_naive), fill_value=np.nan)
 row = np.full(shape=len(head_naive), fill_value=np.nan)
 for idr, _ in enumerate(tqdm(head_naive.index)):
@@ -270,18 +264,37 @@ head_naive["col"] = col.astype(np.int_)
 head_naive
 
 # %%
-tiles_locations.reshape((rows, cols)).T
+tiles_map = tiles_locations.reshape((rows, cols))
+tiles_map
 
 # %%
+tiles_map.T
+
+# %%
+# Populate the tile number
 head_naive["tile"] = np.full(shape=len(head_naive), fill_value=np.nan)
 for row in range(rows):
     for col in range(cols):
         head_naive.loc[
             (head_naive.row == row) & (head_naive.col == col), "tile"
-        ] = tiles_locations.reshape((rows, cols)).T[row, col]
+        ] = tiles_map.T[row, col]
 head_naive
 
 # %%
+# Transpose everything because the north port is filmed
+# in the bottom left instead of top right corner
+for idx in tqdm(head_naive.index):
+    row, col = np.argwhere(
+        tiles_map.T
+        == tiles_map[int(head_naive.loc[idx].row), int(head_naive.loc[idx].col)]
+    ).flatten()
+    head_naive.loc[idx, "row"] = row
+    head_naive.loc[idx, "col"] = col
+    head_naive.loc[idx, "tile"] = tiles_map.T[row, col]
+head_naive
+
+# %%
+# Select only moves from one tile to another
 tile_changes = head_naive.iloc[
     np.concatenate(
         [np.array([False]), (head_naive.tile.diff().dropna() != 0).to_numpy()]
@@ -290,19 +303,47 @@ tile_changes = head_naive.iloc[
 tile_changes
 
 # %%
-row_conv = {1: "UP", -1: "DOWN"}
+# Populate the action corresponding to each tile movement
+row_conv = {-1: "UP", 1: "DOWN"}
 col_conv = {1: "RIGHT", -1: "LEFT"}
 
 head_naive["action"] = np.full(shape=len(head_naive), fill_value=np.nan)
 diff_row = tile_changes.row.diff()
 diff_col = tile_changes.col.diff()
-for idx, row in tile_changes[1:].iterrows():
-    if diff_row[idx] != 0 and np.abs(diff_row[idx]) == 1:
-        head_naive.loc[idx, "action"] = row_conv[diff_row[idx]]
-    elif diff_col[idx] != 0 and np.abs(diff_col[idx]) == 1:
-        head_naive.loc[idx, "action"] = col_conv[diff_col[idx]]
+for filt_idx, _ in enumerate(tile_changes.index[1:]):
+    main_idx = tile_changes.index[filt_idx]
+    if diff_col.iloc[filt_idx] == 0 and np.abs(diff_row.iloc[filt_idx]) == 1:
+        head_naive.loc[main_idx, "action"] = row_conv[diff_row.iloc[filt_idx]]
+    elif diff_row.iloc[filt_idx] == 0 and np.abs(diff_col.iloc[filt_idx]) == 1:
+        head_naive.loc[main_idx, "action"] = col_conv[diff_col.iloc[filt_idx]]
     else:
+        # If the move if the move is of more than one tile, there's something wrong
         warnings.warn(
-            f"Issue with row: {idx} - row: {diff_row[idx]} - col: {diff_col[idx]}"
+            f"Issue with row: {filt_idx} - row: {diff_row.iloc[filt_idx]} - col: {diff_col.iloc[filt_idx]}"
         )
 head_naive.dropna()
+
+# %%
+tiles_map.T
+
+# %%
+# # Filter incoherent actions
+# head_naive["coherent"] = np.full(shape=len(head_naive), fill_value=False)
+# filt_idx_prev = head_naive.dropna().index[0]
+# for idx, filt_idx in enumerate(head_naive.loc[1:].dropna().index):
+#     diff_row = head_naive.loc[filt_idx].row - head_naive.loc[filt_idx_prev].row
+#     diff_col = head_naive.loc[filt_idx].col - head_naive.loc[filt_idx_prev].col
+#     if diff_col == 0 and np.abs(diff_row) == 1:
+#         head_naive.loc[filt_idx, "coherent"] = True
+#     elif diff_row == 0 and np.abs(diff_col) == 1:
+#         head_naive.loc[filt_idx, "coherent"] = True
+#     filt_idx_prev = filt_idx
+# head_naive_coherent = head_naive[head_naive.coherent == True]
+# head_naive_coherent
+
+# %%
+# Save the dataset
+actions_path = Path(f"{naive_coord_path.stem}_naive_actions.csv")
+head_naive.to_csv(actions_path)
+
+# %%

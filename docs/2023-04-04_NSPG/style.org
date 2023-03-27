@@ -25,6 +25,7 @@
 #+LaTeX_HEADER: \usepackage{color}
 #+LaTeX_HEADER: \usepackage{transparent}
 #+BEAMER_HEADER: \setbeamercovered{transparent=10}
+#+LaTeX_HEADER: \usepackage{textpos}
 
 
 # #+BEAMER_HEADER: \makeatletter\patchcmd{\beamer@subsectionintoc}{\vskip1.5em}{\vskip0.5em}{}{}\makeatother
