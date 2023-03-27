@@ -16,11 +16,20 @@
 *** Behavior only (theoretical)
 *** Fit behavior to data to be able to predict actual behavior
 *** Investigate neural representations needed to solve an olfactory task
-** Why we record in the LEC?
-- Hypothesised to encode local
-** Joint representation
-*** Feature selection
-- Which features/representations are needed/the brain use to learn the task?
+** Context
+#+begin_export latex
+\metroset{block=fill}
+\begin{exampleblock}{Hypothesis}
+LEC hypothesized to encode the conjunction of odor-place information
+\end{exampleblock}
+\pause
+#+end_export
+#+begin_export latex
+\metroset{block=fill}
+\begin{exampleblock}{Question}
+Which representations are needed by the brain to learn a place-odor association task?
+\end{exampleblock}
+#+end_export
 ** What is Reinforcement Learning and why we want to use it ?
 *** Diagram :BMCOL:
 :PROPERTIES:
@@ -60,13 +69,6 @@ $V(S_t) = V(S_t) + \alpha(\underbrace{R_{t+1} + \gamma V(S_{t+1})}_\text{TD targ
 \begin{adjustbox}{max width=\columnwidth, keepaspectratio}
 $NewEstimate \leftarrow OldEstimate + StepSize[Target - OldEstimate]$
 \end{adjustbox}
-#+end_export
-** Hypothesis
-#+begin_export latex
-\metroset{block=fill}
-\begin{exampleblock}{Hypothesis}
-LEC hypothesized to encode the conjunction of odor-place information
-\end{exampleblock}
 #+end_export
 * Experimental setup and task
 ** Olivia's diamond arena olfactory task
@@ -178,9 +180,19 @@ Egocentric
 \to The agent learns to solve the task
 ** States occupancy ?
 ** Can we predict the behavioral data ?
+#+ATTR_LaTeX: :width \textwidth
+*** Left :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+#+ATTR_LaTeX: :width \textwidth
 [[file:img/naive-mouse-coords.png]]
-* What we plan to do next
-** What we plan to do next
+*** Right :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+
+* Next steps
 ** From tabular RL to deep RL
 #+ATTR_LaTeX: :height 0.7\textheight
 #+INCLUDE: "./RL-tab.tex" src latex
