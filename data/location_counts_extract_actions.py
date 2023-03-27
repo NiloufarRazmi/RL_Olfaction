@@ -268,7 +268,8 @@ tiles_map = tiles_locations.reshape((rows, cols))
 tiles_map
 
 # %%
-tiles_map.T
+rotated_tiles_map = np.rot90(tiles_map, 2)
+rotated_tiles_map
 
 # %%
 # Populate the tile number
@@ -277,20 +278,20 @@ for row in range(rows):
     for col in range(cols):
         head_naive.loc[
             (head_naive.row == row) & (head_naive.col == col), "tile"
-        ] = tiles_map.T[row, col]
+        ] = rotated_tiles_map[row, col]
 head_naive
 
 # %%
-# Transpose everything because the north port is filmed
+# Rotate everything because the north port is filmed
 # in the bottom left instead of top right corner
 for idx in tqdm(head_naive.index):
     row, col = np.argwhere(
-        tiles_map.T
+        rotated_tiles_map
         == tiles_map[int(head_naive.loc[idx].row), int(head_naive.loc[idx].col)]
     ).flatten()
     head_naive.loc[idx, "row"] = row
     head_naive.loc[idx, "col"] = col
-    head_naive.loc[idx, "tile"] = tiles_map.T[row, col]
+    head_naive.loc[idx, "tile"] = rotated_tiles_map[row, col]
 head_naive
 
 # %%
@@ -304,8 +305,8 @@ tile_changes
 
 # %%
 # Populate the action corresponding to each tile movement
-row_conv = {-1: "UP", 1: "DOWN"}
-col_conv = {1: "RIGHT", -1: "LEFT"}
+row_conv = {1: "UP", -1: "DOWN"}
+col_conv = {-1: "RIGHT", 1: "LEFT"}
 
 head_naive["action"] = np.full(shape=len(head_naive), fill_value=np.nan)
 diff_row = tile_changes.row.diff()
@@ -319,12 +320,13 @@ for filt_idx, _ in enumerate(tile_changes.index[1:]):
     else:
         # If the move if the move is of more than one tile, there's something wrong
         warnings.warn(
-            f"Issue with row: {filt_idx} - row: {diff_row.iloc[filt_idx]} - col: {diff_col.iloc[filt_idx]}"
+            f"Issue with row: {filt_idx} - "
+            "row: {diff_row.iloc[filt_idx]} - col: {diff_col.iloc[filt_idx]}"
         )
 head_naive.dropna()
 
 # %%
-tiles_map.T
+tiles_map
 
 # %%
 # # Filter incoherent actions
