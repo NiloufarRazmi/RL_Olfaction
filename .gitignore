@@ -10,3 +10,4 @@ wtMatrix.json
 .~lock.*
 **/.auctex-auto
 *.bkp
+*.dtmp
