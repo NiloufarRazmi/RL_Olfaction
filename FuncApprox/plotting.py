@@ -5,11 +5,12 @@ import numpy as np
 import seaborn as sns
 
 sns.set_theme()
+
 sns.set(font_scale=1.5)
+# plt.rcParams['text.usetex'] = True
 
 
 def plot_steps_and_rewards(df):
-    sns.set(font_scale=1.5)
     fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(15, 5))
     # ax[0].set(ylabel="Cummulated rewards")
     sns.lineplot(data=df, x="Episodes", y="Rewards", ax=ax[0])
@@ -18,6 +19,8 @@ def plot_steps_and_rewards(df):
     sns.lineplot(data=df, x="Episodes", y="Steps", ax=ax[1])
     # ax[1].set(ylabel="Averaged steps number")
     fig.tight_layout()
+    fig.patch.set_alpha(0)
+    fig.patch.set_facecolor("white")
 
     plt.show()
 
@@ -124,7 +127,7 @@ def plot_q_values_maps(qtable, rows, cols, labels):
     # font_name = "DejaVu Math TeX Gyre"
     # mpl.rcParams["font.family"] = font_name
 
-    f, ax = plt.subplots(2, 2, figsize=(12, 10))
+    fig, ax = plt.subplots(2, 2, figsize=(12, 10))
     maps = [
         np.arange(0, rows * cols),
         np.arange(rows * cols, 2 * rows * cols),
@@ -151,12 +154,14 @@ def plot_q_values_maps(qtable, rows, cols, labels):
             spine.set_visible(True)
             spine.set_linewidth(0.7)
             spine.set_color("black")
+
+    fig.patch.set_alpha(0)
+    fig.patch.set_facecolor("white")
     plt.show()
 
 
 def plot_states_actions_distribution(states, actions):
     """Plot the distributions of states and actions."""
-    sns.set(font_scale=1.5)
     fig, ax = plt.subplots(2, 1, figsize=(12, 5))
     sns.histplot(data=states, ax=ax[0], kde=True)
     ax[0].set_title("States")

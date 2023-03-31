@@ -7,7 +7,7 @@
 # #+PROPERTY: header-args:R :session *R* :results value :cache yes :tangle yes :exports code :eval yes
 # #+COLUMNS: %40ITEM %10BEAMER_env(Env) %9BEAMER_envargs(Env Args) %4BEAMER_col(Col) %10BEAMER_extra(Extra)
 # #+COLUMNS: %45ITEM %10BEAMER_env(Env) %10BEAMER_act(Act) %4BEAMER_col(Col) %8BEAMER_opt(Opt)
-#+BEAMER_HEADER: \institute{Brown University}
+#+BEAMER_HEADER: \institute{Fleischmann Lab}
 # #+BEAMER_HEADER: \author{\texorpdfstring{Andrea Pierré\newline\scriptsize\url{andrea_pierre@brown.edu}}{Andrea Pierré}}
 # #+BEAMER_HEADER:\titlegraphic{\hfill\includegraphics[height=1.5cm]{img/Brown Logo_2016_2 Color Process ST_1300.png}\vspace{7em}\flushright\includegraphics[height=1.5cm]{img/qr-code.png}}
 #+BEAMER_HEADER:\titlegraphic{\hfill\includegraphics[height=1.5cm]{img/Brown Logo_2016_2 Color Process ST_1300.png}}
@@ -20,7 +20,6 @@
 #+LaTeX_HEADER: \usetikzlibrary{automata, positioning, arrows, arrows.meta}
 #+LaTeX_HEADER: \usepackage{diagbox}
 #+LaTeX_HEADER: \usepackage{dsfont}
-#+LaTeX_HEADER: \usepackage{amsmath}
 #+LaTeX_HEADER: \usepackage{fontawesome5}
 # #+LaTeX_HEADER: \usepackage{ctable}
 # #+LaTeX_HEADER: \usepackage{emoji}
@@ -28,6 +27,11 @@
 #+LaTeX_HEADER: \usepackage{transparent}
 #+BEAMER_HEADER: \setbeamercovered{transparent=10}
 #+LaTeX_HEADER: \usepackage{textpos}
+
+# Maths
+#+LaTeX_HEADER: \usepackage{mathtools}
+# #+LaTeX_HEADER: \usepackage{firamath-otf}
+#+LaTeX_HEADER: \usepackage[mathrm=sym]{unicode-math}
 
 
 # #+BEAMER_HEADER: \makeatletter\patchcmd{\beamer@subsectionintoc}{\vskip1.5em}{\vskip0.5em}{}{}\makeatother

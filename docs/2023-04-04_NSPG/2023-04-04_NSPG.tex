@@ -1,4 +1,4 @@
-% Created 2023-03-29 Wed 04:13
+% Created 2023-03-31 Fri 13:29
 % Intended LaTeX compiler: lualatex
 \documentclass[bigger]{beamer}
 \usepackage{graphicx}
@@ -19,11 +19,12 @@
 \usetikzlibrary{automata, positioning, arrows, arrows.meta}
 \usepackage{diagbox}
 \usepackage{dsfont}
-\usepackage{amsmath}
 \usepackage{fontawesome5}
 \usepackage{color}
 \usepackage{transparent}
 \usepackage{textpos}
+\usepackage{mathtools}
+\usepackage[mathrm=sym]{unicode-math}
 \definecolor{RedBrown}{RGB}{192, 4, 4} \setbeamercolor{progress bar}{fg=RedBrown} \setbeamercolor{title separator}{fg=RedBrown}
 \setbeamercolor{progress bar in head/foot}{fg=RedBrown} \setbeamercolor{progress bar in section page}{fg=RedBrown} \setbeamercolor{alerted text}{fg=RedBrown}
 \pretocmd{\tableofcontents}{\thispagestyle{empty}}{}{}
@@ -57,7 +58,7 @@ tabsize=2
 \author{Andrea Pierré}
 \date{April 4, 2023}
 \title{Learning useful representations to solve a place-odor association task}
-\institute{Brown University}
+\institute{Fleischmann Lab}
 \titlegraphic{\hfill\includegraphics[height=1.5cm]{img/Brown Logo_2016_2 Color Process ST_1300.png}}
 \setbeamercovered{transparent=10}
 \setbeamertemplate{section in toc}[sections numbered]
@@ -66,21 +67,21 @@ tabsize=2
 \begin{document}
 
 \maketitle
-\begin{frame}[plain]{Outline}
+\begin{frame}{Outline}
 \tableofcontents
 \end{frame}
 
 \section{Context of the project}
-\label{sec:orge02e9ec}
+\label{sec:orgd77a2e5}
 \section*{Context}
-\label{sec:org48101ef}
+\label{sec:orgb7f49e9}
 {%
 \setbeamertemplate{background canvas}{\includegraphics[height=\paperheight]{img/kitchen1.png}}
 \begin{frame}[fragile]{Odor-place association}
 \end{frame}
 }
 \section*{Context}
-\label{sec:org2dd3d0b}
+\label{sec:org692af47}
 {%
 \setbeamertemplate{background canvas}{\includegraphics[height=\paperheight]{img/kitchen2.png}}
 \begin{frame}[fragile]{Odor-place association}
@@ -88,43 +89,52 @@ tabsize=2
 \end{frame}
 }
 \section*{Context}
-\label{sec:org0d37e46}
+\label{sec:org2c29495}
 {%
 \setbeamertemplate{background canvas}{\includegraphics[height=\paperheight]{img/kitchen3.png}}
 \begin{frame}[fragile]{Odor-place association}
 \addtocounter{framenumber}{-1}
 \end{frame}
 }
-\begin{frame}[label={sec:org5c53190}]{Why we are interested in the LEC ?}
+\begin{frame}[<+->][label={sec:org6ba3ff6}]{The LEC is key to sensory associations and spatial memory}
 \begin{columns}
-\begin{column}{0.5\columnwidth}
-\pause
-\scriptsize
+\begin{column}{0.45\columnwidth}
+%\pause
+%\scriptsize
+%\footnotesize
 \footnotesize
-\begin{itemize}[<+->]
-\item The LEC is key to sensory associations and spatial memory
 \begin{itemize}
-\scriptsize
-\item LEC is needed for learning sensory associations and certain spatial memory tasks
-\item Individual cells are tuned to goal, object, and sensory cue locations
-\end{itemize}
-\item The LEC connects sensory information to the HPC
-\begin{itemize}
-\scriptsize
-\item LEC and HPC are strongly and reciprocally connected
-\item Direct olfactory connections from OB and piriform
-\end{itemize}
+\item \alert{LEC} is needed for learning sensory associations and certain spatial memory tasks
+\item \alert{LEC} and \alert{hippocampus} are strongly and reciprocally connected
+\item Direct olfactory connections from \alert{olfactory bulb} and \alert{piriform}
 \end{itemize}
 \end{column}
-\begin{column}{0.5\columnwidth}
+\begin{column}{0.55\columnwidth}
 \begin{center}
-\includegraphics[width=\textwidth]{img/connectivity.png}
+\includegraphics[width=\textwidth]{img/brain.png}
 \end{center}
 \end{column}
 \end{columns}
 \end{frame}
 
-\begin{frame}[label={sec:org047aefd}]{Olivia's diamond arena olfactory task}
+\begin{frame}[label={sec:org9ecbf9e}]{Diamond arena experimental setup}
+\begin{textblock}{5}(11,-1.3)
+\center
+\includegraphics[width=3em]{img/olivia.jpg}\\
+\scriptsize
+Olivia McKissick
+\end{textblock}
+\begin{center}
+\includegraphics[width=0.8\textwidth]{img/physical-diamond-arena.png}
+\end{center}
+\end{frame}
+\begin{frame}[label={sec:org5245553}]{Diamond arena olfactory task}
+\begin{textblock}{5}(11,-0.5)
+\center
+\includegraphics[width=3em]{img/olivia.jpg}\\
+\scriptsize
+Olivia McKissick
+\end{textblock}
 \begin{columns}
 \begin{column}[t]{0.5\columnwidth}
 \center
@@ -142,25 +152,13 @@ Egocentric\\
 \begin{center}
 \includegraphics[width=0.8\textwidth]{img/egocentric-task.png}
 \end{center}
-
-\begin{textblock}{5}(-1,13)
-\center
-\includegraphics[width=3em]{img/olivia.jpg}\\
-\scriptsize
-Olivia McKissick
-\end{textblock}
 \end{column}
 \end{columns}
 \end{frame}
 
-\begin{frame}[label={sec:org3b70935}]{Diamond arena experimental setup}
-\begin{center}
-\includegraphics[width=.9\linewidth]{img/physical-diamond-arena.png}
-\end{center}
-\end{frame}
-\begin{frame}[label={sec:org10e66be}]{What is Reinforcement Learning and why we want to use it ?}
+\begin{frame}[<+->][label={sec:org268e49d}]{What is Reinforcement Learning and why use it ?}
 \begin{columns}
-\begin{column}{0.6\columnwidth}
+\begin{column}{0.55\columnwidth}
 % \usepackage{fontawesome5}
 \usetikzlibrary{positioning,fit,arrows}
 
@@ -200,9 +198,11 @@ Olivia McKissick
 \end{adjustbox}
 \end{column}
 
-\begin{column}{0.4\columnwidth}
-\small
+\begin{column}{0.45\columnwidth}
+\footnotesize
 \begin{itemize}
+\item Theoretical framework hypothesized to be implemented in the brain
+\item Tool to model behavior
 \item Goal of the agent : maximize rewards
 \item Natural fit for behavioral experiments involving rewards and learning
 \end{itemize}
@@ -210,7 +210,7 @@ Olivia McKissick
 \end{columns}
 \end{frame}
 
-\begin{frame}[label={sec:org60e9efd}]{Temporal Difference learning}
+\begin{frame}[label={sec:orgb973b7f}]{RL maps states to optimized actions}
 \begin{columns}
 \begin{column}{0.5\columnwidth}
 \begin{center}
@@ -219,101 +219,134 @@ Olivia McKissick
 \end{column}
 \begin{column}{0.5\columnwidth}
 \begin{adjustbox}{max width=\columnwidth, keepaspectratio}
-$V(S_t) = V(S_t) + \alpha(\underbrace{R_{t+1} + \gamma V(S_{t+1})}_\text{TD target} - V(S_t))$
+\( Q^{new}(s_t, a_t) \longleftarrow Q(s_t, a_t) + \underbrace{\alpha}_\text{learning rate}\overbrace{(\underbrace{r_t}_\text{reward} + \gamma \operatorname*{max}_a Q(s_{t+1, a}) - Q(s_t, a_t))}^\text{temporal difference} \)
 \end{adjustbox}\\[1em]
 \begin{adjustbox}{max width=\columnwidth, keepaspectratio}
-$NewEstimate \leftarrow OldEstimate + StepSize[Target - OldEstimate]$
+%\begin{align}
+\( \mathbf{Q} = \mathrm{\mathbf{x}} \cdot \mathbf{W} \)
+%\end{align}
 \end{adjustbox}
 \end{column}
 \end{columns}
 \end{frame}
 \section*{Question}
-\label{sec:orgc2118bd}
+\label{sec:org52745ce}
 \begin{frame}[fragile]{}
 \metroset{block=fill}
 \begin{exampleblock}{Question}
 Which representations are needed by the brain to learn a place-odor association task ?
 \end{exampleblock}
 \end{frame}
-\section{Experiments \& preliminary results}
-\label{sec:org0dbcc52}
-\begin{frame}[label={sec:org961d1bb}]{The model}
+\section{Modeling \& preliminary results}
+\label{sec:org28367b5}
+\begin{frame}[label={sec:org9eb7334}]{Allocentric vs. Egocentric}
+\begin{columns}
+\begin{column}{0.5\columnwidth}
+\center
+Allocentric
+\end{column}
+\begin{column}{0.5\columnwidth}
+\center
+Egocentric
+\end{column}
+\end{columns}
+\begin{block}{~}
+\begin{center}
+\includegraphics[width=.9\linewidth]{img/ego-vs-allo.jpg}
+\end{center}
+\end{block}
+\end{frame}
+\begin{frame}[label={sec:orgc26ac97}]{The model}
 \begin{columns}
 \begin{column}{0.5\columnwidth}
 \center
 Allocentric
 \begin{center}
-\includegraphics[width=\textwidth]{img/RL_environment-Allo.drawio.png}
+\includegraphics[width=\textwidth]{img/RL_env-allo-model.drawio.png}
 \end{center}
 \end{column}
 \begin{column}{0.5\columnwidth}
 \end{column}
 \end{columns}
 \end{frame}
-\begin{frame}[label={sec:org85797eb}]{The model}
+\begin{frame}[label={sec:org239fa30}]{The model}
 \addtocounter{framenumber}{-1}
 \begin{columns}
 \begin{column}{0.5\columnwidth}
 \center
 Allocentric
 \begin{center}
-\includegraphics[width=\textwidth]{img/RL_environment-Allo.drawio.png}
+\includegraphics[width=\textwidth]{img/RL_env-allo-model.drawio.png}
 \end{center}
 \end{column}
 \begin{column}{0.5\columnwidth}
 \center
 Egocentric
 \begin{center}
-\includegraphics[width=\textwidth]{img/RL_environment-Ego.drawio.png}
+\includegraphics[width=\textwidth]{img/RL_env-ego-model.drawio.png}
 \end{center}
 \end{column}
 \end{columns}
 \end{frame}
-\begin{frame}[label={sec:orgb3bc871}]{With joint representation}
+\begin{frame}[label={sec:orgfa80403}]{The joint representation encodes odor + location}
+\begin{center}
+\includegraphics[width=.9\linewidth]{img/joint-repr.drawio.png}
+\end{center}
+\end{frame}
+\begin{frame}[label={sec:orge8b1e2b}]{Minimizing the number of steps to solve the task}
 \begin{columns}
-\begin{column}{0.5\columnwidth}
+\begin{column}[t]{0.5\columnwidth}
 \begin{center}
-\includegraphics[height=0.4\textheight]{img/features-allo-joint-repr.png}
+With joint representation
 \end{center}
-\end{column}
-\begin{column}{0.5\columnwidth}
 \begin{center}
-\includegraphics[width=\textwidth]{img/policy-allo-joint-repr.png}
-\end{center}
-\end{column}
-\end{columns}
-\begin{block}{~}
-\vspace{-2em}
-\begin{center}
-\includegraphics[height=0.4\textheight]{img/rewards-steps-allo-joint-repr.png}
+\includegraphics[width=\textwidth]{img/steps-allo-joint-repr.png}
 \end{center}
 \(\to\) The agent learns to solve the task
-\end{block}
-\end{frame}
-\begin{frame}[label={sec:org02350da}]{Without joint representation}
-\begin{columns}
-\begin{column}{0.5\columnwidth}
-\begin{center}
-\includegraphics[height=0.4\textheight]{img/features-allo-no-joint-repr.png}
-\end{center}
 \end{column}
-\begin{column}{0.5\columnwidth}
+
+\begin{column}[t]{0.5\columnwidth}
 \begin{center}
-\includegraphics[width=\textwidth]{img/policy-allo-no-joint-repr.png}
+Without joint representation
 \end{center}
+\begin{center}
+\includegraphics[width=\textwidth]{img/steps-allo-no-joint-repr.png}
+\end{center}
+\(\to\) The agent doesn't learn
 \end{column}
 \end{columns}
-\begin{block}{~}
-\vspace{-2em}
+\end{frame}
+\begin{frame}[label={sec:org844a1f5}]{Maximizing rewards}
+\begin{columns}
+\begin{column}[t]{0.5\columnwidth}
 \begin{center}
-\includegraphics[height=0.4\textheight]{img/rewards-steps-allo-no-joint-repr.png}
+With joint representation
 \end{center}
-\(\to\) The agent is unable to solve the task
-\end{block}
+\begin{center}
+\includegraphics[width=\textwidth]{img/rewards-allo-joint-repr.png}
+\end{center}
+\(\to\) The agent learns to solve the task
+\end{column}
+
+\begin{column}[t]{0.5\columnwidth}
+\begin{center}
+Without joint representation
+\end{center}
+\begin{center}
+\includegraphics[width=\textwidth]{img/rewards-allo-no-joint-repr.png}
+\end{center}
+\(\to\) The agent doesn't learn
+\end{column}
+\end{columns}
+\end{frame}
+\begin{frame}[label={sec:org439d520}]{What policy did the agent learned ?}
+\begin{center}
+\includegraphics[height=0.9\textheight]{img/policy-allo-joint-repr.png}
+\end{center}
 \end{frame}
 \section{Next steps}
-\label{sec:org58dbcff}
-\begin{frame}[label={sec:orgb6d6ced}]{From tabular RL to deep RL}
+\label{sec:org80f82d7}
+\begin{frame}[label={sec:org5089755}]{From tabular RL to deep RL}
 \center
 % \usepackage{fontawesome5}
 \usetikzlibrary{positioning,fit,arrows}
@@ -346,7 +379,7 @@ Egocentric
         \node[punkt,below=of center] (environment) {Environment \faIcon{globe}};
         \node[right=8em of center, align=center] (action) {Action\\$a_t$};
         \node[left=8em of center, align=center] (state_reward) {State, Reward\\$s_t$, $r_t$};
-        \node [below=-0.2em of environment] {\includegraphics[height=8em]{./img/RL_environment-Allo.drawio.png}};
+        \node [below=-0.2em of environment] {\includegraphics[height=8em]{./img/RL_env-allo-model.drawio.png}};
 
         \path[pil]
         (state_reward.east) edge [->, bend left=45] node {} (agent.west)
@@ -357,7 +390,7 @@ Egocentric
 \end{adjustbox}
 \end{frame}
 
-\begin{frame}[label={sec:orgadc390d}]{From tabular RL to deep RL}
+\begin{frame}[label={sec:org5213989}]{From tabular RL to deep RL}
 \center
 \addtocounter{framenumber}{-1}
 % \usepackage{fontawesome5}
@@ -391,7 +424,7 @@ Egocentric
         \node[punkt,below=of center] (environment) {Environment \faIcon{globe}};
         \node[right=8em of center, align=center] (action) {Action\\$a_t$};
         \node[left=8em of center, align=center] (state_reward) {State, Reward\\$s_t$, $r_t$};
-        \node [below=-0.2em of environment] {\includegraphics[height=8em]{./img/RL_environment-Allo.drawio.png}};
+        \node [below=-0.2em of environment] {\includegraphics[height=8em]{./img/RL_env-allo-model.drawio.png}};
 
         \path[pil]
         (state_reward.east) edge [->, bend left=45] node {} (agent.west)
@@ -402,23 +435,27 @@ Egocentric
 \end{adjustbox}
 \end{frame}
 
-\begin{frame}[label={sec:org83f12bc}]{What are the representations needed to solve the task ?}
+\begin{frame}[label={sec:orgc8b79f6}]{What types of representations are in use to solve the odor-place association task ?}
 \begin{columns}
-\begin{column}{0.5\columnwidth}
+\begin{column}[t]{0.5\columnwidth}
+\begin{center}
+Experiment
+\end{center}
 \begin{center}
 \includegraphics[height=0.25\textheight]{img/place-cells-grid-cells.jpg.png}
+\end{center}
+\(\to\) Look for candidate patterns in the data: place cells, grid cells,\dots{}?
+\end{column}
+\begin{column}[t]{0.5\columnwidth}
+\begin{center}
+Simulation
 \end{center}
 \begin{center}
 \includegraphics[height=0.25\textheight]{img/nn.svg.png}
 \end{center}
-\end{column}
-\begin{column}{0.5\columnwidth}
-\begin{enumerate}
-\item Look for candidate patterns in the data: place cells, grid cells,\dots{}?
-\item Compare the data with the representations learned from scratch by the neural network
-\end{enumerate}
+\(\to\) Compare the data with the representations learned from scratch by the neural network
 
-\begin{textblock}{5}(0,12)
+\begin{textblock}{5}(-8.5,0.5)
 \begin{minipage}[t]{3em}
 \center
 \includegraphics[height=2em]{img/matt-nassar.jpg}\\
@@ -436,10 +473,15 @@ Niloufar Razmi
 \end{columns}
 \end{frame}
 
-\begin{frame}[label={sec:orgc7de864}]{Summary}
+\begin{frame}[<+->][label={sec:org2b0d972}]{Summary}
+\begin{itemize}
+\item The LEC is key to sensory associations and spatial memory
+\item Reinforcement Learning can be a useful tool to model behavior involving rewards
+\item The joint representation is needed to solve an odor-place location task
+\end{itemize}
 \end{frame}
 \section*{Acknowledgments}
-\label{sec:org3e74109}
+\label{sec:org1edb247}
 {%
 \setbeamertemplate{background canvas}{\includegraphics[height=\paperheight]{img/grand-canyon.JPG}}
 \begin{frame}[fragile,t, plain]{Acknowledgments}
@@ -457,7 +499,7 @@ Niloufar Razmi
                     \item Tuan Pham
                     \item Simon Daste
                     \item Max Seppo
-                    %\item \colorbox{white}{\transparent{0.2}Sara Zeppilli}}
+                    %\item \colorbox{white}{\transparent{0.2}Sara Zeppilli}
                     \item Sara Zeppilli
                     \item Nell Klimpert
                     \item Erin Meyers
@@ -466,8 +508,9 @@ Niloufar Razmi
                     \item Timothy Pyon
                 \end{itemize}
             \end{itemize}
-            \vspace{4em}
-            \hspace{1.5em}\includegraphics[height=1.5cm]{img/qr-code.png}
+            \vspace{5em}
+            \includegraphics[height=1.5cm]{img/qr-code.png}\\
+            %\colorbox{white}{\footnotesize\transparent{0.5}https://reduced.to/tn9x6}
         \end{column}
 
         \begin{column}{0.5\textwidth}
