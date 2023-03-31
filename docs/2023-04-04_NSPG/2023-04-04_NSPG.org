@@ -60,9 +60,9 @@
 %\footnotesize
 \footnotesize
 #+end_export
-- *LEC* is needed for learning sensory associations and certain spatial memory tasks
-- *LEC* and *hippocampus* are strongly and reciprocally connected
-- Direct olfactory connections from *olfactory bulb* and *piriform*
+- *Piriform* encodes olfactory information
+- *Hippocampus* encodes spatial information
+- *LEC* encodes both olfactory & spatial information
 *** Image :BMCOL:
 :PROPERTIES:
 :BEAMER_col: 0.55
@@ -304,7 +304,7 @@ Without joint representation
 #+ATTR_LaTeX: :height 0.9\textheight
 [[file:img/policy-allo-joint-repr.png]]
 * Next steps
-** From tabular RL to deep RL
+** What we have done so far
 #+begin_export latex
 \center
 #+end_export
@@ -344,28 +344,28 @@ Simulation
 \to Compare the data with the representations learned from scratch by the neural network
 
 #+begin_export latex
-\begin{textblock}{5}(-8.5,0.5)
-\begin{minipage}[t]{3em}
-\center
-\includegraphics[height=2em]{img/matt-nassar.jpg}\\
-\scriptsize
-Matt Nassar
-\end{minipage}
-\begin{minipage}[t]{3em}
-\center
-\includegraphics[height=2em]{img/niloufar-razmi.jpeg}\\
-\scriptsize
-Niloufar Razmi
-\end{minipage}
-\end{textblock}
+% \begin{textblock}{5}(-8.5,0.5)
+% \begin{minipage}[t]{3em}
+% \center
+% \includegraphics[height=2em]{img/matt-nassar.jpg}\\
+% \scriptsize
+% Matt Nassar
+% \end{minipage}
+% \begin{minipage}[t]{3em}
+% \center
+% \includegraphics[height=2em]{img/niloufar-razmi.jpeg}\\
+% \scriptsize
+% Niloufar Razmi
+% \end{minipage}
+% \end{textblock}
 #+end_export
 
 ** Summary
 :PROPERTIES:
 :BEAMER_act: [<+->]
 :END:
-- The LEC is key to sensory associations and spatial memory
-- Reinforcement Learning can be a useful tool to model behavior involving rewards
+- We record in the LEC which encodes spatial & olfactory information
+- Reinforcement Learning can be a useful tool to model behavior involving rewards and learning
 - The joint representation is needed to solve an odor-place location task
 * Acknowledgments
 :PROPERTIES:
@@ -409,8 +409,8 @@ Niloufar Razmi
                 \item Collaborations
                 \begin{itemize}
                     \tiny
-                    \item Jason Ritt
                     \item Matt Nassar
+                    \item Jason Ritt
                     \item Niloufar Razmi
                 \end{itemize}
             \end{itemize}
