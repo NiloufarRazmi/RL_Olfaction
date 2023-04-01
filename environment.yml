@@ -7,7 +7,7 @@ dependencies:
   - python>=3.8
   - numpy
   - ipykernel
-  # - pip
+  - pip
   - matplotlib
   - jupyterlab
   - jupytext
@@ -15,7 +15,6 @@ dependencies:
   - jupyterlab-git
   - ipdb
   - black[jupyter]
-  # - flake8
   - ruff
   - ipywidgets
   - seaborn
@@ -24,5 +23,5 @@ dependencies:
   - tqdm
   - pandas
   - scikit-learn
-  # - isort
-  # pip:
+  - pip:
+      - imojify

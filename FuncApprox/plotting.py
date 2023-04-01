@@ -1,10 +1,14 @@
 import itertools
 
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
+from imojify import imojify
+from matplotlib.offsetbox import AnnotationBbox, OffsetImage
 
 sns.set_theme()
+mpl.rcParams["font.family"] = ["Fira Sans"]
 
 sns.set(font_scale=1.5)
 # plt.rcParams['text.usetex'] = True
@@ -154,6 +158,46 @@ def plot_q_values_maps(qtable, rows, cols, labels):
             spine.set_visible(True)
             spine.set_linewidth(0.7)
             spine.set_color("black")
+
+    fig.patch.set_alpha(0)
+    fig.patch.set_facecolor("white")
+    plt.show()
+
+
+def add_emoji(coords, emoji, ax):
+    """Add emoji as image at absolute coordinates."""
+    img = plt.imread(imojify.get_img_path(emoji))
+    im = OffsetImage(img, zoom=0.08)
+    im.image.axes = ax
+    ab = AnnotationBbox(im, (coords[0], coords[1]), frameon=False, pad=0)
+    ax.add_artist(ab)
+
+
+def plot_policy_emoji(qtable, rows, cols, label, emoji):
+    """Plot the heatmap of the Q-values.
+
+    Also plot the best action's direction with arrows."""
+
+    fig, ax = plt.subplots(figsize=(10, 8))
+
+    qtable_val_max, qtable_directions = qtable_directions_map(qtable, rows, cols)
+    sns.heatmap(
+        qtable_val_max,
+        annot=qtable_directions,
+        fmt="",
+        ax=ax,
+        cmap=sns.color_palette("Blues", as_cmap=True),
+        linewidths=0.7,
+        linecolor="black",
+        xticklabels=[],
+        yticklabels=[],
+        annot_kws={"fontsize": "xx-large"},
+    ).set(title=label)
+    for _, spine in ax.spines.items():
+        spine.set_visible(True)
+        spine.set_linewidth(0.7)
+        spine.set_color("black")
+    add_emoji(emoji["coords"], emoji["emoji"], ax)
 
     fig.patch.set_alpha(0)
     fig.patch.set_facecolor("white")

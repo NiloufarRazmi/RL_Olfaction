@@ -1,12 +1,9 @@
 #+TITLE: Learning useful representations to solve a place-odor association task
 # #+SUBTITLE: NSGP seminar
 # #+SUBTITLE: (Reinforcement) learning of an odor-place association task
+# #+TITLE: Using Reinforcement Learning to solve a place-odor association task
 #+author: Andrea Pierré
 #+date: April 4, 2023
-* COMMENT Add plain option to Beamer TOC
-% Local variables:
-% org-beamer-outline-frame-options: "plain"
-% End:
 * HEADER :noexport:
 #+SETUPFILE: ./style.org
 
@@ -47,9 +44,6 @@
 }
 #+end_export
 ** The LEC is key to sensory associations and spatial memory
-:PROPERTIES:
-:BEAMER_act: [<+->]
-:END:
 *** Text :BMCOL:
 :PROPERTIES:
 :BEAMER_col: 0.45
@@ -301,8 +295,40 @@ Without joint representation
 [[file:img/rewards-allo-no-joint-repr.png]]
 \to The agent doesn't learn
 ** What policy did the agent learned ?
-#+ATTR_LaTeX: :height 0.9\textheight
-[[file:img/policy-allo-joint-repr.png]]
+#+begin_export latex
+\vspace{-7em}
+#+end_export
+*** Left
+:PROPERTIES:
+:BEAMER_col: 0.5
+:BEAMER_opt: [t]
+:END:
+#+ATTR_LaTeX: :height 0.4\textheight
+[[file:img/policy-allo-north-light.png]]
+*** Right
+:PROPERTIES:
+:BEAMER_col: 0.5
+:BEAMER_opt: [t]
+:END:
+#+ATTR_LaTeX: :height 0.4\textheight
+[[file:img/policy-allo-south-light.png]]
+** What policy did the agent learned ?
+*** Left
+:PROPERTIES:
+:BEAMER_col: 0.5
+:BEAMER_opt: [t]
+:END:
+#+ATTR_LaTeX: :height 0.4\textheight
+[[file:img/policy-allo-north-light.png]]
+[[file:img/policy-allo-odor-A.png]]
+*** Right
+:PROPERTIES:
+:BEAMER_col: 0.5
+:BEAMER_opt: [t]
+:END:
+#+ATTR_LaTeX: :height 0.4\textheight
+[[file:img/policy-allo-south-light.png]]
+[[file:img/policy-allo-odor-B.png]]
 * Next steps
 ** What we have done so far
 #+begin_export latex
@@ -506,3 +532,61 @@ Put it in the next steps?
 **** If the no repr the model can't solve the task
 *** Saying expectations loud
 *** TODO Add a fit to reward plot to show the trend
+** v3
+*** No connection between coffee & LEC slide
+*** TODO What's the motivation? Goals? Why it matters?
+*** Question motivated by this and that
+*** What do I mean by states?
+*** TODO Put Jason/Matt/Niloufar in the first slide
+*** TODO No outline, directly coffee
+*** Tea in one room, coffee in the other room
+*** Agent on the map
+Bubble with what it is thinking
+Bubble with question mark
+*** What happens in the head of the agent?
+That's why we show LEC
+What states in the head of the agent
+*** How does the brain learn to know olfactory information to associate
+What we think are the major players involved LEC, blabbla
+*** Focus on transitions
+*** Include only A, B and D in experiment
+What do I show the ports? If I don't talk about it, don't need to show
+*** Go from brain to schema of the task
+*** Animate allocentric schema
+*** Show egocentric?
+*** Type of infor the mouse is using to solve the task
+\to joint repr
+What type of information the mouse might keep track of?
+*** Path
+1. repr to RL
+2. RL to repr
+*** Didn't explain states on the RL diagram
+Rl work if you get the right states repr
+What is the right states repr
+Then show joint repr slide
+*** Animate states that strengthen connections
+*** Legend on the policy
+*** We also did it with an egocentric action space
+*** Walk through allocentric model
+*** Same info, two ways to represent the info
+In one way it doesn't learn
+In the other it learns
+
+** Priorities
+*** Title?
+*** Intro with coffee/tea/agent
+*** Pictures arena
+*** Redo task schema
+*** Allo vs. ego schema?
+*** Plots
+**** Fit on plots
+**** DONE Odor emoji
+**** Legend?
+*** Next steps
+**** Write clear text?
+**** Remake exp vs simulation with loop?
+
+* COMMENT Add plain option to Beamer TOC
+% Local variables:
+% org-beamer-outline-frame-options: "plain"
+% End:

@@ -205,3 +205,5 @@ plotting_ego.plot_location_count(
     cues=env.cues,
     contexts_labels=CONTEXTS_LABELS,
 )
+
+# %%

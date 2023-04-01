@@ -33,7 +33,13 @@ import numpy as np
 import pandas as pd
 import plotting
 from agent import EpsilonGreedy, QLearningFuncApprox
-from environment_allo import CONTEXTS_LABELS, Actions, LightCues, WrappedEnvironment
+from environment_allo import (
+    CONTEXTS_LABELS,
+    Actions,
+    LightCues,
+    OdorID,
+    WrappedEnvironment,
+)
 from plotting_ego import plot_location_count
 from tqdm import tqdm
 
@@ -65,58 +71,93 @@ env = WrappedEnvironment(params)
 # %%
 # Manually engineered features, optional
 # if `None`, a diagonal matrix of features will be created automatically
-# features = np.matlib.repmat(
-#     np.eye(len(env.tiles_locations), len(env.tiles_locations)),
-#     len(LightCues) * len(OdorID),
-#     len(LightCues) * len(OdorID),
-# )
-
-# %%
-tmp1 = np.matlib.repmat(
-    np.eye(len(env.tiles_locations), len(env.tiles_locations)), len(env.cues), 1
+features = np.matlib.repmat(
+    np.eye(len(env.tiles_locations), len(env.tiles_locations)),
+    len(env.cues),
+    len(env.cues),
 )
-tmp1.shape
-
-# %%
-tmp2 = np.vstack(
-    (
-        np.hstack(
-            (
-                np.ones((len(env.tiles_locations), 1)),
-                np.zeros((len(env.tiles_locations), len(env.cues) - 1)),
-            )
-        ),
-        np.hstack(
-            (
-                np.zeros((len(env.tiles_locations), 1)),
-                np.ones((len(env.tiles_locations), 1)),
-                np.zeros((len(env.tiles_locations), len(env.cues) - 2)),
-            )
-        ),
-        np.hstack(
-            (
-                np.zeros((len(env.tiles_locations), 2)),
-                np.ones((len(env.tiles_locations), 1)),
-                np.zeros((len(env.tiles_locations), len(env.cues) - 3)),
-            )
-        ),
-        np.hstack(
-            (
-                np.zeros((len(env.tiles_locations), len(env.cues) - 1)),
-                np.ones((len(env.tiles_locations), 1)),
-            )
-        ),
-    )
-)
-
-tmp2.shape
-
-# %%
-features = np.hstack((tmp1, tmp2))
 features.shape
 
 # %%
-# features = None
+# tmp1 = np.matlib.repmat(
+#     np.eye(len(env.tiles_locations), len(env.tiles_locations)), len(env.cues), 1
+# )
+# tmp1.shape
+
+# %%
+# tmp2 = np.vstack(
+#     (
+#         np.hstack(
+#             (
+#                 np.ones((len(env.tiles_locations), 1)),
+#                 np.zeros((len(env.tiles_locations), len(env.cues) - 1)),
+#             )
+#         ),
+#         np.hstack(
+#             (
+#                 np.zeros((len(env.tiles_locations), 1)),
+#                 np.ones((len(env.tiles_locations), 1)),
+#                 np.zeros((len(env.tiles_locations), len(env.cues) - 2)),
+#             )
+#         ),
+#         np.hstack(
+#             (
+#                 np.zeros((len(env.tiles_locations), 2)),
+#                 np.ones((len(env.tiles_locations), 1)),
+#                 np.zeros((len(env.tiles_locations), len(env.cues) - 3)),
+#             )
+#         ),
+#         np.hstack(
+#             (
+#                 np.zeros((len(env.tiles_locations), len(env.cues) - 1)),
+#                 np.ones((len(env.tiles_locations), 1)),
+#             )
+#         ),
+#     )
+# )
+
+# tmp2.shape
+
+# %%
+# tmp2 = np.vstack(
+#     (
+#         np.hstack(
+#             (
+#                 np.zeros((len(env.tiles_locations), len(env.cues) - 1)),
+#                 np.ones((len(env.tiles_locations), 1)),
+#             )
+#         ),
+#         np.hstack(
+#             (
+#                 np.zeros((len(env.tiles_locations), 2)),
+#                 np.ones((len(env.tiles_locations), 1)),
+#                 np.zeros((len(env.tiles_locations), len(env.cues) - 3)),
+#             )
+#         ),
+#         np.hstack(
+#             (
+#                 np.zeros((len(env.tiles_locations), 1)),
+#                 np.ones((len(env.tiles_locations), 1)),
+#                 np.zeros((len(env.tiles_locations), len(env.cues) - 2)),
+#             )
+#         ),
+#         np.hstack(
+#             (
+#                 np.ones((len(env.tiles_locations), 1)),
+#                 np.zeros((len(env.tiles_locations), len(env.cues) - 1)),
+#             )
+#         ),
+#     )
+# )
+
+# tmp2.shape
+
+# %%
+# features = np.hstack((tmp1, tmp2))
+# features.shape
+
+# %%
+features = None
 
 # %%
 # Load the agent algorithms
@@ -284,3 +325,67 @@ plot_location_count(
     cues=env.cues,
     contexts_labels=CONTEXTS_LABELS,
 )
+
+import matplotlib.pyplot as plt
+
+# %%
+import seaborn as sns
+
+sns.set(font_scale=1.8)
+fig, ax = plt.subplots(figsize=(12, 8))
+sns.lineplot(data=res, x="Episodes", y="Steps", ax=ax)
+ax.set(xlabel="Trial")
+fig.tight_layout()
+fig.patch.set_alpha(0)
+fig.patch.set_facecolor("white")
+
+plt.show()
+
+# %%
+sns.set(font_scale=1.8)
+fig, ax = plt.subplots(figsize=(12, 8))
+sns.lineplot(data=res, x="Episodes", y="Rewards", ax=ax)
+fig.tight_layout()
+fig.patch.set_alpha(0)
+fig.patch.set_facecolor("white")
+ax.set(xlabel="Trial")
+plt.show()
+
+# %%
+emoji = [
+    {"emoji": "💡", "coords": [4.5, 0.5]},
+    {"emoji": "💡", "coords": [0.5, 4.5]},
+    {"emoji": "🍌", "coords": [0.5, 0.5]},
+    {"emoji": "🍋", "coords": [4.5, 4.5]},
+]
+
+# %%
+for idx, cue in enumerate(CONTEXTS_LABELS):
+    current_map = np.array(list(env.tiles_locations)) + idx * len(env.tiles_locations)
+    current_q_table = qtable[current_map, :]
+    plotting.plot_policy_emoji(
+        qtable=current_q_table,
+        rows=env.rows,
+        cols=env.cols,
+        label=CONTEXTS_LABELS[cue],
+        emoji=emoji[idx],
+    )
+
+# %%
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+fig, ax = plt.subplots(figsize=(9, 9))
+cmap = sns.light_palette("seagreen", as_cmap=True)
+# cmap = sns.color_palette("light:b", as_cmap=True)
+chart = sns.heatmap(qtable, cmap=cmap, ax=ax)
+chart.set_title("Actions", fontsize=40)
+chart.set_ylabel("States", fontsize=40)
+ax.tick_params(
+    left=False, right=False, labelleft=False, labelbottom=False, bottom=False
+)
+fig.patch.set_alpha(0)
+fig.patch.set_facecolor("white")
+plt.show()
+
+# %%

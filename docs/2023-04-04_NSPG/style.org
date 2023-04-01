@@ -2,15 +2,15 @@
 #+startup: beamer
 #+LaTeX_CLASS: beamer
 #+LaTeX_CLASS_OPTIONS: [bigger]
-#+OPTIONS: H:2 num:t toc:t
+# #+OPTIONS: H:2 num:t toc:t
+#+OPTIONS: H:2 num:t toc:nil
 #+LATEX_COMPILER: lualatex
 # #+PROPERTY: header-args:R :session *R* :results value :cache yes :tangle yes :exports code :eval yes
 # #+COLUMNS: %40ITEM %10BEAMER_env(Env) %9BEAMER_envargs(Env Args) %4BEAMER_col(Col) %10BEAMER_extra(Extra)
 # #+COLUMNS: %45ITEM %10BEAMER_env(Env) %10BEAMER_act(Act) %4BEAMER_col(Col) %8BEAMER_opt(Opt)
 #+BEAMER_HEADER: \institute{Fleischmann Lab}
 # #+BEAMER_HEADER: \author{\texorpdfstring{Andrea Pierré\newline\scriptsize\url{andrea_pierre@brown.edu}}{Andrea Pierré}}
-# #+BEAMER_HEADER:\titlegraphic{\hfill\includegraphics[height=1.5cm]{img/Brown Logo_2016_2 Color Process ST_1300.png}\vspace{7em}\flushright\includegraphics[height=1.5cm]{img/qr-code.png}}
-#+BEAMER_HEADER:\titlegraphic{\hfill\includegraphics[height=1.5cm]{img/Brown Logo_2016_2 Color Process ST_1300.png}}
+#+BEAMER_HEADER:\titlegraphic{\hfill\includegraphics[height=1.5cm]{img/Brown Logo_2016_2 Color Process ST_1300.png}\vspace{7em}\flushright\includegraphics[height=1.5cm]{img/qr-code.png}}
 #+LATEX_HEADER: \usetheme[progressbar=foot, sectionpage=none, numbering=fraction]{metropolis}
 #+LaTeX_HEADER: \usepackage{tikz}
 #+LaTeX_HEADER: \usepackage{booktabs}
@@ -36,11 +36,11 @@
 
 # #+BEAMER_HEADER: \makeatletter\patchcmd{\beamer@subsectionintoc}{\vskip1.5em}{\vskip0.5em}{}{}\makeatother
 
-# Show section number in the table of contents
-#+BEAMER_HEADER: \setbeamertemplate{section in toc}[sections numbered]
-# Show table of content between each section, do not increment the frame numbering and do not show the footer
-#+BEAMER_HEADER: \AtBeginSection[]{\begin{frame}[plain, noframenumbering]{Outline}    \setbeamertemplate{section in toc}[sections numbered]\setbeamertemplate{subsection in toc}[subsections numbered]\tableofcontents[currentsection, currentsubsection]\end{frame}}
-#+BEAMER_HEADER: \AtBeginSubsection[]{\begin{frame}[plain, noframenumbering]{Outline}\setbeamertemplate{section in toc}[sections numbered]\setbeamertemplate{subsection in toc}[subsections numbered]\tableofcontents[currentsection,currentsubsection]\end{frame}}
+# # Show section number in the table of contents
+# #+BEAMER_HEADER: \setbeamertemplate{section in toc}[sections numbered]
+# # Show table of content between each section, do not increment the frame numbering and do not show the footer
+# #+BEAMER_HEADER: \AtBeginSection[]{\begin{frame}[plain, noframenumbering]{Outline}    \setbeamertemplate{section in toc}[sections numbered]\setbeamertemplate{subsection in toc}[subsections numbered]\tableofcontents[currentsection, currentsubsection]\end{frame}}
+# #+BEAMER_HEADER: \AtBeginSubsection[]{\begin{frame}[plain, noframenumbering]{Outline}\setbeamertemplate{section in toc}[sections numbered]\setbeamertemplate{subsection in toc}[subsections numbered]\tableofcontents[currentsection,currentsubsection]\end{frame}}
 
 # Brown color styling
 #+LaTeX_HEADER: \definecolor{RedBrown}{RGB}{192, 4, 4} \setbeamercolor{progress bar}{fg=RedBrown} \setbeamercolor{title separator}{fg=RedBrown}
