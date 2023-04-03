@@ -326,25 +326,51 @@ plot_location_count(
     contexts_labels=CONTEXTS_LABELS,
 )
 
+# %% [markdown]
+# ## Presentations figures
+
 import matplotlib.pyplot as plt
 
 # %%
 import seaborn as sns
 
-sns.set(font_scale=1.8)
+sns.set(font_scale=2)
+
+# %%
 fig, ax = plt.subplots(figsize=(12, 8))
 sns.lineplot(data=res, x="Episodes", y="Steps", ax=ax)
+sns.regplot(
+    x="Episodes",
+    y="Steps",
+    data=res,
+    ax=ax,
+    order=5,
+    scatter=False,
+    # ci=None,
+    # scatter_kws={"s": 80},
+    line_kws={"color": "C1"},
+)
 ax.set(xlabel="Trial")
 fig.tight_layout()
 fig.patch.set_alpha(0)
 fig.patch.set_facecolor("white")
-
 plt.show()
 
 # %%
-sns.set(font_scale=1.8)
 fig, ax = plt.subplots(figsize=(12, 8))
 sns.lineplot(data=res, x="Episodes", y="Rewards", ax=ax)
+sns.regplot(
+    x="Episodes",
+    y="Rewards",
+    data=res,
+    ax=ax,
+    order=6,
+    # ci=None,
+    # scatter_kws={"s": 80},
+    scatter=False,
+    line_kws={"color": "C1"},
+)
+ax.set_ylim(bottom=-0.5)
 fig.tight_layout()
 fig.patch.set_alpha(0)
 fig.patch.set_facecolor("white")
@@ -387,5 +413,59 @@ ax.tick_params(
 fig.patch.set_alpha(0)
 fig.patch.set_facecolor("white")
 plt.show()
+
+# %%
+fig, ax = plt.subplots(figsize=(12, 8))
+sns.regplot(
+    x="Episodes",
+    y="Steps",
+    data=res,
+    ax=ax,
+    order=5,
+    scatter=False,
+    # ci=None,
+    # scatter_kws={"s": 80},
+    line_kws={"color": "C1"},
+)
+ax.set(xlabel="Trial")
+fig.tight_layout()
+fig.patch.set_alpha(0)
+fig.patch.set_facecolor("white")
+plt.show()
+
+# %%
+fig, ax = plt.subplots(figsize=(12, 8))
+sns.regplot(
+    x="Episodes",
+    y="Rewards",
+    data=res,
+    ax=ax,
+    order=8,
+    # ci=None,
+    # scatter_kws={"s": 80},
+    scatter=False,
+    line_kws={"color": "C1"},
+)
+fig.tight_layout()
+fig.patch.set_alpha(0)
+fig.patch.set_facecolor("white")
+ax.set(xlabel="Trial")
+plt.show()
+
+# %%
+import seaborn.objects as so
+
+p = so.Plot(
+    x="Episodes",
+    y="Steps",
+    data=res,
+)
+p.add(so.Band())
+
+# %%
+plt.plot(res.Steps.rolling(window=3).mean())
+
+# %%
+plt.plot(res.Rewards.rolling(window=3).mean())
 
 # %%

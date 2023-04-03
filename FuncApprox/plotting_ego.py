@@ -243,6 +243,8 @@ def plot_ego_q_values_maps(qtable, rows, cols, labels, states):
 
     clb = fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap), cax=ax_clb)
     clb.ax.set_title("Q-value", pad=10)
+    fig.patch.set_alpha(0)
+    fig.patch.set_facecolor("white")
     plt.show()
 
 

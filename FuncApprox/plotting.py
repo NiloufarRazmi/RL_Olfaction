@@ -177,11 +177,11 @@ def plot_policy_emoji(qtable, rows, cols, label, emoji):
     """Plot the heatmap of the Q-values.
 
     Also plot the best action's direction with arrows."""
-
-    fig, ax = plt.subplots(figsize=(10, 8))
+    grid_spec = {"width_ratios": (0.9, 0.05)}
+    fig, (ax, cbar_ax) = plt.subplots(1, 2, gridspec_kw=grid_spec, figsize=(10, 8))
 
     qtable_val_max, qtable_directions = qtable_directions_map(qtable, rows, cols)
-    sns.heatmap(
+    chart = sns.heatmap(
         qtable_val_max,
         annot=qtable_directions,
         fmt="",
@@ -192,7 +192,11 @@ def plot_policy_emoji(qtable, rows, cols, label, emoji):
         xticklabels=[],
         yticklabels=[],
         annot_kws={"fontsize": "xx-large"},
-    ).set(title=label)
+        cbar_ax=cbar_ax,
+        cbar_kws={"label": "Q-value"},
+    )
+    chart.set_title(label=label, fontsize=40)
+    cbar_ax.yaxis.label.set_size(30)
     for _, spine in ax.spines.items():
         spine.set_visible(True)
         spine.set_linewidth(0.7)

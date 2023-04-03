@@ -7,14 +7,58 @@
 * HEADER :noexport:
 #+SETUPFILE: ./style.org
 
-* Context of the project
+* Collaborators
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
+** Collaborators
+:PROPERTIES:
+:BEAMER_opt: plain
+:END:
+#+begin_export latex
+%\addtocounter{framenumber}{-1}
+#+end_export
+#+begin_export latex
+\begin{adjustbox}{max width=\textwidth, keepaspectratio}
+\begin{minipage}[t]{0.2\textwidth}
+\center
+\includegraphics[height=0.2\textheight]{img/matt-nassar.jpg}\\
+\scriptsize
+Matt Nassar
+\end{minipage}
+\begin{minipage}[t]{0.2\textwidth}
+\center
+\includegraphics[height=0.2\textheight]{img/niloufar-razmi.jpeg}\\
+\scriptsize
+Niloufar Razmi
+\end{minipage}
+\begin{minipage}[t]{0.2\textwidth}
+\center
+\includegraphics[height=0.2\textheight]{img/jason-ritt.jpg}\\
+\scriptsize
+Jason Ritt
+\end{minipage}
+\begin{minipage}[t]{0.2\textwidth}
+\center
+\includegraphics[height=0.2\textheight]{img/olivia.jpg}\\
+\scriptsize
+Olivia McKissick
+\end{minipage}
+\begin{minipage}[t]{0.2\textwidth}
+\center
+\includegraphics[height=0.2\textheight]{img/alex-fleischmann.jpg}\\
+\scriptsize
+Alex Fleischmann
+\end{minipage}
+\end{adjustbox}
+#+end_export
 * Context
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
 #+begin_export latex
 {%
-\setbeamertemplate{background canvas}{\includegraphics[height=\paperheight]{img/kitchen1.png}}
+\setbeamertemplate{background canvas}{\includegraphics[height=\paperheight]{img/rooms1.svg.png}}
 \begin{frame}[fragile]{Odor-place association}
 \end{frame}
 }
@@ -25,7 +69,7 @@
 :END:
 #+begin_export latex
 {%
-\setbeamertemplate{background canvas}{\includegraphics[height=\paperheight]{img/kitchen2.png}}
+\setbeamertemplate{background canvas}{\includegraphics[height=\paperheight]{img/rooms2.svg.png}}
 \begin{frame}[fragile]{Odor-place association}
 \addtocounter{framenumber}{-1}
 \end{frame}
@@ -35,14 +79,6 @@
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
-#+begin_export latex
-{%
-\setbeamertemplate{background canvas}{\includegraphics[height=\paperheight]{img/kitchen3.png}}
-\begin{frame}[fragile]{Odor-place association}
-\addtocounter{framenumber}{-1}
-\end{frame}
-}
-#+end_export
 ** The LEC is key to sensory associations and spatial memory
 *** Text :BMCOL:
 :PROPERTIES:
@@ -64,17 +100,6 @@
 #+ATTR_LaTeX: :width \textwidth
 [[file:img/brain.png]]
 
-** Diamond arena experimental setup
-#+begin_export latex
-\begin{textblock}{5}(11,-1.3)
-\center
-\includegraphics[width=3em]{img/olivia.jpg}\\
-\scriptsize
-Olivia McKissick
-\end{textblock}
-#+end_export
-#+ATTR_LaTeX: :width 0.8\textwidth
-[[file:img/physical-diamond-arena.png]]
 ** Diamond arena olfactory task
 #+begin_export latex
 \begin{textblock}{5}(11,-0.5)
@@ -110,6 +135,17 @@ Egocentric\\
 #+ATTR_LaTeX: :width 0.8\textwidth
 [[file:img/egocentric-task.png]]
 
+** Diamond arena experimental setup
+#+begin_export latex
+\begin{textblock}{5}(11,-1.3)
+\center
+\includegraphics[width=3em]{img/olivia.jpg}\\
+\scriptsize
+Olivia McKissick
+\end{textblock}
+#+end_export
+#+ATTR_LaTeX: :width 0.8\textwidth
+[[file:img/physical-diamond-arena.png]]
 ** What is Reinforcement Learning and why use it ?
 :PROPERTIES:
 :BEAMER_act: [<+->]
@@ -134,14 +170,14 @@ Egocentric\\
 - Goal of the agent : maximize rewards
 - Natural fit for behavioral experiments involving rewards and learning
 
-** RL maps states to optimized actions
-*** Illustration :BMCOL:
-:PROPERTIES:
-:BEAMER_col: 0.5
-:END:
-#+ATTR_LaTeX: :height 0.8\textheight
-[[./img/RL_mapping.drawio.png]]
-*** Equation :BMCOL:
+** RL maps states to actions
+#+begin_export latex
+\center
+\begin{tikzpicture}
+    \node[anchor=south west,inner sep=0] (image) at (0,0) {\includegraphics[height=\textheight]{img/RL_mapping-1.drawio.png}};
+\end{tikzpicture}
+#+end_export
+*** COMMENT Equation :BMCOL:
 :PROPERTIES:
 :BEAMER_col: 0.5
 :END:
@@ -155,7 +191,132 @@ Egocentric\\
 %\end{align}
 \end{adjustbox}
 #+end_export
-* Question
+** RL maps states to actions
+#+begin_export latex
+\center
+\addtocounter{framenumber}{-1}
+\begin{tikzpicture}
+    \node[anchor=south west,inner sep=0] (image) at (0,0) {\includegraphics[height=\textheight]{img/RL_mapping-1.drawio.png}};
+    \draw[RedBrown,ultra thick,rounded corners] (0,4) rectangle (3,4.7);
+\end{tikzpicture}
+#+end_export
+** RL maps states to actions
+#+begin_export latex
+\addtocounter{framenumber}{-1}
+\center
+\begin{tikzpicture}
+    \node[anchor=south west,inner sep=0] (image) at (0,0) {\includegraphics[height=\textheight]{img/RL_mapping-1.drawio.png}};
+    \draw[RedBrown,ultra thick,rounded corners] (4.5,3.5) rectangle (7,4.5);
+\end{tikzpicture}
+#+end_export
+** RL maps states to actions
+#+begin_export latex
+\addtocounter{framenumber}{-1}
+\center
+\begin{tikzpicture}
+    \node[anchor=south west,inner sep=0] (image) at (0,0) {\includegraphics[height=\textheight]{img/RL_mapping-all.drawio.png}};
+    \draw[RedBrown,ultra thick,rounded corners] (4.5,0.5) rectangle (7,2.5);
+\end{tikzpicture}
+#+end_export
+** RL maps states to actions
+#+begin_export latex
+\addtocounter{framenumber}{-1}
+\center
+\begin{tikzpicture}
+    \node[anchor=south west,inner sep=0] (image) at (0,0) {\includegraphics[height=\textheight]{img/RL_mapping-2.drawio.png}};
+    \draw[RedBrown,ultra thick,rounded corners] (0,4) rectangle (3,4.7);
+\end{tikzpicture}
+#+end_export
+** The joint representation encodes odor + location
+*** Location :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.33
+:END:
+#+begin_export latex
+\begin{center}
+Location only
+\end{center}
+#+end_export
+[[file:img/joint-repr-location.drawio.png]]
+*** Odor :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.33
+:END:
+*** Joint :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.33
+:END:
+** The joint representation encodes odor + location
+#+begin_export latex
+\addtocounter{framenumber}{-1}
+#+end_export
+*** Location :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.33
+:END:
+#+begin_export latex
+\begin{center}
+Location only
+\end{center}
+#+end_export
+[[file:img/joint-repr-location.drawio.png]]
+*** Odor :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.33
+:END:
+#+begin_export latex
+\begin{center}
+Odor only
+\end{center}
+#+end_export
+[[file:img/joint-repr-odor.drawio.png]]
+*** Joint :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.33
+:END:
+** The joint representation encodes odor + location
+#+begin_export latex
+\addtocounter{framenumber}{-1}
+#+end_export
+*** Location :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.33
+:END:
+#+begin_export latex
+\begin{center}
+Location only
+\end{center}
+#+end_export
+[[file:img/joint-repr-location.drawio.png]]
+*** Odor :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.33
+:END:
+#+begin_export latex
+\begin{center}
+Odor only
+\end{center}
+#+end_export
+[[file:img/joint-repr-odor.drawio.png]]
+*** Joint :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.33
+:END:
+#+begin_export latex
+\begin{center}
+Joint
+\end{center}
+#+end_export
+[[file:img/joint-repr-joint.drawio.png]]
+** \nbsp{}
+:PROPERTIES:
+:BEAMER_opt: standout
+:END:
+#+begin_export latex
+\raggedright
+#+end_export
+Which representations are needed by the brain to learn a place-odor association task ?
+* COMMENT Question
 :PROPERTIES:
 :UNNUMBERED: notoc
 :END:
@@ -174,19 +335,21 @@ Which representations are needed by the brain to learn a place-odor association 
 :BEAMER_col: 0.5
 :END:
 #+begin_export latex
-\center
-#+end_export
+\begin{center}
 Allocentric
+\end{center}
+#+end_export
+[[file:img/ego-vs-allo-allo.drawio.png]]
 *** Egocentric :BMCOL:
 :PROPERTIES:
 :BEAMER_col: 0.5
 :END:
 #+begin_export latex
-\center
-#+end_export
+\begin{center}
 Egocentric
-*** \nbsp{}
-[[file:img/ego-vs-allo.jpg]]
+\end{center}
+#+end_export
+[[file:img/ego-vs-allo-ego.drawio.png]]
 ** The model
 *** Allocentric :BMCOL:
 :PROPERTIES:
@@ -226,8 +389,6 @@ Allocentric
 Egocentric
 #+ATTR_LaTeX: :width \textwidth
 [[file:img/RL_env-ego-model.drawio.png]]
-** The joint representation encodes odor + location
-[[file:img/joint-repr.drawio.png]]
 ** COMMENT With joint representation
 *** \nbsp{}
 #+ATTR_LaTeX: :height 0.4\textheight
@@ -238,21 +399,7 @@ Egocentric
 #+ATTR_LaTeX: :height 0.4\textheight
 [[file:img/rewards-steps-allo-no-joint-repr.png]]
 \to The agent is unable to solve the task
-** Minimizing the number of steps to solve the task
-*** With joint representation
-:PROPERTIES:
-:BEAMER_col: 0.5
-:BEAMER_opt: [t]
-:END:
-#+begin_export latex
-\begin{center}
-With joint representation
-\end{center}
-#+end_export
-#+ATTR_LaTeX: :width \textwidth
-[[file:img/steps-allo-joint-repr.png]]
-\to The agent learns to solve the task
-
+** Maximizing rewards
 *** Without joint representation
 :PROPERTIES:
 :BEAMER_col: 0.5
@@ -264,9 +411,8 @@ Without joint representation
 \end{center}
 #+end_export
 #+ATTR_LaTeX: :width \textwidth
-[[file:img/steps-allo-no-joint-repr.png]]
+[[file:img/rewards-allo-no-joint-repr.png]]
 \to The agent doesn't learn
-** Maximizing rewards
 *** With joint representation
 :PROPERTIES:
 :BEAMER_col: 0.5
@@ -281,6 +427,7 @@ With joint representation
 [[file:img/rewards-allo-joint-repr.png]]
 \to The agent learns to solve the task
 
+** Minimizing the number of steps to solve the task
 *** Without joint representation
 :PROPERTIES:
 :BEAMER_col: 0.5
@@ -292,8 +439,22 @@ Without joint representation
 \end{center}
 #+end_export
 #+ATTR_LaTeX: :width \textwidth
-[[file:img/rewards-allo-no-joint-repr.png]]
+[[file:img/steps-allo-no-joint-repr.png]]
 \to The agent doesn't learn
+*** With joint representation
+:PROPERTIES:
+:BEAMER_col: 0.5
+:BEAMER_opt: [t]
+:END:
+#+begin_export latex
+\begin{center}
+With joint representation
+\end{center}
+#+end_export
+#+ATTR_LaTeX: :width \textwidth
+[[file:img/steps-allo-joint-repr.png]]
+\to The agent learns to solve the task
+
 ** What policy did the agent learned ?
 #+begin_export latex
 \vspace{-7em}
@@ -313,6 +474,9 @@ Without joint representation
 #+ATTR_LaTeX: :height 0.4\textheight
 [[file:img/policy-allo-south-light.png]]
 ** What policy did the agent learned ?
+#+begin_export latex
+\addtocounter{framenumber}{-1}
+#+end_export
 *** Left
 :PROPERTIES:
 :BEAMER_col: 0.5
@@ -331,17 +495,53 @@ Without joint representation
 [[file:img/policy-allo-odor-B.png]]
 * Next steps
 ** What we have done so far
-#+begin_export latex
-\center
-#+end_export
+*** Diagram :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.55
+:BEAMER_opt: [t]
+:END:
+#+ATTR_LaTeX: :width \columnwidth
 #+INCLUDE: "./RL-tab.tex" src latex
-** From tabular RL to deep RL
+
+*** Ideas :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.45
+:BEAMER_opt: [t]
+:END:
 #+begin_export latex
-\center
-\addtocounter{framenumber}{-1}
+\footnotesize
 #+end_export
+- Behavioral model only
+- Tabular model that maps states to actions
+- All states need to be visited by the agent to propagate the prediction of getting a future reward \to\nbsp{}not what happens in the brain
+
+** From tabular RL to deep RL
+*** Diagram :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.55
+:BEAMER_opt: [t]
+:END:
+#+ATTR_LaTeX: :width \columnwidth
 #+INCLUDE: "./RL-nn.tex" src latex
-** What types of representations are in use to solve the odor-place association task ?
+
+*** Ideas :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.45
+:BEAMER_opt: [t]
+:END:
+#+begin_export latex
+\footnotesize
+#+end_export
+- Behavioral + neural model
+- Neural network that maps states to actions
+- Extract features from the simulation data
+- Not all states need to be visited by the agent to propagate the prediction of getting a future reward \to\nbsp{}closer to the brain
+** What types of representations are in use to solve an odor-place association task ?
+#+ATTR_LaTeX: :height 0.4\textheight
+[[file:img/exp-vs-simu.drawio.png]]
+#+begin_export latex
+\vspace{-3em}
+#+end_export
 *** Experiment :BMCOL:
 :PROPERTIES:
 :BEAMER_col: 0.5
@@ -352,8 +552,6 @@ Without joint representation
 Experiment
 \end{center}
 #+end_export
-#+ATTR_LaTeX: :height 0.25\textheight
-[[file:img/place-cells-grid-cells.jpg.png]]
 \to Look for candidate patterns in the data: place cells, grid cells,\dots?
 *** Simulation :BMCOL:
 :PROPERTIES:
@@ -365,8 +563,6 @@ Experiment
 Simulation
 \end{center}
 #+end_export
-#+ATTR_LaTeX: :height 0.25\textheight
-[[file:img/nn.svg.png]]
 \to Compare the data with the representations learned from scratch by the neural network
 
 #+begin_export latex
@@ -390,9 +586,10 @@ Simulation
 :PROPERTIES:
 :BEAMER_act: [<+->]
 :END:
-- We record in the LEC which encodes spatial & olfactory information
-- Reinforcement Learning can be a useful tool to model behavior involving rewards and learning
-- The joint representation is needed to solve an odor-place location task
+- We record in the LEC because it encodes spatial & olfactory information
+- Reinforcement Learning is a useful framework to model behavior involving rewards and learning
+- The joint representation is needed to solve an odor-place association task
+- We hope to use Deep Reinforcement Learning to better understand the representations that are at play in this type of task
 * Acknowledgments
 :PROPERTIES:
 :UNNUMBERED: notoc
@@ -401,14 +598,17 @@ Simulation
 {%
 \setbeamertemplate{background canvas}{\includegraphics[height=\paperheight]{img/grand-canyon.JPG}}
 \begin{frame}[fragile,t, plain]{Acknowledgments}
-    \vspace{1em}
+    \addtocounter{framenumber}{-1}
+    %\vspace{1em}
     \begin{columns}[T]
         \begin{column}{0.5\textwidth}
-            \begin{itemize}
+            \begin{tcolorbox}[opacityfill=0.1, arc=0mm, size=fbox, coltext=white, colback=black, colframe=black]
                 \small
-                \item Fleischmann lab
-                \begin{itemize}
-                    \tiny
+                \centering
+                \textbf{Fleischmann lab}
+                \begin{itemize}[noitemsep, before=\color{white}\bfseries]
+                    \scriptsize
+                    %{\transparent{0.5}\colorbox{white}{%
                     \item Alexander Fleischmann
                     \item Keeley Baker
                     \item Olivia Mckissick
@@ -423,28 +623,35 @@ Simulation
                     \item Camille Donoho
                     \item Timothy Pyon
                 \end{itemize}
-            \end{itemize}
-            \vspace{5em}
+            \end{tcolorbox}
+            %\vspace{5em}
             \includegraphics[height=1.5cm]{img/qr-code.png}\\
             %\colorbox{white}{\footnotesize\transparent{0.5}https://reduced.to/tn9x6}
         \end{column}
 
         \begin{column}{0.5\textwidth}
-            \begin{itemize}
+            \begin{tcolorbox}[opacityfill=0.1, arc=0mm, size=fbox, coltext=white, colback=black, colframe=black]
                 \small
-                \item Collaborations
-                \begin{itemize}
-                    \tiny
+                \centering
+                \textbf{Collaborations}
+                \begin{itemize}[noitemsep, before=\color{white}\bfseries]
+                    \scriptsize
                     \item Matt Nassar
                     \item Jason Ritt
                     \item Niloufar Razmi
                 \end{itemize}
-            \end{itemize}
+            \end{tcolorbox}
         \end{column}
     \end{columns}
 \end{frame}
 }
 #+end_export
+* Backup
+** Egocentric policy
+#+begin_export latex
+\addtocounter{framenumber}{-1}
+#+end_export
+[[file:img/policy-ego-joint-repr.png]]
 * Feedback :noexport:
 ** v1
 *** What is LEC?
@@ -537,10 +744,10 @@ Put it in the next steps?
 *** TODO What's the motivation? Goals? Why it matters?
 *** Question motivated by this and that
 *** What do I mean by states?
-*** TODO Put Jason/Matt/Niloufar in the first slide
-*** TODO No outline, directly coffee
-*** Tea in one room, coffee in the other room
-*** Agent on the map
+*** DONE Put Jason/Matt/Niloufar in the first slide
+*** DONE No outline, directly coffee
+*** DONE Tea in one room, coffee in the other room
+*** DONE Agent on the map
 Bubble with what it is thinking
 Bubble with question mark
 *** What happens in the head of the agent?
@@ -551,7 +758,7 @@ What we think are the major players involved LEC, blabbla
 *** Focus on transitions
 *** Include only A, B and D in experiment
 What do I show the ports? If I don't talk about it, don't need to show
-*** Go from brain to schema of the task
+*** DONE Go from brain to schema of the task
 *** Animate allocentric schema
 *** Show egocentric?
 *** Type of infor the mouse is using to solve the task
@@ -564,7 +771,7 @@ What type of information the mouse might keep track of?
 Rl work if you get the right states repr
 What is the right states repr
 Then show joint repr slide
-*** Animate states that strengthen connections
+*** DONE Animate states that strengthen connections
 *** Legend on the policy
 *** We also did it with an egocentric action space
 *** Walk through allocentric model
@@ -574,17 +781,31 @@ In the other it learns
 
 ** Priorities
 *** Title?
-*** Intro with coffee/tea/agent
+*** DONE Intro with coffee/tea/agent
 *** Pictures arena
 *** Redo task schema
-*** Allo vs. ego schema?
+*** DONE Allo vs. ego schema?
 *** Plots
-**** Fit on plots
+**** DONE Fit on plots
 **** DONE Odor emoji
 **** Legend?
 *** Next steps
 **** Write clear text?
 **** Remake exp vs simulation with loop?
+* COMMENT Questions
+** neural network
+*** Lookup table
+** [?] What type of representations?
+*** Feature extractions
+*** hierarchical combination of features
+*** Feature compression
+**** Location \to cue
+** [?] What type of neural network
+*** First make a simple feedforward working
+- Already difficult to plug DL with RL
+- 2 optimization loops \eq 2 times more problems or bugs that can arise
+*** Then we can think of more complex networks, which adds recurrence for example
+
 
 * COMMENT Add plain option to Beamer TOC
 % Local variables:

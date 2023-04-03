@@ -10,7 +10,7 @@
 # #+COLUMNS: %45ITEM %10BEAMER_env(Env) %10BEAMER_act(Act) %4BEAMER_col(Col) %8BEAMER_opt(Opt)
 #+BEAMER_HEADER: \institute{Fleischmann Lab}
 # #+BEAMER_HEADER: \author{\texorpdfstring{Andrea Pierré\newline\scriptsize\url{andrea_pierre@brown.edu}}{Andrea Pierré}}
-#+BEAMER_HEADER:\titlegraphic{\hfill\includegraphics[height=1.5cm]{img/Brown Logo_2016_2 Color Process ST_1300.png}\vspace{7em}\flushright\includegraphics[height=1.5cm]{img/qr-code.png}}
+#+BEAMER_HEADER:\titlegraphic{\hfill\includegraphics[height=1.5cm]{img/Brown Logo_2016_2 Color Process ST_1300.png}\vspace{8em}\flushright\includegraphics[height=1.5cm]{img/qr-code.png}}
 #+LATEX_HEADER: \usetheme[progressbar=foot, sectionpage=none, numbering=fraction]{metropolis}
 #+LaTeX_HEADER: \usepackage{tikz}
 #+LaTeX_HEADER: \usepackage{booktabs}
@@ -27,6 +27,11 @@
 #+LaTeX_HEADER: \usepackage{transparent}
 #+BEAMER_HEADER: \setbeamercovered{transparent=10}
 #+LaTeX_HEADER: \usepackage{textpos}
+#+LaTeX_HEADER: \usepackage{tcolorbox}
+
+# Itemize environment
+#+LaTeX_HEADER: \usepackage{enumitem}
+#+LaTeX_HEADER: \setlist[itemize]{label=\textbullet}
 
 # Maths
 #+LaTeX_HEADER: \usepackage{mathtools}
