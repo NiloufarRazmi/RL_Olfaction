@@ -58,7 +58,7 @@ from utils import Params
 
 # %%
 # Choose the parameters for the task
-params = Params(epsilon=0.1, n_runs=3, numEpisodes=200, alpha=0.025)
+params = Params(epsilon=0.1, n_runs=10, numEpisodes=300, alpha=0.025)
 params
 
 # %% [markdown]
@@ -379,21 +379,33 @@ plt.show()
 
 # %%
 emoji = [
-    {"emoji": "💡", "coords": [4.5, 0.5]},
-    {"emoji": "💡", "coords": [0.5, 4.5]},
-    {"emoji": "💧", "coords": [0.5, 0.5]},
-    {"emoji": "💧", "coords": [4.5, 4.5]},
+    [{"emoji": "💡", "coords": [4.5, 0.5]}],
+    [{"emoji": "💡", "coords": [0.5, 4.5]}],
+    [{"emoji": "💧", "coords": [0.5, 0.5]}, {"emoji": "🍌", "coords": [4, -0.25]}],
+    [{"emoji": "💧", "coords": [4.5, 4.5]}, {"emoji": "🍋", "coords": [4, -0.25]}],
 ]
 
 # %%
-for idx, cue in enumerate(CONTEXTS_LABELS):
+from collections import OrderedDict
+
+trunc_labels = OrderedDict(
+    [
+        (LightCues.North, "Pre odor - North light"),
+        (LightCues.South, "Pre odor - South light"),
+        (OdorID.A, "Post odor - "),
+        (OdorID.B, "Post odor - "),
+    ]
+)
+
+# %%
+for idx, cue in enumerate(trunc_labels):
     current_map = np.array(list(env.tiles_locations)) + idx * len(env.tiles_locations)
     current_q_table = qtable[current_map, :]
     plotting.plot_policy_emoji(
         qtable=current_q_table,
         rows=env.rows,
         cols=env.cols,
-        label=CONTEXTS_LABELS[cue],
+        label=trunc_labels[cue],
         emoji=emoji[idx],
     )
 
@@ -402,9 +414,9 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 fig, ax = plt.subplots(figsize=(9, 9))
-cmap = sns.light_palette("seagreen", as_cmap=True)
-# cmap = sns.color_palette("light:b", as_cmap=True)
-chart = sns.heatmap(qtable, cmap=cmap, ax=ax)
+# cmap = sns.light_palette("seagreen", as_cmap=True)
+cmap = sns.color_palette("light:b", as_cmap=True)
+chart = sns.heatmap(qtable, cmap=cmap, ax=ax, cbar=False)
 chart.set_title("Actions", fontsize=40)
 chart.set_ylabel("States", fontsize=40)
 ax.tick_params(

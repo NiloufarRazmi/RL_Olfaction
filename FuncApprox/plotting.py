@@ -169,7 +169,9 @@ def add_emoji(coords, emoji, ax):
     img = plt.imread(imojify.get_img_path(emoji))
     im = OffsetImage(img, zoom=0.08)
     im.image.axes = ax
-    ab = AnnotationBbox(im, (coords[0], coords[1]), frameon=False, pad=0)
+    ab = AnnotationBbox(
+        im, (coords[0], coords[1]), frameon=False, pad=0, annotation_clip=False
+    )
     ax.add_artist(ab)
 
 
@@ -201,7 +203,8 @@ def plot_policy_emoji(qtable, rows, cols, label, emoji):
         spine.set_visible(True)
         spine.set_linewidth(0.7)
         spine.set_color("black")
-    add_emoji(emoji["coords"], emoji["emoji"], ax)
+    for _, emo in enumerate(emoji):
+        add_emoji(emo["coords"], emo["emoji"], ax)
 
     fig.patch.set_alpha(0)
     fig.patch.set_facecolor("white")
