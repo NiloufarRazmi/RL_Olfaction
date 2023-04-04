@@ -128,12 +128,46 @@ Olivia\\McKissick
 :END:
 #+begin_export latex
 \center
+\vspace{-2em}
 #+end_export
 Allocentric\\
 (go west/east)
+#+begin_export latex
+\vspace{-2em}
+#+end_export
 #+ATTR_LaTeX: :width 0.8\textwidth
-[[file:img/allocentric-task.png]]
-
+[[file:img/RL_env-allo-task.drawio.png]]
+*** Egocentric :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:BEAMER_opt: [t]
+:END:
+** Diamond arena olfactory task
+#+begin_export latex
+\addtocounter{framenumber}{-1}
+\begin{textblock}{0.2}(1,0.071)%
+\center%
+\includegraphics[width=3em]{img/olivia.jpg}\\
+\scriptsize
+Olivia\\McKissick
+\end{textblock}
+#+end_export
+*** Allocentric :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:BEAMER_opt: [t]
+:END:
+#+begin_export latex
+\center
+\vspace{-2em}
+#+end_export
+Allocentric\\
+(go west/east)
+#+begin_export latex
+\vspace{-2em}
+#+end_export
+#+ATTR_LaTeX: :width 0.8\textwidth
+[[file:img/RL_env-allo-task.drawio.png]]
 *** Egocentric :BMCOL:
 :PROPERTIES:
 :BEAMER_col: 0.5
@@ -141,12 +175,15 @@ Allocentric\\
 :END:
 #+begin_export latex
 \center
+\vspace{-2em}
 #+end_export
 Egocentric\\
 (go right/left)
+#+begin_export latex
+\vspace{-2em}
+#+end_export
 #+ATTR_LaTeX: :width 0.8\textwidth
-[[file:img/egocentric-task.png]]
-
+[[file:img/RL_env-ego-task.drawio.png]]
 ** What is Reinforcement Learning and why use it ?
 :PROPERTIES:
 :BEAMER_act: [<+->]

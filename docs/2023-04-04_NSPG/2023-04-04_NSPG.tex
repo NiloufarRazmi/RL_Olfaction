@@ -1,4 +1,4 @@
-% Created 2023-04-03 Mon 19:50
+% Created 2023-04-03 Mon 21:08
 % Intended LaTeX compiler: lualatex
 \documentclass[bigger]{beamer}
 \usepackage{graphicx}
@@ -77,8 +77,8 @@ tabsize=2
 
 \maketitle
 \section*{Collaborators}
-\label{sec:orgdfc5cbe}
-\begin{frame}[label={sec:org44eea50},plain]{Collaborators}
+\label{sec:orgf34c394}
+\begin{frame}[label={sec:orgda4cbe0},plain]{Collaborators}
 %\addtocounter{framenumber}{-1}
 \begin{adjustbox}{max width=\textwidth, keepaspectratio}
 \begin{minipage}[t]{0.2\textwidth}
@@ -114,14 +114,14 @@ Alex Fleischmann
 \end{adjustbox}
 \end{frame}
 \section*{Context}
-\label{sec:org34d6bdb}
+\label{sec:orgb259d9a}
 {%
 \setbeamertemplate{background canvas}{\includegraphics[height=\paperheight]{img/rooms1.svg.png}}
 \begin{frame}[fragile]{Odor-place association}
 \end{frame}
 }
 \section*{Context}
-\label{sec:org75fd113}
+\label{sec:orgb1ad0a4}
 {%
 \setbeamertemplate{background canvas}{\includegraphics[height=\paperheight]{img/rooms2.svg.png}}
 \begin{frame}[fragile]{Odor-place association}
@@ -129,8 +129,8 @@ Alex Fleischmann
 \end{frame}
 }
 \section*{Context}
-\label{sec:org69aa42e}
-\begin{frame}[label={sec:org822dad7}]{The LEC is key to sensory associations and spatial memory}
+\label{sec:org25c12e2}
+\begin{frame}[label={sec:orgff236ac}]{The LEC is key to sensory associations and spatial memory}
 \begin{columns}
 \begin{column}{0.45\columnwidth}
 %\pause
@@ -151,7 +151,7 @@ Alex Fleischmann
 \end{columns}
 \end{frame}
 
-\begin{frame}[label={sec:orgf8ffd0d}]{Diamond arena experimental setup}
+\begin{frame}[label={sec:org328f458}]{Diamond arena experimental setup}
 \begin{textblock}{0.2}(1,0.071)%
 \center
 \includegraphics[width=3em]{img/olivia.jpg}\\
@@ -163,7 +163,7 @@ Olivia\\McKissick
 \end{center}
 \(\to\)~1P calcium imaging recording on freely moving mice
 \end{frame}
-\begin{frame}[label={sec:orge128abd}]{Diamond arena olfactory task}
+\begin{frame}[label={sec:org3a20667}]{Diamond arena olfactory task}
 \begin{textblock}{0.2}(1,0.071)%
 \center%
 \includegraphics[width=3em]{img/olivia.jpg}\\
@@ -173,25 +173,50 @@ Olivia\\McKissick
 \begin{columns}
 \begin{column}[t]{0.5\columnwidth}
 \center
+\vspace{-2em}
 Allocentric\\
 (go west/east)
+\vspace{-2em}
 \begin{center}
-\includegraphics[width=0.8\textwidth]{img/allocentric-task.png}
+\includegraphics[width=0.8\textwidth]{img/RL_env-allo-task.drawio.png}
 \end{center}
 \end{column}
-
+\begin{column}[t]{0.5\columnwidth}
+\end{column}
+\end{columns}
+\end{frame}
+\begin{frame}[label={sec:orgf8e709c}]{Diamond arena olfactory task}
+\addtocounter{framenumber}{-1}
+\begin{textblock}{0.2}(1,0.071)%
+\center%
+\includegraphics[width=3em]{img/olivia.jpg}\\
+\scriptsize
+Olivia\\McKissick
+\end{textblock}
+\begin{columns}
 \begin{column}[t]{0.5\columnwidth}
 \center
+\vspace{-2em}
+Allocentric\\
+(go west/east)
+\vspace{-2em}
+\begin{center}
+\includegraphics[width=0.8\textwidth]{img/RL_env-allo-task.drawio.png}
+\end{center}
+\end{column}
+\begin{column}[t]{0.5\columnwidth}
+\center
+\vspace{-2em}
 Egocentric\\
 (go right/left)
+\vspace{-2em}
 \begin{center}
-\includegraphics[width=0.8\textwidth]{img/egocentric-task.png}
+\includegraphics[width=0.8\textwidth]{img/RL_env-ego-task.drawio.png}
 \end{center}
 \end{column}
 \end{columns}
 \end{frame}
-
-\begin{frame}[<+->][label={sec:orgd0219be}]{What is Reinforcement Learning and why use it ?}
+\begin{frame}[<+->][label={sec:orgd04899e}]{What is Reinforcement Learning and why use it ?}
 \begin{columns}
 \begin{column}{0.55\columnwidth}
 % \usepackage{fontawesome5}
@@ -245,13 +270,13 @@ Egocentric\\
 \end{columns}
 \end{frame}
 
-\begin{frame}[label={sec:org5b35b3f}]{RL maps states to actions}
+\begin{frame}[label={sec:org1ffac30}]{RL maps states to actions}
 \center
 \begin{tikzpicture}
     \node[anchor=south west,inner sep=0] (image) at (0,0) {\includegraphics[height=\textheight]{img/RL_mapping-1.drawio.png}};
 \end{tikzpicture}
 \end{frame}
-\begin{frame}[label={sec:orgbabf785}]{RL maps states to actions}
+\begin{frame}[label={sec:org9f40d4c}]{RL maps states to actions}
 \center
 \addtocounter{framenumber}{-1}
 \begin{tikzpicture}
@@ -259,7 +284,7 @@ Egocentric\\
     \draw[RedBrown,ultra thick,rounded corners] (0,4) rectangle (3,4.7);
 \end{tikzpicture}
 \end{frame}
-\begin{frame}[label={sec:orgcc34aeb}]{RL maps states to actions}
+\begin{frame}[label={sec:orgdbb400d}]{RL maps states to actions}
 \addtocounter{framenumber}{-1}
 \center
 \begin{tikzpicture}
@@ -267,7 +292,7 @@ Egocentric\\
     \draw[RedBrown,ultra thick,rounded corners] (4.5,3.5) rectangle (7,4.5);
 \end{tikzpicture}
 \end{frame}
-\begin{frame}[label={sec:orgb95a5fc}]{RL maps states to actions}
+\begin{frame}[label={sec:orgf974748}]{RL maps states to actions}
 \addtocounter{framenumber}{-1}
 \center
 \begin{tikzpicture}
@@ -275,7 +300,7 @@ Egocentric\\
     \draw[RedBrown,ultra thick,rounded corners] (4.5,0.5) rectangle (7,2.5);
 \end{tikzpicture}
 \end{frame}
-\begin{frame}[label={sec:org8768797}]{RL maps states to actions}
+\begin{frame}[label={sec:orgdf5d628}]{RL maps states to actions}
 \addtocounter{framenumber}{-1}
 \center
 \begin{tikzpicture}
@@ -284,11 +309,11 @@ Egocentric\\
     \draw[RedBrown,ultra thick,rounded corners] (4.5,3.5) rectangle (7,4.5);
 \end{tikzpicture}
 \end{frame}
-\begin{frame}[label={sec:orgdda15ae},standout]{~}
+\begin{frame}[label={sec:org9ef2173},standout]{~}
 \raggedright
 Which representations are needed by the brain to learn a place-odor association task ?
 \end{frame}
-\begin{frame}[label={sec:org88c93b9}]{The joint representation encodes odor + location}
+\begin{frame}[label={sec:org2d9962e}]{The joint representation encodes odor + location}
 \begin{columns}
 \begin{column}{0.33\columnwidth}
 \begin{center}
@@ -304,7 +329,7 @@ Location only
 \end{column}
 \end{columns}
 \end{frame}
-\begin{frame}[label={sec:orgb01e964}]{The joint representation encodes odor + location}
+\begin{frame}[label={sec:org776c9e4}]{The joint representation encodes odor + location}
 \addtocounter{framenumber}{-1}
 \begin{columns}
 \begin{column}{0.33\columnwidth}
@@ -327,7 +352,7 @@ Odor only
 \end{column}
 \end{columns}
 \end{frame}
-\begin{frame}[label={sec:org583d53c}]{The joint representation encodes odor + location}
+\begin{frame}[label={sec:org538bc67}]{The joint representation encodes odor + location}
 \addtocounter{framenumber}{-1}
 \begin{columns}
 \begin{column}{0.33\columnwidth}
@@ -357,8 +382,8 @@ Joint
 \end{columns}
 \end{frame}
 \section{Modeling \& preliminary results}
-\label{sec:org6adb910}
-\begin{frame}[label={sec:orgfd802a2}]{The model}
+\label{sec:org0c5b504}
+\begin{frame}[label={sec:org6e43f5f}]{The model}
 \begin{columns}
 \begin{column}{0.5\columnwidth}
 \center
@@ -374,7 +399,7 @@ Allocentric
 \end{column}
 \end{columns}
 \end{frame}
-\begin{frame}[label={sec:orgc708f55}]{The model}
+\begin{frame}[label={sec:orgb828b14}]{The model}
 \addtocounter{framenumber}{-1}
 \begin{columns}
 \begin{column}{0.5\columnwidth}
@@ -399,7 +424,7 @@ Egocentric
 \end{column}
 \end{columns}
 \end{frame}
-\begin{frame}[label={sec:orgea3805f}]{Maximizing rewards}
+\begin{frame}[label={sec:orge700521}]{Maximizing rewards}
 \begin{columns}
 \begin{column}[t]{0.5\columnwidth}
 \begin{center}
@@ -422,7 +447,7 @@ With joint representation
 \end{columns}
 \end{frame}
 
-\begin{frame}[label={sec:org3464634}]{Minimizing the number of steps to solve the task}
+\begin{frame}[label={sec:orgf1807f2}]{Minimizing the number of steps to solve the task}
 \begin{columns}
 \begin{column}[t]{0.5\columnwidth}
 \begin{center}
@@ -445,7 +470,7 @@ With joint representation
 \end{columns}
 \end{frame}
 
-\begin{frame}[label={sec:orge57f1bf}]{What policy did the agent learned ?}
+\begin{frame}[label={sec:orgce6a44e}]{What policy did the agent learned ?}
 \vspace{-7em}
 \begin{columns}
 \begin{column}[t]{0.5\columnwidth}
@@ -460,7 +485,7 @@ With joint representation
 \end{column}
 \end{columns}
 \end{frame}
-\begin{frame}[label={sec:orgc1fc0cc}]{What policy did the agent learned ?}
+\begin{frame}[label={sec:org4be4351}]{What policy did the agent learned ?}
 \addtocounter{framenumber}{-1}
 \begin{columns}
 \begin{column}[t]{0.5\columnwidth}
@@ -482,8 +507,8 @@ With joint representation
 \end{columns}
 \end{frame}
 \section{Next steps}
-\label{sec:org0d1c85e}
-\begin{frame}[label={sec:orgf22d0a0}]{Our RL model so far}
+\label{sec:org93f5ad1}
+\begin{frame}[label={sec:org90847be}]{Our RL model so far}
 \begin{columns}
 \begin{column}[t]{0.55\columnwidth}
 % \usepackage{fontawesome5}
@@ -538,7 +563,7 @@ With joint representation
 \end{columns}
 \end{frame}
 
-\begin{frame}[label={sec:org401082e}]{Next step : from tabular RL to deep RL}
+\begin{frame}[label={sec:orgd144540}]{Next step : from tabular RL to deep RL}
 \begin{columns}
 \begin{column}[t]{0.55\columnwidth}
 % \usepackage{fontawesome5}
@@ -593,7 +618,7 @@ With joint representation
 \end{column}
 \end{columns}
 \end{frame}
-\begin{frame}[label={sec:org770dfa8}]{What types of representations are in use to solve an odor-place association task ?}
+\begin{frame}[label={sec:org735ff8f}]{What types of representations are in use to solve an odor-place association task ?}
 \begin{center}
 \includegraphics[height=0.4\textheight]{img/exp-vs-simu.drawio.png}
 \end{center}
@@ -629,7 +654,7 @@ With joint representation
 \end{columns}
 \end{frame}
 
-\begin{frame}[<+->][label={sec:org441e60f}]{Summary}
+\begin{frame}[<+->][label={sec:org10bdb82}]{Summary}
 \begin{itemize}
 \item LEC as candidate brain area for studying how \alert{odor} \& \alert{place} information are integrated in the brain
 \item We use Reinforcement Learning to model behavior involving rewards and learning
@@ -638,7 +663,7 @@ With joint representation
 \end{itemize}
 \end{frame}
 \section*{Acknowledgments}
-\label{sec:org88dbe62}
+\label{sec:org9514945}
 {%
 \setbeamertemplate{background canvas}{\includegraphics[height=\paperheight]{img/grand-canyon.JPG}}
 \begin{frame}[fragile,t, plain]{Acknowledgments}
@@ -690,8 +715,8 @@ With joint representation
 \end{frame}
 }
 \section{Backup}
-\label{sec:org02b4630}
-\begin{frame}[label={sec:org9ff3be0}]{Policy learned in the egocentric version}
+\label{sec:org657e083}
+\begin{frame}[label={sec:org0fd12f5}]{Policy learned in the egocentric version}
 \addtocounter{framenumber}{-1}
 \begin{center}
 \includegraphics[width=.9\linewidth]{img/policy-ego-joint-repr.png}
