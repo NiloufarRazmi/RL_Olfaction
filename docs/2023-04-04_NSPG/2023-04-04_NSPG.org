@@ -90,7 +90,7 @@ Alex Fleischmann
 %\footnotesize
 \footnotesize
 #+end_export
-- *Piriform* encodes olfactory information
+- *Piriform Cortex* encodes olfactory information
 - *Hippocampus* encodes spatial information
 - *Lateral Entorhinal Cortex (LEC)* encodes both olfactory & spatial information
 *** Image :BMCOL:
@@ -582,7 +582,7 @@ With joint representation
 \textbf{Experimental data}
 \end{center}
 #+end_export
-\to Look for candidate patterns in the data: place cells, grid cells,\dots?
+\to Look for candidate patterns in the data: place cells, grid cells, odor tuned cells,\dots?
 *** Simulation :BMCOL:
 :PROPERTIES:
 :BEAMER_col: 0.5
@@ -783,7 +783,7 @@ Bubble with question mark
 *** What happens in the head of the agent?
 That's why we show LEC
 What states in the head of the agent
-*** How does the brain learn to know olfactory information to associate
+*** How does the brain learn to associate olfactory & spatial information
 What we think are the major players involved LEC, blabbla
 *** Focus on transitions
 *** TODO Include only A, B and D in experiment
@@ -798,9 +798,9 @@ What type of information the mouse might keep track of?
 1. repr to RL
 2. RL to repr
 *** Didn't explain states on the RL diagram
-Rl work if you get the right states repr
-What is the right states repr
-Then show joint repr slide
+1. Rl work if you get the right states repr
+2. What is the right states repr
+3. Then show joint repr slide
 *** DONE Animate states that strengthen connections
 *** Legend on the policy
 *** We also did it with an egocentric action space
