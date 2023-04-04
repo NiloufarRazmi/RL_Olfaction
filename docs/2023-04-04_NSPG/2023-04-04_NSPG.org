@@ -133,7 +133,7 @@ Olivia\\McKissick
 Allocentric\\
 (go west/east)
 #+begin_export latex
-\vspace{-2em}
+\vspace{-1.5em}
 #+end_export
 #+ATTR_LaTeX: :width 0.8\textwidth
 [[file:img/RL_env-allo-task.drawio.png]]
@@ -164,7 +164,7 @@ Olivia\\McKissick
 Allocentric\\
 (go west/east)
 #+begin_export latex
-\vspace{-2em}
+\vspace{-1.5em}
 #+end_export
 #+ATTR_LaTeX: :width 0.8\textwidth
 [[file:img/RL_env-allo-task.drawio.png]]
@@ -517,6 +517,14 @@ With joint representation
 #+ATTR_LaTeX: :height 0.4\textheight
 [[file:img/policy-allo-south-light.png]]
 [[file:img/policy-allo-odor-B.png]]
+#+begin_export latex
+\begin{textblock}{0.2}(0.29,0.525)%
+\includegraphics[height=1em]{img/banana.png}
+\end{textblock}
+\begin{textblock}{0.2}(0.855,0.525)%
+\includegraphics[height=1em]{img/lemon.png}
+\end{textblock}
+#+end_export
 * Next steps
 ** Our RL model so far
 *** Diagram :BMCOL:
