@@ -92,7 +92,7 @@ Alex Fleischmann
 #+end_export
 - *Piriform* encodes olfactory information
 - *Hippocampus* encodes spatial information
-- *LEC* encodes both olfactory & spatial information
+- *Lateral Entorhinal Cortex (LEC)* encodes both olfactory & spatial information
 *** Image :BMCOL:
 :PROPERTIES:
 :BEAMER_col: 0.55
@@ -100,13 +100,25 @@ Alex Fleischmann
 #+ATTR_LaTeX: :width \textwidth
 [[file:img/brain.png]]
 
-** Diamond arena olfactory task
+** Diamond arena experimental setup
 #+begin_export latex
-\begin{textblock}{5}(11,-0.5)
+\begin{textblock}{0.2}(1,0.071)%
 \center
 \includegraphics[width=3em]{img/olivia.jpg}\\
 \scriptsize
-Olivia McKissick
+Olivia\\McKissick
+\end{textblock}
+#+end_export
+#+ATTR_LaTeX: :width 0.8\textwidth
+[[file:img/physical-diamond-arena.png]]
+\to\nbsp{}1P calcium imaging recording on freely moving mice
+** Diamond arena olfactory task
+#+begin_export latex
+\begin{textblock}{0.2}(1,0.071)%
+\center%
+\includegraphics[width=3em]{img/olivia.jpg}\\
+\scriptsize
+Olivia\\McKissick
 \end{textblock}
 #+end_export
 *** Allocentric :BMCOL:
@@ -135,17 +147,6 @@ Egocentric\\
 #+ATTR_LaTeX: :width 0.8\textwidth
 [[file:img/egocentric-task.png]]
 
-** Diamond arena experimental setup
-#+begin_export latex
-\begin{textblock}{5}(11,-1.3)
-\center
-\includegraphics[width=3em]{img/olivia.jpg}\\
-\scriptsize
-Olivia McKissick
-\end{textblock}
-#+end_export
-#+ATTR_LaTeX: :width 0.8\textwidth
-[[file:img/physical-diamond-arena.png]]
 ** What is Reinforcement Learning and why use it ?
 :PROPERTIES:
 :BEAMER_act: [<+->]
@@ -225,8 +226,17 @@ Olivia McKissick
 \begin{tikzpicture}
     \node[anchor=south west,inner sep=0] (image) at (0,0) {\includegraphics[height=\textheight]{img/RL_mapping-2.drawio.png}};
     \draw[RedBrown,ultra thick,rounded corners] (0,4) rectangle (3,4.7);
+    \draw[RedBrown,ultra thick,rounded corners] (4.5,3.5) rectangle (7,4.5);
 \end{tikzpicture}
 #+end_export
+** \nbsp{}
+:PROPERTIES:
+:BEAMER_opt: standout
+:END:
+#+begin_export latex
+\raggedright
+#+end_export
+Which representations are needed by the brain to learn a place-odor association task ?
 ** The joint representation encodes odor + location
 *** Location :BMCOL:
 :PROPERTIES:
@@ -308,14 +318,6 @@ Joint
 \end{center}
 #+end_export
 [[file:img/joint-repr-joint.drawio.png]]
-** \nbsp{}
-:PROPERTIES:
-:BEAMER_opt: standout
-:END:
-#+begin_export latex
-\raggedright
-#+end_export
-Which representations are needed by the brain to learn a place-odor association task ?
 * COMMENT Question
 :PROPERTIES:
 :UNNUMBERED: notoc
@@ -329,27 +331,6 @@ Which representations are needed by the brain to learn a place-odor association 
 \end{frame}
 #+end_export
 * Modeling & preliminary results
-** Allocentric vs. Egocentric
-*** Allocentric :BMCOL:
-:PROPERTIES:
-:BEAMER_col: 0.5
-:END:
-#+begin_export latex
-\begin{center}
-Allocentric
-\end{center}
-#+end_export
-[[file:img/ego-vs-allo-allo.drawio.png]]
-*** Egocentric :BMCOL:
-:PROPERTIES:
-:BEAMER_col: 0.5
-:END:
-#+begin_export latex
-\begin{center}
-Egocentric
-\end{center}
-#+end_export
-[[file:img/ego-vs-allo-ego.drawio.png]]
 ** The model
 *** Allocentric :BMCOL:
 :PROPERTIES:
@@ -359,7 +340,9 @@ Egocentric
 \center
 #+end_export
 Allocentric
-#+ATTR_LaTeX: :width \textwidth
+#+ATTR_LaTeX: :height 0.2\textheight
+[[file:img/ego-vs-allo-allo.drawio.png]]
+#+ATTR_LaTeX: :width 0.9\textwidth
 [[file:img/RL_env-allo-model.drawio.png]]
 *** Egocentric :BMCOL:
 :PROPERTIES:
@@ -377,7 +360,9 @@ Allocentric
 \center
 #+end_export
 Allocentric
-#+ATTR_LaTeX: :width \textwidth
+#+ATTR_LaTeX: :height 0.2\textheight
+[[file:img/ego-vs-allo-allo.drawio.png]]
+#+ATTR_LaTeX: :width 0.9\textwidth
 [[file:img/RL_env-allo-model.drawio.png]]
 *** Egocentric :BMCOL:
 :PROPERTIES:
@@ -387,7 +372,9 @@ Allocentric
 \center
 #+end_export
 Egocentric
-#+ATTR_LaTeX: :width \textwidth
+#+ATTR_LaTeX: :height 0.2\textheight
+[[file:img/ego-vs-allo-ego.drawio.png]]
+#+ATTR_LaTeX: :width 0.9\textwidth
 [[file:img/RL_env-ego-model.drawio.png]]
 ** COMMENT With joint representation
 *** \nbsp{}
@@ -494,7 +481,7 @@ With joint representation
 [[file:img/policy-allo-south-light.png]]
 [[file:img/policy-allo-odor-B.png]]
 * Next steps
-** What we have done so far
+** Our RL model so far
 *** Diagram :BMCOL:
 :PROPERTIES:
 :BEAMER_col: 0.55
@@ -511,11 +498,10 @@ With joint representation
 #+begin_export latex
 \footnotesize
 #+end_export
-- Behavioral model only
 - Tabular model that maps states to actions
-- All states need to be visited by the agent to propagate the prediction of getting a future reward \to\nbsp{}not what happens in the brain
+- No generalization \to\nbsp{}each state needs to be visited by the agent to compute a prediction of getting a future reward
 
-** From tabular RL to deep RL
+** Next step : from tabular RL to deep RL
 *** Diagram :BMCOL:
 :PROPERTIES:
 :BEAMER_col: 0.55
@@ -532,10 +518,9 @@ With joint representation
 #+begin_export latex
 \footnotesize
 #+end_export
-- Behavioral + neural model
-- Neural network that maps states to actions
-- Extract features from the simulation data
-- Not all states need to be visited by the agent to propagate the prediction of getting a future reward \to\nbsp{}closer to the brain
+- Neural network does the mapping from states to actions
+- Learn to extract features/representations from the simulation data
+- Better generalization \to\nbsp{}the agent does not need to visit each state to compute a prediction of getting a future reward
 ** What types of representations are in use to solve an odor-place association task ?
 #+ATTR_LaTeX: :height 0.4\textheight
 [[file:img/exp-vs-simu.drawio.png]]
@@ -549,7 +534,7 @@ With joint representation
 :END:
 #+begin_export latex
 \begin{center}
-Experiment
+\textbf{Experimental data}
 \end{center}
 #+end_export
 \to Look for candidate patterns in the data: place cells, grid cells,\dots?
@@ -560,10 +545,10 @@ Experiment
 :END:
 #+begin_export latex
 \begin{center}
-Simulation
+\textbf{Simulation}
 \end{center}
 #+end_export
-\to Compare the data with the representations learned from scratch by the neural network
+\to Compare the experimental data with the representations learned from scratch by the neural network
 
 #+begin_export latex
 % \begin{textblock}{5}(-8.5,0.5)
@@ -586,10 +571,10 @@ Simulation
 :PROPERTIES:
 :BEAMER_act: [<+->]
 :END:
-- We record in the LEC because it encodes spatial & olfactory information
-- Reinforcement Learning is a useful framework to model behavior involving rewards and learning
-- The joint representation is needed to solve an odor-place association task
-- We hope to use Deep Reinforcement Learning to better understand the representations that are at play in this type of task
+- LEC as candidate brain area for studying how *odor* & *place* information are integrated in the brain
+- We use Reinforcement Learning to model behavior involving rewards and learning
+- The *joint representation* is needed to solve an odor-place association task
+- We expect to use Deep Reinforcement Learning to investigate other types of representations that may be at play
 * Acknowledgments
 :PROPERTIES:
 :UNNUMBERED: notoc
@@ -647,7 +632,7 @@ Simulation
 }
 #+end_export
 * Backup
-** Egocentric policy
+** Policy learned in the egocentric version
 #+begin_export latex
 \addtocounter{framenumber}{-1}
 #+end_export
@@ -756,7 +741,7 @@ What states in the head of the agent
 *** How does the brain learn to know olfactory information to associate
 What we think are the major players involved LEC, blabbla
 *** Focus on transitions
-*** Include only A, B and D in experiment
+*** TODO Include only A, B and D in experiment
 What do I show the ports? If I don't talk about it, don't need to show
 *** DONE Go from brain to schema of the task
 *** Animate allocentric schema
@@ -789,9 +774,9 @@ In the other it learns
 **** DONE Fit on plots
 **** DONE Odor emoji
 **** Legend?
-*** Next steps
-**** Write clear text?
-**** Remake exp vs simulation with loop?
+*** DONE Next steps
+**** DONE Write clear text?
+**** DONE Remake exp vs simulation with loop?
 * COMMENT Questions
 ** neural network
 *** Lookup table

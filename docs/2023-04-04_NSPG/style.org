@@ -26,8 +26,13 @@
 #+LaTeX_HEADER: \usepackage{color}
 #+LaTeX_HEADER: \usepackage{transparent}
 #+BEAMER_HEADER: \setbeamercovered{transparent=10}
-#+LaTeX_HEADER: \usepackage{textpos}
 #+LaTeX_HEADER: \usepackage{tcolorbox}
+
+# Absolute positioning
+# #+LaTeX_HEADER: \usepackage[absolute, overlay, showboxes]{textpos}
+#+LaTeX_HEADER: \usepackage[absolute, overlay]{textpos}
+#+LaTeX_HEADER: \setlength{\TPHorizModule}{\textwidth}
+#+LaTeX_HEADER: \setlength{\TPVertModule}{\textwidth}
 
 # Itemize environment
 #+LaTeX_HEADER: \usepackage{enumitem}

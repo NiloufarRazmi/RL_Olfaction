@@ -381,8 +381,8 @@ plt.show()
 emoji = [
     {"emoji": "💡", "coords": [4.5, 0.5]},
     {"emoji": "💡", "coords": [0.5, 4.5]},
-    {"emoji": "🍌", "coords": [0.5, 0.5]},
-    {"emoji": "🍋", "coords": [4.5, 4.5]},
+    {"emoji": "💧", "coords": [0.5, 0.5]},
+    {"emoji": "💧", "coords": [4.5, 4.5]},
 ]
 
 # %%
