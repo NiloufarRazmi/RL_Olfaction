@@ -36,7 +36,7 @@ class QLearningFuncApprox:
         else:
             self.features = features_matrix
         self.weights = np.zeros((self.features.shape[1], action_size))
-        self.reset_Q_hat_table()
+        self.reset(action_size=action_size)
 
     def Q_hat(self, weights, features):
         """Compute the approximated Q-value."""
@@ -57,9 +57,10 @@ class QLearningFuncApprox:
         )
         return weights_update
 
-    def reset_Q_hat_table(self):
+    def reset(self, action_size):
         """Reset the approximated Q-table."""
         self.Q_hat_table = np.zeros((self.features.shape[0], self.weights.shape[1]))
+        self.weights = np.zeros((self.features.shape[1], action_size))
 
 
 class EpsilonGreedy:

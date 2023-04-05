@@ -58,7 +58,7 @@ from utils import Params
 
 # %%
 # Choose the parameters for the task
-params = Params(epsilon=0.1, n_runs=10, numEpisodes=300, alpha=0.025)
+params = Params(epsilon=0.1, n_runs=100, numEpisodes=300, alpha=0.025)
 params
 
 # %% [markdown]
@@ -218,7 +218,9 @@ all_states = []
 all_actions = []
 
 for run in range(params.n_runs):  # Run several times to account for stochasticity
-    learner.reset_Q_hat_table()  # Reset the Q-table between runs
+    learner.reset(
+        action_size=env.numActions
+    )  # Reset the Q-table and the weights between runs
 
     for episode in tqdm(
         episodes, desc=f"Run {run+1}/{params.n_runs} - Episodes", leave=False
@@ -267,8 +269,8 @@ for run in range(params.n_runs):  # Run several times to account for stochastici
 res = pd.DataFrame(
     data={
         "Episodes": np.tile(episodes, reps=params.n_runs),
-        "Rewards": rewards.flatten(),
-        "Steps": steps.flatten(),
+        "Rewards": rewards.flatten(order="F"),
+        "Steps": steps.flatten(order="F"),
     }
 )
 res["cum_rewards"] = rewards.cumsum(axis=0).flatten(order="F")
@@ -427,57 +429,7 @@ fig.patch.set_facecolor("white")
 plt.show()
 
 # %%
-fig, ax = plt.subplots(figsize=(12, 8))
-sns.regplot(
-    x="Episodes",
-    y="Steps",
-    data=res,
-    ax=ax,
-    order=5,
-    scatter=False,
-    # ci=None,
-    # scatter_kws={"s": 80},
-    line_kws={"color": "C1"},
-)
-ax.set(xlabel="Trial")
-fig.tight_layout()
-fig.patch.set_alpha(0)
-fig.patch.set_facecolor("white")
-plt.show()
-
-# %%
-fig, ax = plt.subplots(figsize=(12, 8))
-sns.regplot(
-    x="Episodes",
-    y="Rewards",
-    data=res,
-    ax=ax,
-    order=8,
-    # ci=None,
-    # scatter_kws={"s": 80},
-    scatter=False,
-    line_kws={"color": "C1"},
-)
-fig.tight_layout()
-fig.patch.set_alpha(0)
-fig.patch.set_facecolor("white")
-ax.set(xlabel="Trial")
-plt.show()
-
-# %%
-import seaborn.objects as so
-
-p = so.Plot(
-    x="Episodes",
-    y="Steps",
-    data=res,
-)
-p.add(so.Band())
-
-# %%
 plt.plot(res.Steps.rolling(window=3).mean())
 
 # %%
 plt.plot(res.Rewards.rolling(window=3).mean())
-
-# %%
