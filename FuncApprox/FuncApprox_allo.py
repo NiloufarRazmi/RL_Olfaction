@@ -27,6 +27,8 @@
 # %% [markdown]
 # ## Initialization
 
+import re
+
 # %%
 # Import packages
 import numpy as np
@@ -58,7 +60,7 @@ from utils import Params
 
 # %%
 # Choose the parameters for the task
-params = Params(epsilon=0.1, n_runs=100, numEpisodes=300, alpha=0.025)
+params = Params(epsilon=0.1, n_runs=30, numEpisodes=300, alpha=0.025)
 params
 
 # %% [markdown]
@@ -68,96 +70,84 @@ params
 # Load the environment
 env = WrappedEnvironment(params)
 
-# %%
-# Manually engineered features, optional
-# if `None`, a diagonal matrix of features will be created automatically
-features = np.matlib.repmat(
-    np.eye(len(env.tiles_locations), len(env.tiles_locations)),
-    len(env.cues),
-    len(env.cues),
-)
-features.shape
+# %% [markdown]
+# Manually engineered features, optional.
+# If `None`, a diagonal matrix of features will be created automatically
 
 # %%
-# tmp1 = np.matlib.repmat(
-#     np.eye(len(env.tiles_locations), len(env.tiles_locations)), len(env.cues), 1
+# features = np.matlib.repmat(
+#     np.eye(len(env.tiles_locations), len(env.tiles_locations)),
+#     len(env.cues),
+#     len(env.cues),
 # )
-# tmp1.shape
-
-# %%
-# tmp2 = np.vstack(
-#     (
-#         np.hstack(
-#             (
-#                 np.ones((len(env.tiles_locations), 1)),
-#                 np.zeros((len(env.tiles_locations), len(env.cues) - 1)),
-#             )
-#         ),
-#         np.hstack(
-#             (
-#                 np.zeros((len(env.tiles_locations), 1)),
-#                 np.ones((len(env.tiles_locations), 1)),
-#                 np.zeros((len(env.tiles_locations), len(env.cues) - 2)),
-#             )
-#         ),
-#         np.hstack(
-#             (
-#                 np.zeros((len(env.tiles_locations), 2)),
-#                 np.ones((len(env.tiles_locations), 1)),
-#                 np.zeros((len(env.tiles_locations), len(env.cues) - 3)),
-#             )
-#         ),
-#         np.hstack(
-#             (
-#                 np.zeros((len(env.tiles_locations), len(env.cues) - 1)),
-#                 np.ones((len(env.tiles_locations), 1)),
-#             )
-#         ),
-#     )
-# )
-
-# tmp2.shape
-
-# %%
-# tmp2 = np.vstack(
-#     (
-#         np.hstack(
-#             (
-#                 np.zeros((len(env.tiles_locations), len(env.cues) - 1)),
-#                 np.ones((len(env.tiles_locations), 1)),
-#             )
-#         ),
-#         np.hstack(
-#             (
-#                 np.zeros((len(env.tiles_locations), 2)),
-#                 np.ones((len(env.tiles_locations), 1)),
-#                 np.zeros((len(env.tiles_locations), len(env.cues) - 3)),
-#             )
-#         ),
-#         np.hstack(
-#             (
-#                 np.zeros((len(env.tiles_locations), 1)),
-#                 np.ones((len(env.tiles_locations), 1)),
-#                 np.zeros((len(env.tiles_locations), len(env.cues) - 2)),
-#             )
-#         ),
-#         np.hstack(
-#             (
-#                 np.ones((len(env.tiles_locations), 1)),
-#                 np.zeros((len(env.tiles_locations), len(env.cues) - 1)),
-#             )
-#         ),
-#     )
-# )
-
-# tmp2.shape
-
-# %%
-# features = np.hstack((tmp1, tmp2))
 # features.shape
 
 # %%
-features = None
+tmp1 = np.matlib.repmat(
+    np.eye(len(env.tiles_locations), len(env.tiles_locations)), len(env.cues), 1
+)
+tmp1.shape
+
+# %%
+tmp2 = np.vstack(
+    (
+        np.hstack(
+            (
+                np.ones((len(env.tiles_locations), 1)),
+                np.zeros((len(env.tiles_locations), len(env.cues) - 1)),
+            )
+        ),
+        np.hstack(
+            (
+                np.zeros((len(env.tiles_locations), 1)),
+                np.ones((len(env.tiles_locations), 1)),
+                np.zeros((len(env.tiles_locations), len(env.cues) - 2)),
+            )
+        ),
+        np.hstack(
+            (
+                np.zeros((len(env.tiles_locations), 2)),
+                np.ones((len(env.tiles_locations), 1)),
+                np.zeros((len(env.tiles_locations), len(env.cues) - 3)),
+            )
+        ),
+        np.hstack(
+            (
+                np.zeros((len(env.tiles_locations), len(env.cues) - 1)),
+                np.ones((len(env.tiles_locations), 1)),
+            )
+        ),
+    )
+)
+
+tmp2.shape
+
+# %%
+tmp2 = np.vstack(
+    (
+        np.hstack(
+            (
+                np.ones((len(env.tiles_locations) * len(OdorID), 1)),
+                np.zeros((len(env.tiles_locations) * len(OdorID), 1)),
+            )
+        ),
+        np.hstack(
+            (
+                np.zeros((len(env.tiles_locations) * len(LightCues), 1)),
+                np.ones((len(env.tiles_locations) * len(LightCues), 1)),
+            )
+        ),
+    )
+)
+
+tmp2.shape
+
+# %%
+features = np.hstack((tmp1, tmp2))
+features.shape
+
+# %%
+# features = None
 
 # %%
 # Load the agent algorithms
@@ -171,7 +161,21 @@ learner = QLearningFuncApprox(
 explorer = EpsilonGreedy(epsilon=params.epsilon)
 
 # %%
-plotting.plot_heatmap(matrix=learner.features, title="Features", ylabel="States")
+braces = []
+for idx, cue in enumerate(CONTEXTS_LABELS):
+    braces.append(
+        {
+            "p1": [-5, idx * len(env.tiles_locations)],
+            "p2": [-5, (idx + 1) * len(env.tiles_locations)],
+            "str_text": re.sub(r"^P.*?odor - ", "", CONTEXTS_LABELS[cue]),
+        }
+    )
+braces
+
+# %%
+plotting.plot_heatmap(
+    matrix=learner.features, title="Features", ylabel="States", braces=braces
+)
 
 # %%
 learner.Q_hat_table.shape, learner.weights.shape, learner.features.shape

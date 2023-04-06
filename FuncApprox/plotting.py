@@ -4,6 +4,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
+from curlyBrace import curlyBrace
 from imojify import imojify
 from matplotlib.offsetbox import AnnotationBbox, OffsetImage
 
@@ -18,10 +19,11 @@ def plot_steps_and_rewards(df):
     fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(15, 5))
     # ax[0].set(ylabel="Cummulated rewards")
     sns.lineplot(data=df, x="Episodes", y="Rewards", ax=ax[0])
-    # ax[0].set(ylabel="Cumulated rewards")
+    ax[0].set(ylabel="Averaged rewards")
 
     sns.lineplot(data=df, x="Episodes", y="Steps", ax=ax[1])
-    # ax[1].set(ylabel="Averaged steps number")
+    # ax[1].set_yscale("log")
+    ax[1].set(ylabel="Averaged steps number")
     fig.tight_layout()
     fig.patch.set_alpha(0)
     fig.patch.set_facecolor("white")
@@ -74,7 +76,7 @@ def plot_q_values_map(qtable, rows, cols):
     plt.show()
 
 
-def plot_heatmap(matrix, title=None, xlabel=None, ylabel=None):
+def plot_heatmap(matrix, title=None, xlabel=None, ylabel=None, braces=[]):
     fig, ax = plt.subplots(figsize=(9, 9))
     cmap = sns.light_palette("seagreen", as_cmap=True)
     # cmap = sns.color_palette("light:b", as_cmap=True)
@@ -89,6 +91,20 @@ def plot_heatmap(matrix, title=None, xlabel=None, ylabel=None):
     ax.tick_params(axis="y", rotation=0)
     ax.tick_params(left=True)
     ax.xaxis.tick_top()
+    if braces:
+        for idx, brace in enumerate(braces):
+            curlyBrace(
+                fig=fig,
+                ax=ax,
+                p1=brace["p1"],
+                p2=brace["p2"],
+                k_r=0.05,
+                bool_auto=False,
+                str_text=brace["str_text"],
+                color="black",
+                lw=3,
+                int_line_num=1,
+            )
     plt.show()
 
 
