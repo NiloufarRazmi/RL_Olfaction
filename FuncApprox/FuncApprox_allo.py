@@ -60,7 +60,7 @@ from utils import Params
 
 # %%
 # Choose the parameters for the task
-params = Params(epsilon=0.1, n_runs=30, numEpisodes=300, alpha=0.025)
+params = Params(epsilon=0.1, n_runs=20, numEpisodes=300, alpha=0.025)
 params
 
 # %% [markdown]
@@ -304,7 +304,7 @@ plotting.plot_heatmap(matrix=qtable, title="Q-table")
 plotting.plot_states_actions_distribution(all_states, all_actions)
 
 # %%
-plotting.plot_steps_and_rewards(res)
+plotting.plot_steps_and_rewards(res, log=True)
 
 # %%
 plotting.plot_q_values_maps(qtable, env.rows, env.cols, CONTEXTS_LABELS)

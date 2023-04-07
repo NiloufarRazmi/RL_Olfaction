@@ -15,14 +15,15 @@ sns.set(font_scale=1.5)
 # plt.rcParams['text.usetex'] = True
 
 
-def plot_steps_and_rewards(df):
+def plot_steps_and_rewards(df, log=None):
     fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(15, 5))
     # ax[0].set(ylabel="Cummulated rewards")
     sns.lineplot(data=df, x="Episodes", y="Rewards", ax=ax[0])
     ax[0].set(ylabel="Averaged rewards")
 
     sns.lineplot(data=df, x="Episodes", y="Steps", ax=ax[1])
-    # ax[1].set_yscale("log")
+    if log:
+        ax[1].set_yscale("log")
     ax[1].set(ylabel="Averaged steps number")
     fig.tight_layout()
     fig.patch.set_alpha(0)
