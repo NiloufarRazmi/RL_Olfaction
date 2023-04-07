@@ -53,6 +53,7 @@ def plot_q_values_map(qtable, rows, cols):
     """Plot the heatmap of the Q-values.
 
     Also plot the best action's direction with arrows."""
+    # TODO: Remove function as it doesn't seem to be used anymore?
     qtable_val_max, qtable_directions = qtable_directions_map(qtable, rows, cols)
 
     # font_name = "DejaVu Math TeX Gyre"
@@ -176,8 +177,46 @@ def plot_q_values_maps(qtable, rows, cols, labels):
             spine.set_linewidth(0.7)
             spine.set_color("black")
 
+        # Annotate the ports names
+        bbox = {
+            "facecolor": "black",
+            "edgecolor": "none",
+            "boxstyle": "round",
+            "alpha": 0.1,
+        }
+        ax.flatten()[idx].text(
+            x=4.7,
+            y=0.3,
+            s="N",
+            bbox=bbox,
+            color="white",
+        )
+        ax.flatten()[idx].text(
+            x=0.05,
+            y=4.9,
+            s="S",
+            bbox=bbox,
+            color="white",
+        )
+        ax.flatten()[idx].text(
+            x=4.7,
+            y=4.9,
+            s="E",
+            bbox=bbox,
+            color="white",
+        )
+        ax.flatten()[idx].text(
+            x=0.05,
+            y=0.3,
+            s="W",
+            bbox=bbox,
+            color="white",
+        )
+
+    # Make background transparent
     fig.patch.set_alpha(0)
     fig.patch.set_facecolor("white")
+
     plt.show()
 
 
