@@ -52,7 +52,7 @@ from utils import Params
 
 # %%
 # Choose the parameters for the task
-params = Params(epsilon=0.1, n_runs=3, numEpisodes=1000)
+params = Params(epsilon=0.1, n_runs=20, numEpisodes=300)
 params
 
 # %% [markdown]
@@ -153,8 +153,8 @@ for run in range(params.n_runs):  # Run several times to account for stochastici
 res = pd.DataFrame(
     data={
         "Episodes": np.tile(episodes, reps=params.n_runs),
-        "Rewards": rewards.flatten(),
-        "Steps": steps.flatten(),
+        "Rewards": rewards.flatten(order="F"),
+        "Steps": steps.flatten(order="F"),
     }
 )
 res["cum_rewards"] = rewards.cumsum(axis=0).flatten(order="F")

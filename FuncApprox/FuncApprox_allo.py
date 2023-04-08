@@ -165,12 +165,22 @@ braces = []
 for idx, cue in enumerate(CONTEXTS_LABELS):
     braces.append(
         {
-            "p1": [-5, idx * len(env.tiles_locations)],
-            "p2": [-5, (idx + 1) * len(env.tiles_locations)],
+            "p1": [-18, idx * len(env.tiles_locations)],
+            "p2": [-18, (idx + 1) * len(env.tiles_locations)],
             "str_text": re.sub(r"^P.*?odor - ", "", CONTEXTS_LABELS[cue]),
         }
     )
 braces
+
+# %%
+# braces.append(
+#     {
+#         "p1": [len(env.tiles_locations), -15],
+#         "p2": [0, -15],
+#         "str_text": "Locations",
+#     }
+# )
+# braces
 
 # %%
 plotting.plot_heatmap(

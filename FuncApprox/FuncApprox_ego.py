@@ -60,7 +60,7 @@ from utils import Params
 
 # %%
 # Choose the parameters for the task
-params = Params(epsilon=0.1, n_runs=3, numEpisodes=1000, alpha=0.025)
+params = Params(epsilon=0.1, n_runs=20, numEpisodes=1000, alpha=0.025)
 params
 
 # %% [markdown]

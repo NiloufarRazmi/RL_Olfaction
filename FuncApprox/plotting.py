@@ -15,20 +15,29 @@ sns.set(font_scale=1.5)
 # plt.rcParams['text.usetex'] = True
 
 
-def plot_steps_and_rewards(df, log=None):
+def plot_steps_and_rewards(df, n_runs=0, log=None):
     fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(15, 5))
-    # ax[0].set(ylabel="Cummulated rewards")
-    sns.lineplot(data=df, x="Episodes", y="Rewards", ax=ax[0])
-    ax[0].set(ylabel="Averaged rewards")
 
+    # Rewards
+    sns.lineplot(data=df, x="Episodes", y="Rewards", ax=ax[0])
+
+    # Steps
     sns.lineplot(data=df, x="Episodes", y="Steps", ax=ax[1])
     if log:
         ax[1].set_yscale("log")
-    ax[1].set(ylabel="Averaged steps number")
-    fig.tight_layout()
+
+    if n_runs > 1:
+        ax[0].set(ylabel=f"Rewards\naveraged over {n_runs} runs")
+        ax[1].set(ylabel=f"Steps number\naveraged over {n_runs} runs")
+    else:
+        ax[0].set(ylabel="Rewards")
+        ax[1].set(ylabel="Steps number")
+
+    # Transparent background
     fig.patch.set_alpha(0)
     fig.patch.set_facecolor("white")
 
+    fig.tight_layout()
     plt.show()
 
 
@@ -104,8 +113,8 @@ def plot_heatmap(matrix, title=None, xlabel=None, ylabel=None, braces=[]):
                 bool_auto=False,
                 str_text=brace["str_text"],
                 color="black",
-                lw=3,
-                int_line_num=1,
+                lw=2,
+                int_line_num=2,
             )
     plt.show()
 
@@ -171,6 +180,7 @@ def plot_q_values_maps(qtable, rows, cols, labels):
             xticklabels=[],
             yticklabels=[],
             annot_kws={"fontsize": "xx-large"},
+            cbar_kws={"label": "Q-value"},
         ).set(title=labels[cue])
         for _, spine in ax.flatten()[idx].spines.items():
             spine.set_visible(True)
