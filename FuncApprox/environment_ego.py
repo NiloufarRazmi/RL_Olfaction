@@ -159,33 +159,41 @@ class Environment:
 
         if head_direction == 0:  # Facing north
             if action == Actions.LEFT.value:
-                head_direction, col = LEFT(col)
+                # head_direction, col = LEFT(col)
+                head_direction = 270
             elif action == Actions.RIGHT.value:
-                head_direction, col = RIGHT(col)
+                # head_direction, col = RIGHT(col)
+                head_direction = 90
             elif action == Actions.FORWARD.value:
                 head_direction, row = UP(row)
 
         elif head_direction == 90:  # Facing east
             if action == Actions.LEFT.value:
-                head_direction, row = UP(row)
+                # head_direction, row = UP(row)
+                head_direction = 0
             elif action == Actions.RIGHT.value:
-                head_direction, row = DOWN(row)
+                # head_direction, row = DOWN(row)
+                head_direction = 180
             elif action == Actions.FORWARD.value:
                 head_direction, col = RIGHT(col)
 
         elif head_direction == 180:  # Facing south
             if action == Actions.LEFT.value:
-                head_direction, col = RIGHT(col)
+                # head_direction, col = RIGHT(col)
+                head_direction = 90
             elif action == Actions.RIGHT.value:
-                head_direction, col = LEFT(col)
+                # head_direction, col = LEFT(col)
+                head_direction = 270
             elif action == Actions.FORWARD.value:
                 head_direction, row = DOWN(row)
 
         elif head_direction == 270:  # Facing west
             if action == Actions.LEFT.value:
-                head_direction, row = DOWN(row)
+                # head_direction, row = DOWN(row)
+                head_direction = 180
             elif action == Actions.RIGHT.value:
-                head_direction, row = UP(row)
+                # head_direction, row = UP(row)
+                head_direction = 0
             elif action == Actions.FORWARD.value:
                 head_direction, col = LEFT(col)
 
