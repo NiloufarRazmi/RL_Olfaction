@@ -9,16 +9,17 @@ Version : 1.0.2
 
 Last Modified : 2019-04-22
 
-This module is basically an Python implementation of the function written Pål Næverlid Sævik
-for MATLAB (link in Reference).
+This module is basically an Python implementation of the function written
+by Pål Næverlid Sævik for MATLAB (link in Reference).
 
-The function "curlyBrace" allows you to plot an optionally annotated curly bracket between 
-two points when using matplotlib.
+The function "curlyBrace" allows you to plot an optionally annotated curly
+bracket between two points when using matplotlib.
 
 The usual settings for line and fonts in matplotlib also apply.
 
-The function takes the axes scales into account automatically. But when the axes aspect is 
-set to "equal", the auto switch should be turned off.
+The function takes the axes scales into account automatically.
+But when the axes aspect is set to "equal",
+the auto switch should be turned off.
 
 Change Log
 ----------------------
@@ -40,7 +41,6 @@ List of functions
 
 """
 
-import matplotlib.pyplot as plt
 import numpy as np
 
 
@@ -91,17 +91,17 @@ def curlyBrace(
     fontdict={},
     **kwargs
 ):
-    # def curlyBrace(fig, ax, p1, p2, k_r=0.1, bool_auto=True, str_text='', int_line_num=2, fontdict={}, **kwargs):
     """
     .. _curlyBrace :
 
     Plot an optionally annotated curly bracket on the given axes of the given figure.
 
-    Note that the brackets are anti-clockwise by default. To reverse the text position, swap
-    "p1" and "p2".
+    Note that the brackets are anti-clockwise by default. To reverse the text
+    position, swap "p1" and "p2".
 
-    Note that, when the axes aspect is not set to "equal", the axes coordinates need to be
-    transformed to screen coordinates, otherwise the arcs may not be seeable.
+    Note that, when the axes aspect is not set to "equal", the axes
+    coordinates need to be transformed to screen coordinates,
+    otherwise the arcs may not be seeable.
 
     Parameters
     ----------
@@ -152,8 +152,8 @@ def curlyBrace(
         This argument determines how many lines the string annotation is from the summit
         of the bracket.
 
-        The distance would be affected by the font size, since it basically just a number of
-        lines appended to the given string.
+        The distance would be affected by the font size, since it basically
+        just a number of lines appended to the given string.
 
         Default = 2
 
@@ -280,7 +280,8 @@ def curlyBrace(
         yscale = 1.0
 
     # convert length to pixels,
-    # need to minus the lower limit to move the points back to the origin. Then add the limits back on end.
+    # need to minus the lower limit to move the points back to the origin.
+    # Then add the limits back on end.
     pt1[0] = (pt1[0] - ax_xlim[0]) * xscale
     pt1[1] = (pt1[1] - ax_ylim[0]) * yscale
     pt2[0] = (pt2[0] - ax_xlim[0]) * xscale

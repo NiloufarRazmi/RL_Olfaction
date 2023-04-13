@@ -31,6 +31,8 @@
 # Import packages
 # from pprint import pprint
 
+import re
+
 import numpy as np
 import pandas as pd
 import plotting
@@ -70,19 +72,15 @@ params
 # Load the environment
 env = WrappedEnvironment(params)
 
-# %%
-# Manually engineered features, optional
-# if `None`, a diagonal matrix of features will be created automatically
-# features = np.matlib.repmat(
-#     np.eye(
-#         len(env.tiles_locations) * len(env.head_angle_space),
-#         len(env.tiles_locations) * len(env.head_angle_space),
-#     ),
-#     len(LightCues) * len(OdorID),
-#     len(LightCues) * len(OdorID),
-# )
+# %% [markdown]
+# ### Choose the features
+
+# %% [markdown]
+# Manually engineered features, optional.
+# If `None`, a diagonal matrix of features will be created automatically
 
 # %%
+# Place only features
 tmp1 = np.matlib.repmat(
     np.eye(
         len(env.tiles_locations) * len(env.head_angle_space),
@@ -94,6 +92,8 @@ tmp1 = np.matlib.repmat(
 tmp1.shape
 
 # %%
+# 4 cues features
+# Solves the task but not optimally
 tmp2 = np.vstack(
     (
         np.hstack(
@@ -148,11 +148,78 @@ tmp2 = np.vstack(
 tmp2.shape
 
 # %%
+# # 2 cues features
+# # Doesn't solve the task
+# tmp2 = np.vstack(
+#     (
+#         np.hstack(
+#             (
+#                 np.ones(
+#                     (
+#                         len(env.tiles_locations)
+#                         * len(env.head_angle_space)
+#                         * len(OdorID),
+#                         1,
+#                     )
+#                 ),
+#                 np.zeros(
+#                     (
+#                         len(env.tiles_locations)
+#                         * len(env.head_angle_space)
+#                         * len(OdorID),
+#                         1,
+#                     )
+#                 ),
+#             )
+#         ),
+#         np.hstack(
+#             (
+#                 np.zeros(
+#                     (
+#                         len(env.tiles_locations)
+#                         * len(env.head_angle_space)
+#                         * len(LightCues),
+#                         1,
+#                     )
+#                 ),
+#                 np.ones(
+#                     (
+#                         len(env.tiles_locations)
+#                         * len(env.head_angle_space)
+#                         * len(LightCues),
+#                         1,
+#                     )
+#                 ),
+#             )
+#         ),
+#     )
+# )
+
+# tmp2.shape
+
+# %%
 features = np.hstack((tmp1, tmp2))
 features.shape
 
 # %%
-features = None
+# # Place-light features
+# tmp3 = np.matlib.repmat(
+#     np.eye(
+#         len(env.tiles_locations) * len(env.head_angle_space) * len(LightCues),
+#         len(env.tiles_locations) * len(env.head_angle_space) * len(LightCues),
+#     ),
+#     len(LightCues),
+#     1,
+# )
+# tmp3.shape
+
+# %%
+# features = np.hstack((tmp1, tmp2, tmp3))
+# features.shape
+
+# %%
+# # Features == identity matrix
+# features = None
 
 # %%
 # Load the agent algorithms
@@ -166,7 +233,24 @@ learner = QLearningFuncApprox(
 explorer = EpsilonGreedy(epsilon=params.epsilon)
 
 # %%
-plotting.plot_heatmap(matrix=learner.features, title="Features", ylabel="States")
+braces = []
+for idx, cue in enumerate(CONTEXTS_LABELS):
+    braces.append(
+        {
+            "p1": [-30, idx * len(env.tiles_locations) * len(env.head_angle_space)],
+            "p2": [
+                -30,
+                (idx + 1) * len(env.tiles_locations) * len(env.head_angle_space),
+            ],
+            "str_text": re.sub(r"^P.*?odor - ", "", CONTEXTS_LABELS[cue]),
+        }
+    )
+braces
+
+# %%
+plotting.plot_heatmap(
+    matrix=learner.features, title="Features", ylabel="States", braces=braces
+)
 
 # %% [markdown]
 # ## States and actions meaning
@@ -212,7 +296,9 @@ all_states = []
 all_actions = []
 
 for run in range(params.n_runs):  # Run several times to account for stochasticity
-    learner.reset_Q_hat_table()  # Reset the Q-table between runs
+    learner.reset(
+        action_size=env.numActions
+    )  # Reset the Q-table and the weights between runs
 
     for episode in tqdm(
         episodes, desc=f"Run {run+1}/{params.n_runs} - Episodes", leave=False
@@ -261,8 +347,8 @@ for run in range(params.n_runs):  # Run several times to account for stochastici
 res = pd.DataFrame(
     data={
         "Episodes": np.tile(episodes, reps=params.n_runs),
-        "Rewards": rewards.flatten(),
-        "Steps": steps.flatten(),
+        "Rewards": rewards.flatten(order="F"),
+        "Steps": steps.flatten(order="F"),
     }
 )
 res["cum_rewards"] = rewards.cumsum(axis=0).flatten(order="F")
@@ -292,7 +378,7 @@ plotting.plot_heatmap(matrix=qtable, title="Q-table")
 plotting.plot_states_actions_distribution(all_states, all_actions)
 
 # %%
-plotting.plot_steps_and_rewards(res)
+plotting.plot_steps_and_rewards(res, n_runs=params.n_runs, log=True)
 
 # %%
 plotting_ego.plot_ego_q_values_maps(

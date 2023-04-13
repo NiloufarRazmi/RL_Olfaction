@@ -71,58 +71,58 @@ params
 env = WrappedEnvironment(params)
 
 # %% [markdown]
+# ### Choose the features
+
+# %% [markdown]
 # Manually engineered features, optional.
 # If `None`, a diagonal matrix of features will be created automatically
 
 # %%
-# features = np.matlib.repmat(
-#     np.eye(len(env.tiles_locations), len(env.tiles_locations)),
-#     len(env.cues),
-#     len(env.cues),
-# )
-# features.shape
-
-# %%
+# Place only features
 tmp1 = np.matlib.repmat(
     np.eye(len(env.tiles_locations), len(env.tiles_locations)), len(env.cues), 1
 )
 tmp1.shape
 
 # %%
-tmp2 = np.vstack(
-    (
-        np.hstack(
-            (
-                np.ones((len(env.tiles_locations), 1)),
-                np.zeros((len(env.tiles_locations), len(env.cues) - 1)),
-            )
-        ),
-        np.hstack(
-            (
-                np.zeros((len(env.tiles_locations), 1)),
-                np.ones((len(env.tiles_locations), 1)),
-                np.zeros((len(env.tiles_locations), len(env.cues) - 2)),
-            )
-        ),
-        np.hstack(
-            (
-                np.zeros((len(env.tiles_locations), 2)),
-                np.ones((len(env.tiles_locations), 1)),
-                np.zeros((len(env.tiles_locations), len(env.cues) - 3)),
-            )
-        ),
-        np.hstack(
-            (
-                np.zeros((len(env.tiles_locations), len(env.cues) - 1)),
-                np.ones((len(env.tiles_locations), 1)),
-            )
-        ),
-    )
-)
+# # 4 cues features
+# # Solves the task but not optimally
+# tmp2 = np.vstack(
+#     (
+#         np.hstack(
+#             (
+#                 np.ones((len(env.tiles_locations), 1)),
+#                 np.zeros((len(env.tiles_locations), len(env.cues) - 1)),
+#             )
+#         ),
+#         np.hstack(
+#             (
+#                 np.zeros((len(env.tiles_locations), 1)),
+#                 np.ones((len(env.tiles_locations), 1)),
+#                 np.zeros((len(env.tiles_locations), len(env.cues) - 2)),
+#             )
+#         ),
+#         np.hstack(
+#             (
+#                 np.zeros((len(env.tiles_locations), 2)),
+#                 np.ones((len(env.tiles_locations), 1)),
+#                 np.zeros((len(env.tiles_locations), len(env.cues) - 3)),
+#             )
+#         ),
+#         np.hstack(
+#             (
+#                 np.zeros((len(env.tiles_locations), len(env.cues) - 1)),
+#                 np.ones((len(env.tiles_locations), 1)),
+#             )
+#         ),
+#     )
+# )
 
-tmp2.shape
+# tmp2.shape
 
 # %%
+# 2 cues features
+# Doesn't solve the task
 tmp2 = np.vstack(
     (
         np.hstack(
@@ -143,10 +143,27 @@ tmp2 = np.vstack(
 tmp2.shape
 
 # %%
-features = np.hstack((tmp1, tmp2))
+# features = np.hstack((tmp1, tmp2))
+# features.shape
+
+# %%
+# Place-light features
+tmp3 = np.matlib.repmat(
+    np.eye(
+        len(env.tiles_locations) * len(LightCues),
+        len(env.tiles_locations) * len(LightCues),
+    ),
+    len(LightCues),
+    1,
+)
+tmp3.shape
+
+# %%
+features = np.hstack((tmp1, tmp2, tmp3))
 features.shape
 
 # %%
+# # Features == identity matrix
 # features = None
 
 # %%
@@ -165,8 +182,8 @@ braces = []
 for idx, cue in enumerate(CONTEXTS_LABELS):
     braces.append(
         {
-            "p1": [-18, idx * len(env.tiles_locations)],
-            "p2": [-18, (idx + 1) * len(env.tiles_locations)],
+            "p1": [-15, idx * len(env.tiles_locations)],
+            "p2": [-15, (idx + 1) * len(env.tiles_locations)],
             "str_text": re.sub(r"^P.*?odor - ", "", CONTEXTS_LABELS[cue]),
         }
     )
@@ -175,8 +192,8 @@ braces
 # %%
 # braces.append(
 #     {
-#         "p1": [len(env.tiles_locations), -15],
-#         "p2": [0, -15],
+#         "p2": [15.0, 10.0],
+#         "p1": [5.0, 10.0],
 #         "str_text": "Locations",
 #     }
 # )
@@ -314,7 +331,7 @@ plotting.plot_heatmap(matrix=qtable, title="Q-table")
 plotting.plot_states_actions_distribution(all_states, all_actions)
 
 # %%
-plotting.plot_steps_and_rewards(res, log=True)
+plotting.plot_steps_and_rewards(res, n_runs=params.n_runs, log=True)
 
 # %%
 plotting.plot_q_values_maps(qtable, env.rows, env.cols, CONTEXTS_LABELS)

@@ -241,8 +241,46 @@ def plot_ego_q_values_maps(qtable, rows, cols, labels, states):
                     ax=ax[idx],
                 )
 
+        # Annotate the ports names
+        bbox = {
+            "facecolor": "black",
+            "edgecolor": "none",
+            "boxstyle": "round",
+            "alpha": 0.1,
+        }
+        ax[idx].text(
+            x=4.7,
+            y=0,
+            s="E",
+            bbox=bbox,
+            color="white",
+        )
+        ax[idx].text(
+            x=0.05,
+            y=4.9,
+            s="W",
+            bbox=bbox,
+            color="white",
+        )
+        ax[idx].text(
+            x=4.7,
+            y=4.9,
+            s="N",
+            bbox=bbox,
+            color="white",
+        )
+        ax[idx].text(
+            x=0.05,
+            y=0,
+            s="S",
+            bbox=bbox,
+            color="white",
+        )
+
     clb = fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap), cax=ax_clb)
     clb.ax.set_title("Q-value", pad=10)
+
+    # Make background transparent
     fig.patch.set_alpha(0)
     fig.patch.set_facecolor("white")
     plt.show()
