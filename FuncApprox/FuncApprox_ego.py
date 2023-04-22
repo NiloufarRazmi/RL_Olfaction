@@ -38,13 +38,7 @@ import pandas as pd
 import plotting
 import plotting_ego
 from agent import EpsilonGreedy, QLearningFuncApprox
-from environment_ego import (
-    CONTEXTS_LABELS,
-    Actions,
-    LightCues,
-    OdorID,
-    WrappedEnvironment,
-)
+from environment_ego import CONTEXTS_LABELS, Actions, LightCues, WrappedEnvironment
 from tqdm import tqdm
 
 # %%
@@ -62,7 +56,7 @@ from utils import Params
 
 # %%
 # Choose the parameters for the task
-params = Params(epsilon=0.1, n_runs=20, numEpisodes=1000, alpha=0.025)
+params = Params(epsilon=0.1, n_runs=10, numEpisodes=500, alpha=0.025)
 params
 
 # %% [markdown]
@@ -91,60 +85,116 @@ tmp1 = np.matlib.repmat(
 )
 tmp1.shape
 
-# %%
-# 4 cues features
-# Solves the task but not optimally
-tmp2 = np.vstack(
-    (
-        np.hstack(
-            (
-                np.ones((len(env.tiles_locations) * len(env.head_angle_space), 1)),
-                np.zeros(
-                    (
-                        len(env.tiles_locations) * len(env.head_angle_space),
-                        len(env.cues) - 1,
-                    )
-                ),
-            )
-        ),
-        np.hstack(
-            (
-                np.zeros((len(env.tiles_locations) * len(env.head_angle_space), 1)),
-                np.ones((len(env.tiles_locations) * len(env.head_angle_space), 1)),
-                np.zeros(
-                    (
-                        len(env.tiles_locations) * len(env.head_angle_space),
-                        len(env.cues) - 2,
-                    )
-                ),
-            )
-        ),
-        np.hstack(
-            (
-                np.zeros((len(env.tiles_locations) * len(env.head_angle_space), 2)),
-                np.ones((len(env.tiles_locations) * len(env.head_angle_space), 1)),
-                np.zeros(
-                    (
-                        len(env.tiles_locations) * len(env.head_angle_space),
-                        len(env.cues) - 3,
-                    )
-                ),
-            )
-        ),
-        np.hstack(
-            (
-                np.zeros(
-                    (
-                        len(env.tiles_locations) * len(env.head_angle_space),
-                        len(env.cues) - 1,
-                    )
-                ),
-                np.ones((len(env.tiles_locations) * len(env.head_angle_space), 1)),
-            )
-        ),
-    )
-)
 
+# %%
+# # 4 cues features
+# tmp2 = np.vstack(
+#     (
+#         np.hstack(
+#             (
+#                 np.ones((len(env.tiles_locations) * len(env.head_angle_space), 1)),
+#                 np.zeros(
+#                     (
+#                         len(env.tiles_locations) * len(env.head_angle_space),
+#                         len(env.cues) - 1,
+#                     )
+#                 ),
+#             )
+#         ),
+#         np.hstack(
+#             (
+#                 np.zeros((len(env.tiles_locations) * len(env.head_angle_space), 1)),
+#                 np.ones((len(env.tiles_locations) * len(env.head_angle_space), 1)),
+#                 np.zeros(
+#                     (
+#                         len(env.tiles_locations) * len(env.head_angle_space),
+#                         len(env.cues) - 2,
+#                     )
+#                 ),
+#             )
+#         ),
+#         np.hstack(
+#             (
+#                 np.zeros((len(env.tiles_locations) * len(env.head_angle_space), 2)),
+#                 np.ones((len(env.tiles_locations) * len(env.head_angle_space), 1)),
+#                 np.zeros(
+#                     (
+#                         len(env.tiles_locations) * len(env.head_angle_space),
+#                         len(env.cues) - 3,
+#                     )
+#                 ),
+#             )
+#         ),
+#         np.hstack(
+#             (
+#                 np.zeros(
+#                     (
+#                         len(env.tiles_locations) * len(env.head_angle_space),
+#                         len(env.cues) - 1,
+#                     )
+#                 ),
+#                 np.ones((len(env.tiles_locations) * len(env.head_angle_space), 1)),
+#             )
+#         ),
+#     )
+# )
+
+# tmp2.shape
+
+
+# %%
+def ones_custom(total_rows, total_cols, pattern_rows, pattern_cols):
+    ones_pattern = np.ones((pattern_rows, pattern_cols))
+    zeros_pattern = np.zeros((pattern_rows, pattern_cols))
+    # mat = np.full((total_rows, total_cols), fill_value=np.nan)
+    for row in range(int(total_rows / pattern_rows)):
+        for col in range(total_cols):
+            if col == 0:
+                if row == col:
+                    tmp_mat = ones_pattern
+                else:
+                    tmp_mat = zeros_pattern
+                continue
+            if row == col:
+                tmp_mat = np.hstack((tmp_mat, ones_pattern))
+            else:
+                tmp_mat = np.hstack((tmp_mat, zeros_pattern))
+        if row == 0:
+            mat = tmp_mat
+        else:
+            mat = np.vstack((mat, tmp_mat))
+    return mat
+
+
+# %%
+def ones_pattern_repeat(rows_repeat, cols_repeat, pattern_mat):
+    zeros_pattern = np.zeros_like(pattern_mat)
+    for row in range(rows_repeat):
+        for col in range(cols_repeat):
+            if col == 0:
+                if row == col:
+                    tmp_mat = pattern_mat
+                else:
+                    tmp_mat = zeros_pattern
+                continue
+            if row == col:
+                tmp_mat = np.hstack((tmp_mat, pattern_mat))
+            else:
+                tmp_mat = np.hstack((tmp_mat, zeros_pattern))
+        if row == 0:
+            mat = tmp_mat
+        else:
+            mat = np.vstack((mat, tmp_mat))
+    return mat
+
+
+# %%
+sub_mat = ones_custom(total_rows=100, total_cols=4, pattern_rows=25, pattern_cols=1)
+sub_mat.shape
+
+# %%
+# 4 cues features x 4 head direction angles
+tmp2 = ones_pattern_repeat(rows_repeat=4, cols_repeat=4, pattern_mat=sub_mat)
 tmp2.shape
 
 # %%
