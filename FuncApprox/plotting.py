@@ -8,10 +8,8 @@ from curlyBrace import curlyBrace
 from imojify import imojify
 from matplotlib.offsetbox import AnnotationBbox, OffsetImage
 
-sns.set_theme()
-mpl.rcParams["font.family"] = ["Fira Sans"]
-
-sns.set(font_scale=1.5)
+sns.set_theme(font_scale=1.5)
+mpl.rcParams["font.family"] = ["Fira Sans", "sans-serif"]
 # plt.rcParams['text.usetex'] = True
 
 

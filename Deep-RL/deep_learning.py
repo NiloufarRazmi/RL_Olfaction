@@ -1,4 +1,7 @@
 import numpy as np
+from utils import Sigmoid
+
+sigmoid = Sigmoid()
 
 
 class Network:
@@ -39,3 +42,57 @@ class Network:
         for i in range(0, nLayers - 1):
             wtMatrix.append(np.random.normal(0, initVar, (nUnits[i], nUnits[i + 1])))
         return wtMatrix, nonLin
+
+    def forward_pass(self, nLayers, X, i):
+        """Generate model prediction (forward pass of activity through units)."""
+        activity = [np.array([]) for _ in range(nLayers)]
+        for j in range(nLayers):
+            # Determine layer input:
+            if j == 0:
+                input = X[i, :]  # THIS WILL BE YOUR POSITION/ODOR!!!!!
+            else:
+                if activity[j].shape == ():  # Convert to a vector in case it is scalar
+                    activity[j] = activity[j, np.newaxis]
+                input = activity[j - 1] @ self.wtMatrix[j - 1]
+
+            # Apply non-linearity
+            if self.nonLin[j]:
+                activity[j] = sigmoid(input)
+            else:
+                activity[j] = input
+        return activity
+
+    def backward_pass(self, nLayers, Y, activity, i):
+        """Backpropagate errors to compute gradients for all layers."""
+        delta = [np.array([]) for _ in range(nLayers)]
+        for j in reversed(range(nLayers)):
+            # Determine layer input:
+            if j == nLayers - 1:
+                # IF there is nonlinearity, should multiply by derivative of
+                # activation with respect to input (activity.*(1-activity)) here.
+                delta[j] = (Y[i] - activity[j]) * (
+                    sigmoid.gradient(activity[j])
+                ).T  # THIS SHOULD BE REPLACED WITH YOUR COST FUNCTION!
+
+                # doing this in RL framework means that you'll need one RPE for
+                # each output neuron -- so RPE computed above should be
+                # associated with the action agent took... all other RPEs
+                # should be zero.
+
+            else:
+                # OK, here is the magic -- neurons in layer j share the
+                # gradient (ie. prediction errors) from the next layer
+                # according to their responsibility... that is to say, if I
+                # project to a unit in next layer with a strong weight,
+                # then i inherit the gradient (PE) of that unit.
+                if delta[j + 1].shape == ():  # Convert to a vector in case it is scalar
+                    delta[j + 1] = delta[j + 1, np.newaxis]
+                delta[j] = (
+                    self.wtMatrix[j]
+                    @ delta[j + 1]
+                    * (activity[j] * (1.0 - activity[j])).T
+                )
+        return delta
+
+    def backprop(self):
+        pass
