@@ -1,8 +1,6 @@
 import numpy as np
 from utils import Sigmoid
 
-sigmoid = Sigmoid()
-
 
 class Network:
     def __init__(
@@ -12,6 +10,7 @@ class Network:
         nOutputUnits=None,
         nHiddenUnits=None,
         initVar=None,
+        activation_func="sigmoid",
     ):
         if nLayers is None:
             nLayers = 5  # set number of layers for neural network
@@ -24,6 +23,7 @@ class Network:
         if initVar is None:
             initVar = 1
 
+        self.activation_func = Sigmoid()
         self.wtMatrix, self.nonLin = self.build_network(
             nLayers, nOutputUnits, nInputUnits, nHiddenUnits, initVar
         )
@@ -57,7 +57,7 @@ class Network:
 
             # Apply non-linearity
             if self.nonLin[j]:
-                activity[j] = sigmoid(input)
+                activity[j] = self.activation_func(input)
             else:
                 activity[j] = input
         return activity
@@ -71,7 +71,7 @@ class Network:
                 # IF there is nonlinearity, should multiply by derivative of
                 # activation with respect to input (activity.*(1-activity)) here.
                 delta[j] = (Y[i] - activity[j]) * (
-                    sigmoid.gradient(activity[j])
+                    self.activation_func.gradient(activity[j])
                 ).T  # THIS SHOULD BE REPLACED WITH YOUR COST FUNCTION!
 
                 # doing this in RL framework means that you'll need one RPE for
