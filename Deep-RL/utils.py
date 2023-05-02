@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Optional
 
 import numpy as np
 
@@ -7,20 +8,30 @@ import numpy as np
 class Params:
     """Container class to keep track of all hyperparameters."""
 
-    #     epsilon: float = 0.1  # Action-selection parameters
+    # General
+    seed: Optional[int] = None
+    rng: Optional[int] = None
 
-    #     # QLearning parameters
-    #     gamma: float = 0.8
-    #     alpha: float = 0.05
-    #     jointRep: bool = True
+    # Experiment
+    n_runs: int = 10
+    total_episodes: int = 100  # Set up the task
 
-    #     n_runs: int = 5
-    #     numEpisodes: int = 100  # Set up the task
+    # epsilon-greedy
+    epsilon: float = 0.1  # Action-selection parameters
+
+    # QLearning parameters
+    gamma: float = 0.8
+    alpha: float = 0.05
+    jointRep: bool = True
 
     # Deep network
     learning_rate: float = 0.001
     nLayers: int = 5
     nHiddenUnits: int = 20
+
+    # Environment
+    action_size: Optional[int] = None
+    state_size: Optional[int] = None
 
 
 class Sigmoid:

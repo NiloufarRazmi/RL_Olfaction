@@ -1,4 +1,5 @@
 import numpy as np
+from tqdm import tqdm
 from utils import Sigmoid
 
 
@@ -94,5 +95,48 @@ class Network:
                 )
         return delta
 
-    def backprop(self):
-        pass
+    def gradient_descent(self, weight, learning_rate, activity, delta):
+        updated_weight = (
+            weight + learning_rate * np.expand_dims(activity, axis=1) * delta.T
+        )
+        return updated_weight
+
+    def backprop(self, n_obs, X, Y, nLayers, learning_rate):
+        allError = np.nan * np.ones(n_obs)
+        catPredict = np.nan * np.ones(n_obs)
+
+        for i in tqdm(range(n_obs)):
+            activity = self.forward_pass(nLayers=nLayers, X=X, i=i)
+
+            # Take an action! softmax over actions or similar
+
+            # incorporate your model of the task,
+            # to determine where agent actually goes.
+
+            # Now you need to do another forward pass, to see how good the new
+            # state is so that you can compute the RPE below.
+
+            # your cost function will differ from the one below,
+            # should look something like this:
+            # C =  R - X(S)*W+ DISCOUNT*max(X(S')*W)
+
+            delta = self.backward_pass(nLayers=nLayers, Y=Y, activity=activity, i=i)
+
+            # Update weight matrices according to gradients and activities:
+            for j in range(len(self.wtMatrix) - 1):
+                # nn.wtMatrix[j] = (
+                #     nn.wtMatrix[j]
+                #     + p.learning_rate * np.expand_dims(
+                #     activity[j], axis=1) * delta[j + 1].T
+                # )
+                self.wtMatrix[j] = self.gradient_descent(
+                    weight=self.wtMatrix[j],
+                    learning_rate=learning_rate,
+                    activity=activity[j],
+                    delta=delta[j + 1],
+                )
+
+            # store error:
+            allError[i] = delta[-1]
+            catPredict[i] = activity[-1] > 0.5
+        return allError, catPredict, delta, activity

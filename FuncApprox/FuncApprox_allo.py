@@ -1,6 +1,7 @@
 # ---
 # jupyter:
 #   jupytext:
+#     cell_metadata_filter: -all
 #     text_representation:
 #       extension: .py
 #       format_name: percent
@@ -30,10 +31,17 @@
 import re
 
 # %%
+# Presentation figures
+from collections import OrderedDict
+
+import matplotlib.pyplot as plt
+
+# %%
 # Import packages
 import numpy as np
 import pandas as pd
 import plotting
+import seaborn as sns
 from agent import EpsilonGreedy, QLearningFuncApprox
 from environment_allo import (
     CONTEXTS_LABELS,
@@ -48,6 +56,8 @@ from tqdm import tqdm
 # %%
 # Load custom functions
 from utils import Params
+
+sns.set(font_scale=2)
 
 # %%
 # Formatting & autoreload stuff
@@ -362,13 +372,6 @@ plot_location_count(
 # %% [markdown]
 # ## Presentations figures
 
-import matplotlib.pyplot as plt
-
-# %%
-import seaborn as sns
-
-sns.set(font_scale=2)
-
 # %%
 fig, ax = plt.subplots(figsize=(12, 8))
 sns.lineplot(data=res, x="Episodes", y="Steps", ax=ax)
@@ -419,8 +422,6 @@ emoji = [
 ]
 
 # %%
-from collections import OrderedDict
-
 trunc_labels = OrderedDict(
     [
         (LightCues.North, "Pre odor - North light"),
@@ -443,9 +444,6 @@ for idx, cue in enumerate(trunc_labels):
     )
 
 # %%
-import matplotlib.pyplot as plt
-import seaborn as sns
-
 fig, ax = plt.subplots(figsize=(9, 9))
 # cmap = sns.light_palette("seagreen", as_cmap=True)
 cmap = sns.color_palette("light:b", as_cmap=True)

@@ -1,6 +1,7 @@
 # ---
 # jupyter:
 #   jupytext:
+#     cell_metadata_filter: -all
 #     text_representation:
 #       extension: .py
 #       format_name: percent
@@ -22,7 +23,8 @@
 # 1. inputs need to reflect position in arena and odor (NOT CONJUNCTIONS)
 # 2. outputs need to reflect action values
 # 3. actions are selected via softmax on output neuron activity.
-# 4. RPE requires knowing value of new state -- so this will require a forward pass using "new state" inputs.
+# 4. RPE requires knowing value of new state
+#    -- so this will require a forward pass using "new state" inputs.
 
 # %% [markdown]
 # Basically, i'm just coding up what is here:
@@ -195,7 +197,8 @@ for i in tqdm(range(nTrain)):
         # Now you need to do another forward pass, to see how good the new
         # state is so that you can compute the RPE below.
 
-        # your cost function will differ from the one below, should look something like this:
+        # your cost function will differ from the one below,
+        # should look something like this:
         # C =  R - X(S)*W+ DISCOUNT*max(X(S')*W)
 
     # Backpropagate errors to compute gradients for all layers:
