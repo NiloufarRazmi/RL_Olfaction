@@ -58,7 +58,7 @@ class EpsilonGreedy:
         if rng:
             self.rng = rng
 
-    def choose_action(self, action_space, state, qtable):
+    def choose_action(self, action_space, state, q_values):
         """Choose an action a in the current world state (s)"""
 
         def sample(action_space):
@@ -80,10 +80,10 @@ class EpsilonGreedy:
             # Break ties randomly
             # If all actions are the same for this state we choose a random one
             # (otherwise `np.argmax()` would always take the first one)
-            if np.all(qtable[state, :]) == qtable[state, 0]:
+            if np.all(q_values) == q_values[0]:
                 action = sample(action_space)
             else:
-                action = np.argmax(qtable[state, :])
+                action = np.argmax(q_values)
         return action
 
     def update_epsilon(self, ep):

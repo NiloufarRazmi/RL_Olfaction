@@ -58,26 +58,26 @@ nTot = nTrain + nTest
 # create two normal input channels
 X = np.random.multivariate_normal([0, 0], 10 * np.eye(2), size=nTot)
 # X = pd.read_csv("X.csv", header=None).to_numpy()
-# Y is positive if X(1) & X(2) are positive, OR if X(1) and X(2) are negative.
+# y is positive if X(1) & X(2) are positive, OR if X(1) and X(2) are negative.
 X.shape
 
 # %%
-Y = np.sign(X[:, 0] * X[:, 1]) / 2.0 + 0.5
-Y
+y = np.sign(X[:, 0] * X[:, 1]) / 2.0 + 0.5
+y.shape
 
 # %% [markdown]
 # ## Choose the task parameters
 
 # %%
 # Choose the parameters for the task
-p = Params(learning_rate=0.001, nLayers=5, nHiddenUnits=20)
+p = Params(learning_rate=0.001, nLayers=6, nHiddenUnits=20)
 p
 
 # %% [markdown]
 # ## Step 2: Build network
 
 # %%
-nn = Network(
+net = Network(
     nInputUnits=X.shape[1],
     nLayers=p.nLayers,
     nOutputUnits=1,
@@ -85,15 +85,19 @@ nn = Network(
     initVar=1,
 )
 
+# %%
+# Weights matrices shapes
+[layer.shape for layer in net.wtMatrix]
+
 # %% [markdown]
 # ## Step 3: Train network
 
 # %%
 # allError = np.nan * np.ones(nTot)
-# catPredict = np.nan * np.ones(nTot)
+# y_hat = np.nan * np.ones(nTot)
 
 # for i in tqdm(range(nTrain)):
-#     activity = nn.forward_pass(nLayers=p.nLayers, X=X, i=i)
+#     activity = net.forward_pass(nLayers=p.nLayers, X=X, obs=i)
 
 #     # Take an action! softmax over actions or similar
 
@@ -106,16 +110,16 @@ nn = Network(
 #     # should look something like this:
 #     # C =  R - X(S)*W+ DISCOUNT*max(X(S')*W)
 
-#     delta = nn.backward_pass(nLayers=p.nLayers, Y=Y, activity=activity, i=i)
+#     delta = net.backward_pass(nLayers=p.nLayers, y=y, activity=activity, obs=i)
 
 #     # Update weight matrices according to gradients and activities:
-#     for j in range(len(nn.wtMatrix) - 1):
-#         # nn.wtMatrix[j] = (
-#         #     nn.wtMatrix[j]
+#     for j in range(len(net.wtMatrix) - 1):
+#         # net.wtMatrix[j] = (
+#         #     net.wtMatrix[j]
 #         #     + p.learning_rate * np.expand_dims(activity[j], axis=1) * delta[j + 1].T
 #         # )
-#         nn.wtMatrix[j] = nn.gradient_descent(
-#             weight=nn.wtMatrix[j],
+#         net.wtMatrix[j] = net.gradient_descent(
+#             weight=net.wtMatrix[j],
 #             learning_rate=p.learning_rate,
 #             activity=activity[j],
 #             delta=delta[j + 1],
@@ -123,12 +127,16 @@ nn = Network(
 
 #     # store error:
 #     allError[i] = delta[-1]
-#     catPredict[i] = activity[-1] > 0.5
+#     y_hat[i] = activity[-1] > 0.5
 
 # %%
-allError, catPredict, delta, activity = nn.backprop(
-    n_obs=nTot, X=X, Y=Y, nLayers=p.nLayers, learning_rate=p.learning_rate
+allError, y_hat, delta, activity = net.backprop(
+    X=X, y=y, nLayers=p.nLayers, learning_rate=p.learning_rate
 )
+
+# %%
+y_hat = y_hat > 0.5
+y_hat
 
 # %%
 activity
@@ -140,7 +148,7 @@ delta
 allError
 
 # %%
-catPredict
+y_hat
 
 # %%
 Bins = np.round(np.linspace(0, len(allError), num=100)).astype(int)
@@ -161,12 +169,12 @@ plt.show()
 # ## Step 4: Test Network
 
 # %%
-for i in range((nTrain + 1), nTot):
-    activity = nn.forward_pass(nLayers=p.nLayers, X=X, i=i)
+for obs in range((nTrain + 1), nTot):
+    activity = net.forward_pass(x_obs=X[obs, :])
 
     # store error
-    allError[i] = delta[-1]
-    catPredict[i] = activity[-1] > 0.5
+    allError[obs] = delta[-1]
+    y_hat[obs] = activity[-1] > 0.5
 
 isTest = np.zeros(nTot, dtype=bool)
 isTest[nTrain + 1 :] = True
@@ -181,14 +189,14 @@ allError
 fig, ax = plt.subplots(1, 2, figsize=(12, 6))
 ax[0].set_title("Ground Truth")
 sns.scatterplot(
-    x=X[(Y == 1) & isTest, 0],
-    y=X[(Y == 1) & isTest, 1],
+    x=X[(y == 1) & isTest, 0],
+    y=X[(y == 1) & isTest, 1],
     s=200,
     ax=ax[0],
 )
 sns.scatterplot(
-    x=X[(Y == 0) & isTest, 0],
-    y=X[(Y == 0) & isTest, 1],
+    x=X[(y == 0) & isTest, 0],
+    y=X[(y == 0) & isTest, 1],
     s=200,
     ax=ax[0],
 )
@@ -198,14 +206,14 @@ ax[0].set_ylabel("Feature 2")
 
 ax[1].set_title("Model Classification")
 sns.scatterplot(
-    x=X[(catPredict == 1) & isTest, 0],
-    y=X[(catPredict == 1) & isTest, 1],
+    x=X[(y_hat == 1) & isTest, 0],
+    y=X[(y_hat == 1) & isTest, 1],
     s=200,
     ax=ax[1],
 )
 sns.scatterplot(
-    x=X[(catPredict == 0) & isTest, 0],
-    y=X[(catPredict == 0) & isTest, 1],
+    x=X[(y_hat == 0) & isTest, 0],
+    y=X[(y_hat == 0) & isTest, 1],
     s=200,
     ax=ax[1],
 )
@@ -214,5 +222,3 @@ ax[1].set_ylabel("Feature 2")
 
 fig.tight_layout()
 plt.show()
-
-# %%

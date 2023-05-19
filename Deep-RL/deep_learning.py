@@ -1,5 +1,4 @@
 import numpy as np
-from tqdm import tqdm
 from utils import Sigmoid
 
 
@@ -7,30 +6,42 @@ class Network:
     def __init__(
         self,
         nInputUnits,
-        nLayers=None,
-        nOutputUnits=None,
-        nHiddenUnits=None,
-        initVar=None,
+        nLayers,
+        nOutputUnits,
+        nHiddenUnits,
+        initVar=1,
         activation_func="sigmoid",
     ):
-        if nLayers is None:
-            nLayers = 5  # set number of layers for neural network
+        """
+        Initialises the neural network.
 
-        # Number of units in each layer
-        if nOutputUnits is None:
-            nOutputUnits = 1
-        if nHiddenUnits is None:
-            nOutputUnits = 20
-        if initVar is None:
-            initVar = 1
+        Parameters
+        ----------
+        nLayers: int
+            set number of layers for neural network
+        nInputUnits: int
+            Number of units in the first layer
+        nOutputUnits: int
+            Number of units in the last layer
+        nHiddenUnits: int
+            Number of units in each layer
+        initVar: float
+            Variance for the weight initialization
+            By default, the weights for the network are initialized randomly,
+            using a Gaussian distribution with mean 0, and variance 1.
 
+        Returns
+        -------
+        object
+            a `Network` instance
+        """
+        self.nLayers = nLayers
         self.activation_func = Sigmoid()
         self.wtMatrix, self.nonLin = self.build_network(
             nLayers, nOutputUnits, nInputUnits, nHiddenUnits, initVar
         )
 
     def build_network(self, nLayers, nOutputUnits, nInputUnits, nHiddenUnits, initVar):
-        initVar = 1
         nonLin = np.block(
             [False, np.ones((1, nLayers - 2), dtype=bool), True]
         ).squeeze()
@@ -44,36 +55,44 @@ class Network:
             wtMatrix.append(np.random.normal(0, initVar, (nUnits[i], nUnits[i + 1])))
         return wtMatrix, nonLin
 
-    def forward_pass(self, nLayers, X, i):
+    def forward_pass(self, x_obs):
         """Generate model prediction (forward pass of activity through units)."""
-        activity = [np.array([]) for _ in range(nLayers)]
-        for j in range(nLayers):
+        activity = [np.array([]) for _ in range(self.nLayers)]
+        for layer in range(self.nLayers):
             # Determine layer input:
-            if j == 0:
-                input = X[i, :]  # THIS WILL BE YOUR POSITION/ODOR!!!!!
+            if layer == 0:
+                input = x_obs  # THIS WILL BE YOUR POSITION/ODOR!!!!!
             else:
-                if activity[j].shape == ():  # Convert to a vector in case it is scalar
-                    activity[j] = activity[j, np.newaxis]
-                input = activity[j - 1] @ self.wtMatrix[j - 1]
+                if (
+                    activity[layer].shape == ()
+                ):  # Convert to a vector in case it is scalar
+                    activity[layer] = activity[layer, np.newaxis]
+                # import ipdb; ipdb.set_trace()
+                input = activity[layer - 1] @ self.wtMatrix[layer - 1]
 
             # Apply non-linearity
-            if self.nonLin[j]:
-                activity[j] = self.activation_func(input)
+            if self.nonLin[layer]:
+                activity[layer] = self.activation_func(input)
             else:
-                activity[j] = input
+                activity[layer] = input
         return activity
 
-    def backward_pass(self, nLayers, Y, activity, i):
+    def backward_pass(self, nLayers, y_obs, activity):
         """Backpropagate errors to compute gradients for all layers."""
         delta = [np.array([]) for _ in range(nLayers)]
-        for j in reversed(range(nLayers)):
+        for layer in reversed(range(nLayers)):
             # Determine layer input:
-            if j == nLayers - 1:
+            if layer == nLayers - 1:
                 # IF there is nonlinearity, should multiply by derivative of
                 # activation with respect to input (activity.*(1-activity)) here.
-                delta[j] = (Y[i] - activity[j]) * (
-                    self.activation_func.gradient(activity[j])
-                ).T  # THIS SHOULD BE REPLACED WITH YOUR COST FUNCTION!
+                # delta[layer] = (y_obs - activity[layer]) * (
+                #     self.activation_func.gradient(activity[layer])
+                # ).T  # THIS SHOULD BE REPLACED WITH YOUR COST FUNCTION!
+
+                delta[layer] = (
+                    self.cost_derivative(output_activations=activity[layer], y=y_obs)
+                    * (self.activation_func.gradient(activity[layer])).T
+                )
 
                 # doing this in RL framework means that you'll need one RPE for
                 # each output neuron -- so RPE computed above should be
@@ -85,13 +104,15 @@ class Network:
                 # gradient (ie. prediction errors) from the next layer
                 # according to their responsibility... that is to say, if I
                 # project to a unit in next layer with a strong weight,
-                # then i inherit the gradient (PE) of that unit.
-                if delta[j + 1].shape == ():  # Convert to a vector in case it is scalar
-                    delta[j + 1] = delta[j + 1, np.newaxis]
-                delta[j] = (
-                    self.wtMatrix[j]
-                    @ delta[j + 1]
-                    * (activity[j] * (1.0 - activity[j])).T
+                # then I inherit the gradient (PE) of that unit.
+                if (
+                    delta[layer + 1].shape == ()
+                ):  # Convert to a vector in case it is scalar
+                    delta[layer + 1] = delta[layer + 1, np.newaxis]
+                delta[layer] = (
+                    self.wtMatrix[layer]
+                    @ delta[layer + 1]
+                    * (activity[layer] * (1.0 - activity[layer])).T
                 )
         return delta
 
@@ -101,12 +122,15 @@ class Network:
         )
         return updated_weight
 
-    def backprop(self, n_obs, X, Y, nLayers, learning_rate):
-        allError = np.nan * np.ones(n_obs)
-        catPredict = np.nan * np.ones(n_obs)
+    def backprop(self, X, y, nLayers, learning_rate):
+        n_obs = len(y)
+        # allError = np.nan * np.ones_like(y)
+        allError = np.array([])
+        # y_hat = np.nan * np.ones_like(y)
+        y_hat = np.array([])
 
-        for i in tqdm(range(n_obs)):
-            activity = self.forward_pass(nLayers=nLayers, X=X, i=i)
+        for obs in range(n_obs):
+            activity = self.forward_pass(x_obs=X[obs, :])
 
             # Take an action! softmax over actions or similar
 
@@ -120,23 +144,39 @@ class Network:
             # should look something like this:
             # C =  R - X(S)*W+ DISCOUNT*max(X(S')*W)
 
-            delta = self.backward_pass(nLayers=nLayers, Y=Y, activity=activity, i=i)
+            delta = self.backward_pass(nLayers=nLayers, y_obs=y[obs], activity=activity)
 
             # Update weight matrices according to gradients and activities:
-            for j in range(len(self.wtMatrix) - 1):
-                # nn.wtMatrix[j] = (
-                #     nn.wtMatrix[j]
+            for layer in range(len(self.wtMatrix) - 1):
+                # nn.wtMatrix[layer] = (
+                #     nn.wtMatrix[layer]
                 #     + p.learning_rate * np.expand_dims(
-                #     activity[j], axis=1) * delta[j + 1].T
+                #     activity[layer], axis=1) * delta[layer + 1].T
                 # )
-                self.wtMatrix[j] = self.gradient_descent(
-                    weight=self.wtMatrix[j],
+                self.wtMatrix[layer] = self.gradient_descent(
+                    weight=self.wtMatrix[layer],
                     learning_rate=learning_rate,
-                    activity=activity[j],
-                    delta=delta[j + 1],
+                    activity=activity[layer],
+                    delta=delta[layer + 1],
                 )
 
+            # import ipdb; ipdb.set_trace()
             # store error:
-            allError[i] = delta[-1]
-            catPredict[i] = activity[-1] > 0.5
-        return allError, catPredict, delta, activity
+            # allError[obs] = delta[-1]
+            # y_hat[obs] = activity[-1] > 0.5
+            # y_hat[obs] = activity[-1]
+
+            if allError.size == 0:
+                allError = delta[-1]
+            else:
+                allError = np.append(allError, delta[-1])
+            if y_hat.size == 0:
+                y_hat = activity[-1]
+            else:
+                y_hat = np.append(y_hat, activity[-1])
+        return allError, y_hat, delta, activity
+
+    def cost_derivative(self, output_activations, y):
+        """Return the vector of partial derivatives $\partial C_x /
+        \partial a$ for the output activations."""
+        return y - output_activations

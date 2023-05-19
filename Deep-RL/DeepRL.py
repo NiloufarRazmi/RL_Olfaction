@@ -17,6 +17,13 @@
 # # Deep RL
 
 # %% [markdown]
+# 1. inputs need to reflect position in arena and odor (NOT CONJUNCTIONS)
+# 2. outputs need to reflect action values
+# 3. actions are selected via softmax on output neuron activity.
+# 4. RPE requires knowing value of new state
+#    -- so this will require a forward pass using "new state" inputs.
+
+# %% [markdown]
 # ## Dependencies
 
 import matplotlib as mpl
@@ -27,7 +34,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
-from agent import EpsilonGreedy, QLearningFuncApprox
+from agent import DQN, EpsilonGreedy
+from deep_learning import Network
 from env.RandomWalk1D import Actions, RandomWalk1D
 
 # from numpy.random import default_rng
@@ -53,13 +61,13 @@ mpl.rcParams["font.family"] = ["Fira Sans", "sans-serif"]
 p = Params(
     seed=42,
     n_runs=3,
-    total_episodes=50,
+    total_episodes=200,
     epsilon=0.1,
     alpha=0.3,
     gamma=0.95,
     learning_rate=0.001,
-    nLayers=5,
-    nHiddenUnits=20,
+    nLayers=3,
+    nHiddenUnits=5,
 )
 p
 
@@ -83,7 +91,18 @@ print(f"State size: {p.state_size}")
 # ## Running the environment
 
 # %%
-learner = QLearningFuncApprox(
+net = Network(
+    nInputUnits=1,
+    nLayers=p.nLayers,
+    nOutputUnits=p.action_size,
+    nHiddenUnits=p.nHiddenUnits,
+)
+
+# %%
+[layer.shape for layer in net.wtMatrix]
+
+# %%
+learner = DQN(
     learning_rate=p.alpha,
     gamma=p.gamma,
     state_size=p.state_size,
@@ -93,13 +112,17 @@ learner = QLearningFuncApprox(
 # %%
 explorer = EpsilonGreedy(epsilon=p.epsilon, rng=p.rng)
 
+# %% [markdown]
+# ### Main loop
+
 # %%
 rewards = np.zeros((p.total_episodes, p.n_runs))
 steps = np.zeros((p.total_episodes, p.n_runs))
 episodes = np.arange(p.total_episodes)
-qtables = np.zeros((p.n_runs, p.state_size, p.action_size))
 all_states = []
 all_actions = []
+X = np.array([])
+y = np.array([])
 
 for run in range(p.n_runs):  # Run several times to account for stochasticity
     learner.reset(
@@ -113,33 +136,64 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
         total_rewards = 0
 
         while not done:
-            learner.Q_hat_table = learner.Q_hat(learner.weights, learner.features)
+            # Obtain Q-values from network
+            q_values = net.forward_pass(x_obs=[state])[-1]
 
             action = explorer.choose_action(
-                action_space=env.action_space, state=state, qtable=learner.Q_hat_table
+                action_space=env.action_space, state=state, q_values=q_values
+            )
+
+            # Take the action (a) and observe the outcome state(s') and reward (r)
+            new_state, reward, done = env.step(action)
+
+            # Obtain Q-value for selected action
+            q_value = q_values[action]
+
+            # Select next action with highest Q-value
+            if new_state == done:
+                new_q_value = 0  # No Q-value for terminal
+            else:
+                new_q_values = net.forward_pass(x_obs=[new_state])[
+                    -1
+                ]  # No gradient computation
+                # TODO: Take a random action in case of
+                new_action = np.argmax(new_q_values)
+                new_q_value = new_q_values[new_action]
+
+            # Compute observed Q-value
+            q_update = reward + (learner.gamma * new_q_value)
+
+            # # Compute loss value
+            # loss = (q_update-q_value)**2
+
+            # Update X and y for supervised learning
+            if X.size == 0:
+                X = np.array([state])[np.newaxis, :]
+            else:
+                X = np.append(X, np.array([state])[np.newaxis, :], axis=0)
+            if y.size == 0:
+                y = np.array([q_update])[np.newaxis, :]
+            else:
+                y = np.append(y, np.array([q_update])[np.newaxis, :])
+
+            # Compute gradients and apply gradients to update network weights
+            allError, y_hat, delta, activity = net.backprop(
+                X=X, y=y, nLayers=p.nLayers, learning_rate=p.learning_rate
             )
 
             # Log all states and actions
             all_states.append(state)
             all_actions.append(action)
 
-            # Take the action (a) and observe the outcome state(s') and reward (r)
-            new_state, reward, done = env.step(action)
-
-            learner.weights[:, action] = learner.update_weights(
-                state, action, reward, new_state
-            )
-
             total_rewards += reward
             step += 1
 
-            # Our new state is state
+            # Update the state
             state = new_state
 
         # Log all rewards and steps
         rewards[episode, run] = total_rewards
         steps[episode, run] = step
-    qtables[run, :, :] = learner.Q_hat_table
 
 
 # %% [markdown]
@@ -147,7 +201,7 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
 
 
 # %%
-def postprocess(episodes, p, rewards, steps, qtables):
+def postprocess(episodes, p, rewards, steps):
     """Convert the results of the simulation in dataframes."""
     res = pd.DataFrame(
         data={
@@ -157,18 +211,12 @@ def postprocess(episodes, p, rewards, steps, qtables):
         }
     )
     # res["cum_rewards"] = rewards.cumsum(axis=0).flatten(order="F")
-    qtable = qtables.mean(axis=0)  # Average the Q-table between runs
-    return res, qtable
+    return res
 
 
 # %%
-res, qtable = postprocess(episodes, p, rewards, steps, qtables)
-
-# %%
+res = postprocess(episodes, p, rewards, steps)
 res
-
-# %%
-qtable
 
 
 # %% [markdown]
@@ -213,19 +261,21 @@ def plot_steps_and_rewards(df):
 plot_steps_and_rewards(res)
 
 # %%
-qtable
+q_values = np.nan * np.empty((p.state_size, p.action_size))
+for state_i, state_v in enumerate(np.arange(p.state_size)):
+    q_values[state_i,] = net.forward_pass(x_obs=[state_v])[-1]
+q_values
 
 # %%
-qtable_flat = qtable.flatten()[np.newaxis, :]
-qtable_flat
+q_values.flatten()[np.newaxis, :]
 
 
 # %%
-def plot_q_values():
+def plot_q_values(q_values):
     fig, ax = plt.subplots(figsize=(15, 1.5))
     cmap = sns.color_palette("vlag", as_cmap=True)
     chart = sns.heatmap(
-        qtable.flatten()[np.newaxis, :],
+        q_values.flatten()[np.newaxis, :],
         annot=True,
         ax=ax,
         cmap=cmap,
@@ -280,6 +330,6 @@ def plot_q_values():
 
 
 # %%
-plot_q_values()
+plot_q_values(q_values)
 
 # %%
