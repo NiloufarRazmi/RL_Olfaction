@@ -1,0 +1,101 @@
+
+#+startup: beamer
+#+LaTeX_CLASS: beamer
+#+LaTeX_CLASS_OPTIONS: [bigger]
+#+OPTIONS: H:2 num:t toc:t
+#+LATEX_COMPILER: lualatex
+# #+PROPERTY: header-args:R :session *R* :results value :cache yes :tangle yes :exports code :eval yes
+# #+COLUMNS: %40ITEM %10BEAMER_env(Env) %9BEAMER_envargs(Env Args) %4BEAMER_col(Col) %10BEAMER_extra(Extra)
+# #+COLUMNS: %45ITEM %10BEAMER_env(Env) %10BEAMER_act(Act) %4BEAMER_col(Col) %8BEAMER_opt(Opt)
+#+BEAMER_HEADER: \institute{Brown University}
+#+BEAMER_HEADER:\titlegraphic{\hfill\includegraphics[height=1.5cm]{img/Brown Logo_2016_2 Color Process ST_1300.png}}
+#+LATEX_HEADER: \usetheme[progressbar=foot, sectionpage=none, numbering=fraction]{metropolis}
+#+LaTeX_HEADER: \usepackage{tikz}
+#+LaTeX_HEADER: \usetikzlibrary{automata, positioning, arrows, arrows.meta}
+#+LaTeX_HEADER: \tikzstyle{mynode}=[thick,draw=blue,fill=blue!20,circle,minimum size=22]
+#+LaTeX_HEADER: \usepackage{booktabs}
+#+LaTeX_HEADER: \usepackage{adjustbox}
+#+LaTeX_HEADER: \usepackage{diagbox}
+#+LaTeX_HEADER: \usepackage{latexcolors}
+#+LaTeX_HEADER: \usepackage{diagbox}
+#+LaTeX_HEADER: \usepackage{dsfont}
+#+LaTeX_HEADER: \usepackage{amsmath}
+#+LaTeX_HEADER: \usepackage{fontawesome5}
+# #+LaTeX_HEADER: \usepackage{ctable}
+# #+LaTeX_HEADER: \usepackage{emoji}
+#+LaTeX_HEADER: \usepackage{listofitems}
+#+BEAMER_HEADER: \setbeamercovered{transparent=10}
+
+
+# #+BEAMER_HEADER: \makeatletter\patchcmd{\beamer@subsectionintoc}{\vskip1.5em}{\vskip0.5em}{}{}\makeatother
+
+# Show section number in the table of contents
+#+BEAMER_HEADER: \setbeamertemplate{section in toc}[sections numbered]
+# Show table of content between each section, do not increment the frame numbering and do not show the footer
+#+BEAMER_HEADER: \AtBeginSection[]{\begin{frame}[plain, noframenumbering]{Outline}    \setbeamertemplate{section in toc}[sections numbered]\setbeamertemplate{subsection in toc}[subsections numbered]\tableofcontents[currentsection, currentsubsection]\end{frame}}
+#+BEAMER_HEADER: \AtBeginSubsection[]{\begin{frame}[plain, noframenumbering]{Outline}\setbeamertemplate{section in toc}[sections numbered]\setbeamertemplate{subsection in toc}[subsections numbered]\tableofcontents[currentsection,currentsubsection]\end{frame}}
+
+# Brown color styling
+#+LaTeX_HEADER: \definecolor{RedBrown}{RGB}{192, 4, 4} \setbeamercolor{progress bar}{fg=RedBrown} \setbeamercolor{title separator}{fg=RedBrown}
+#+LaTeX_HEADER: \setbeamercolor{progress bar in head/foot}{fg=RedBrown} \setbeamercolor{progress bar in section page}{fg=RedBrown} \setbeamercolor{alerted text}{fg=RedBrown}
+# # To modify the title style
+# #+BEAMER_HEADER: \setbeamercolor{frametitle}{bg=black}
+
+# #+LaTeX_HEADER: \makeatletter\patchcmd{\beamer@sectionintoc}{\vfill}{\vskip\itemsep}{}{}\makeatother
+# Table of content without slide numbering
+# https://emacs.stackexchange.com/q/73562/2247
+#+LaTeX_HEADER: \pretocmd{\tableofcontents}{\thispagestyle{empty}}{}{}
+#+LaTeX_HEADER: \addtocounter{framenumber}{-1}
+
+
+# Source Code Listings
+#+LaTeX_HEADER: \usepackage{listings}
+#+LaTeX_HEADER: \usepackage{xcolor}
+#+LaTeX_HEADER: \definecolor{codegreen}{rgb}{0,0.6,0}
+#+LaTeX_HEADER: \definecolor{codegray}{rgb}{0.5,0.5,0.5}
+#+LaTeX_HEADER: \definecolor{codepurple}{rgb}{0.58,0,0.82}
+#+LaTeX_HEADER: \definecolor{backcolour}{HTML}{f0f0f0}
+#+LaTeX_HEADER: \lstdefinestyle{mystyle}{
+#+LaTeX_HEADER:     backgroundcolor=\color{backcolour},
+#+LaTeX_HEADER:     commentstyle=\color{codegreen},
+#+LaTeX_HEADER:     keywordstyle=\color{magenta},
+#+LaTeX_HEADER:     numberstyle=\tiny\color{codegray},
+#+LaTeX_HEADER:     stringstyle=\color{codepurple},
+#+LaTeX_HEADER:     basicstyle=\ttfamily,
+#+LaTeX_HEADER:     breakatwhitespace=false,
+#+LaTeX_HEADER:     breaklines=true,
+#+LaTeX_HEADER:     captionpos=b,
+#+LaTeX_HEADER:     keepspaces=true,
+#+LaTeX_HEADER:     numbers=none,
+#+LaTeX_HEADER:     numbersep=5pt,
+#+LaTeX_HEADER:     showspaces=false,
+#+LaTeX_HEADER:     showstringspaces=false,
+#+LaTeX_HEADER:     showtabs=false,
+#+LaTeX_HEADER:     tabsize=2
+#+LaTeX_HEADER: }
+#+LaTeX_HEADER: \lstset{style=mystyle}
+
+#+LaTeX_HEADER: \usepackage[outline]{contour} % glow around text
+#+LaTeX_HEADER: \contourlength{1.4pt}
+#+LaTeX_HEADER: \tikzset{>=latex} % for LaTeX arrow head
+#+LaTeX_HEADER: \usepackage{xcolor}
+#+LaTeX_HEADER: \colorlet{myred}{red!80!black}
+#+LaTeX_HEADER: \colorlet{myblue}{blue!80!black}
+#+LaTeX_HEADER: \colorlet{mygreen}{green!60!black}
+#+LaTeX_HEADER: \colorlet{myorange}{orange!70!red!60!black}
+#+LaTeX_HEADER: \colorlet{mydarkred}{red!30!black}
+#+LaTeX_HEADER: \colorlet{mydarkblue}{blue!40!black}
+#+LaTeX_HEADER: \colorlet{mydarkgreen}{green!30!black}
+#+LaTeX_HEADER: \tikzstyle{node}=[thick,circle,draw=myblue,minimum size=22,inner sep=0.5,outer sep=0.6]
+#+LaTeX_HEADER: \tikzstyle{node in}=[node,green!20!black,draw=mygreen!30!black,fill=mygreen!25]
+#+LaTeX_HEADER: \tikzstyle{node hidden}=[node,blue!20!black,draw=myblue!30!black,fill=myblue!20]
+#+LaTeX_HEADER: \tikzstyle{node convol}=[node,orange!20!black,draw=myorange!30!black,fill=myorange!20]
+#+LaTeX_HEADER: \tikzstyle{node out}=[node,red!20!black,draw=myred!30!black,fill=myred!20]
+#+LaTeX_HEADER: \tikzstyle{connect}=[thick,mydarkblue] %,line cap=round
+#+LaTeX_HEADER: \tikzstyle{connect arrow}=[-{Latex[length=4,width=3.5]},thick,mydarkblue,shorten <=0.5,shorten >=1]
+#+LaTeX_HEADER: \tikzset{ % node styles, numbered for easy mapping with \nstyle
+#+LaTeX_HEADER:   node 1/.style={node in},
+#+LaTeX_HEADER:   node 2/.style={node hidden},
+#+LaTeX_HEADER:   node 3/.style={node out},
+#+LaTeX_HEADER: }
+#+LaTeX_HEADER: \def\nstyle{int(\lay<\Nnodlen?min(2,\lay):3)} % map layer number onto 1, 2, or 3
