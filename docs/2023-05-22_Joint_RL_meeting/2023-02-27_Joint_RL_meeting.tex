@@ -1,4 +1,4 @@
-% Created 2023-05-21 Sun 23:54
+% Created 2023-05-22 Mon 08:31
 % Intended LaTeX compiler: lualatex
 \documentclass[bigger]{beamer}
 \usepackage{graphicx}
@@ -101,47 +101,47 @@ node 3/.style={node out},
 \end{frame}
 
 \section{Reducing the number of features in function approximation}
-\label{sec:orgd197184}
-\begin{frame}[label={sec:org4e58741}]{Features matrix -- allocentric agent}
+\label{sec:org991eddd}
+\begin{frame}[label={sec:org9fc4b54}]{Features matrix -- allocentric agent}
 \(\to\) Reduced from 100 to 25 locations + 4 cues
 \begin{center}
 \includegraphics[height=0.8\textheight]{img/FuncApprox-allo-features-matrix.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org4c475c3}]{Rewards and steps -- allocentric agent}
+\begin{frame}[label={sec:org5da0e92}]{Rewards and steps -- allocentric agent}
 \begin{center}
 \includegraphics[width=\textwidth]{img/FuncApprox-allo-rewards-steps.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org2ad4e48}]{Q-values learned -- allocentric agent}
+\begin{frame}[label={sec:org96bebc9}]{Q-values learned -- allocentric agent}
 \begin{center}
 \includegraphics[width=.9\linewidth]{img/FuncApprox-allo-q-values.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org9297f74}]{Features matrix -- egocentric agent}
+\begin{frame}[label={sec:orgbe0187e}]{Features matrix -- egocentric agent}
 \(\to\) Reduced from 400 to 100 locations (25 locations x 4 head directions) + 16 cues (4 cues x 4 head directions)
 \begin{center}
 \includegraphics[height=0.75\textheight]{img/FuncApprox-ego-features-matrix.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org8fca5e8}]{Rewards and steps -- egocentric agent}
+\begin{frame}[label={sec:orga2faaf8}]{Rewards and steps -- egocentric agent}
 \begin{center}
 \includegraphics[width=\textwidth]{img/FuncApprox-ego-rewards-steps.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org0acdbd6}]{Q-values learned -- egocentric agent}
+\begin{frame}[label={sec:orgfdd52d7}]{Q-values learned -- egocentric agent}
 \begin{center}
 \includegraphics[width=.9\linewidth]{img/FuncApprox-ego-q-values.png}
 \end{center}
 \end{frame}
-\section{Deep Reinforcement Learning first draft}
-\label{sec:orgb4cef1b}
-\begin{frame}[label={sec:orge4b140c}]{Toy task : Random Walk 1D}
+\section{Deep Reinforcement Learning -- first draft}
+\label{sec:org85270c6}
+\begin{frame}[label={sec:orgb35e4eb}]{Toy task : Random Walk 1D}
 \begin{center}
 \includegraphics[width=.9\linewidth]{img/RandomWalk1D.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org51e76c9}]{Network used}
+\begin{frame}[label={sec:orgca709cf}]{Network used}
 \begin{center}
 \begin{adjustbox}{max height=\textheight, keepaspectratio}
 % NEURAL NETWORK no text
@@ -180,17 +180,31 @@ node 3/.style={node out},
 \end{adjustbox}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org9879e0d}]{Rewards and steps}
+\begin{frame}[label={sec:org8b4cbe2}]{States and actions}
+\begin{center}
+\includegraphics[width=.9\linewidth]{img/DRL-states-actions.png}
+\end{center}
+\begin{center}
+\includegraphics[width=.9\linewidth]{img/DRL-states-actions2.png}
+\end{center}
+\end{frame}
+\begin{frame}[label={sec:org9b282e5}]{Rewards and steps}
 \begin{center}
 \includegraphics[width=.9\linewidth]{img/DRL-rewards-steps.png}
 \end{center}
+\begin{center}
+\includegraphics[width=.9\linewidth]{img/DRL-rewards-steps2.png}
+\end{center}
 \end{frame}
-\begin{frame}[label={sec:org0b9482a}]{Q-values learned}
+\begin{frame}[label={sec:org47cb14d}]{Q-values learned}
 \begin{center}
 \includegraphics[width=\textwidth]{img/DRL-q-values.png}
 \end{center}
+\begin{center}
+\includegraphics[width=\textwidth]{img/DRL-q-values2.png}
+\end{center}
 \end{frame}
-\begin{frame}[label={sec:org6feb5fe},standout]{~}
+\begin{frame}[label={sec:org07950bc},standout]{~}
 Questions ?
 \end{frame}
 \end{document}

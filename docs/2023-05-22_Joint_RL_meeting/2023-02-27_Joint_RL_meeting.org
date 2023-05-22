@@ -24,7 +24,7 @@
 [[file:img/FuncApprox-ego-rewards-steps.png]]
 ** Q-values learned -- egocentric agent
 [[file:img/FuncApprox-ego-q-values.png]]
-* Deep Reinforcement Learning first draft
+* Deep Reinforcement Learning -- first draft
 ** Toy task : Random Walk 1D
 [[file:img/RandomWalk1D.png]]
 ** Network used
@@ -67,11 +67,16 @@
 \end{adjustbox}
 \end{center}
 #+end_export
+** States and actions
+[[file:img/DRL-states-actions.png]]
+[[file:img/DRL-states-actions2.png]]
 ** Rewards and steps
 [[file:img/DRL-rewards-steps.png]]
+[[file:img/DRL-rewards-steps2.png]]
 ** Q-values learned
 #+ATTR_LaTeX: :width \textwidth
 [[file:img/DRL-q-values.png]]
+[[file:img/DRL-q-values2.png]]
 ** \nbsp{}
 :PROPERTIES:
 :BEAMER_opt: standout
