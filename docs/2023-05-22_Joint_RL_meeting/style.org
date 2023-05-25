@@ -24,6 +24,7 @@
 # #+LaTeX_HEADER: \usepackage{ctable}
 # #+LaTeX_HEADER: \usepackage{emoji}
 #+LaTeX_HEADER: \usepackage{listofitems}
+#+LaTeX_HEADER: \usepackage[ruled]{algorithm2e}
 #+BEAMER_HEADER: \setbeamercovered{transparent=10}
 
 

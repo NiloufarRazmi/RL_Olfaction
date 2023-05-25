@@ -37,6 +37,8 @@ import seaborn as sns
 from agent import DQN, EpsilonGreedy
 from deep_learning import Network
 from env.RandomWalk1D import Actions, RandomWalk1D
+from imojify import imojify
+from matplotlib.offsetbox import AnnotationBbox, OffsetImage
 
 # from numpy.random import default_rng
 from tqdm import tqdm
@@ -60,8 +62,8 @@ mpl.rcParams["font.family"] = ["Fira Sans", "sans-serif"]
 # %%
 p = Params(
     seed=42,
-    n_runs=3,
-    total_episodes=200,
+    n_runs=1,
+    total_episodes=1000,
     epsilon=0.1,
     alpha=0.3,
     gamma=0.95,
@@ -77,6 +79,9 @@ p
 
 # %% [markdown]
 # ## The environment
+
+# %% [markdown]
+# ![The task](https://juliareinforcementlearning.org/docs/assets/RandomWalk1D.png)
 
 # %%
 env = RandomWalk1D()
@@ -128,8 +133,11 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
     learner.reset(
         action_size=env.numActions
     )  # Reset the Q-table and the weights between runs
+    meanErrors = []
 
-    for episode in tqdm(episodes, desc=f"Run {run}/{p.n_runs} - Episodes", leave=False):
+    for episode in tqdm(
+        episodes, desc=f"Run {run+1}/{p.n_runs} - Episodes", leave=False
+    ):
         state = env.reset()  # Reset the environment
         step = 0
         done = False
@@ -181,9 +189,10 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
                 X=X, y=y, nLayers=p.nLayers, learning_rate=p.learning_rate
             )
 
-            # Log all states and actions
+            # Logging
             all_states.append(state)
             all_actions.append(action)
+            meanErrors.append(np.nanmean(abs(allError)))
 
             total_rewards += reward
             step += 1
@@ -195,9 +204,15 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
         rewards[episode, run] = total_rewards
         steps[episode, run] = step
 
-
 # %% [markdown]
 # ## Visualization
+
+# %%
+fig, ax = plt.subplots(figsize=(8, 6))
+ax.plot(meanErrors)
+ax.set_ylabel("Loss")
+ax.set_xlabel("Steps")
+plt.show()
 
 
 # %%
@@ -263,6 +278,9 @@ plot_steps_and_rewards(res)
 # %%
 q_values = np.nan * np.empty((p.state_size, p.action_size))
 for state_i, state_v in enumerate(np.arange(p.state_size)):
+    if state_i in [0, len(q_values) - 1]:
+        # q_values[state_i,] = 0
+        continue
     q_values[state_i,] = net.forward_pass(x_obs=[state_v])[-1]
 q_values
 
@@ -284,13 +302,21 @@ def plot_q_values(q_values):
     )
     states_nodes = np.arange(1, 14, 2)
     chart.set_xticks(states_nodes)
-    chart.set_xticklabels([str(item) for item in np.arange(0, 7, 1)])
+    chart.set_xticklabels([str(item) for item in np.arange(1, 8, 1)])
     chart.set_title("Q values")
     ax.tick_params(bottom=True)
 
     # Add actions arrows
     for node in states_nodes:
-        arrows_left = {"x_tail": node, "y_tail": 1.4, "x_head": node - 1, "y_head": 1.4}
+        y_height = 1.7
+        if node in [1, 13]:
+            continue
+        arrows_left = {
+            "x_tail": node,
+            "y_tail": y_height,
+            "x_head": node - 1,
+            "y_head": y_height,
+        }
         arrow = mpatches.FancyArrowPatch(
             (arrows_left["x_tail"], arrows_left["y_tail"]),
             (arrows_left["x_head"], arrows_left["y_head"]),
@@ -301,9 +327,9 @@ def plot_q_values(q_values):
         ax.add_patch(arrow)
         arrows_right = {
             "x_tail": node,
-            "y_tail": 1.4,
+            "y_tail": y_height,
             "x_head": node + 1,
-            "y_head": 1.4,
+            "y_head": y_height,
         }
         arrow = mpatches.FancyArrowPatch(
             (arrows_right["x_tail"], arrows_right["y_tail"]),
@@ -325,6 +351,23 @@ def plot_q_values(q_values):
             clip_on=False,
         )
         ax.add_patch(rect)
+
+    def add_emoji(coords, emoji, ax):
+        """Add emoji as image at absolute coordinates."""
+        img = plt.imread(imojify.get_img_path(emoji))
+        im = OffsetImage(img, zoom=0.08)
+        im.image.axes = ax
+        ab = AnnotationBbox(
+            im, (coords[0], coords[1]), frameon=False, pad=0, annotation_clip=False
+        )
+        ax.add_artist(ab)
+
+    emoji = [
+        {"emoji": "🪨", "coords": [1, y_height]},
+        {"emoji": "💎", "coords": [13, y_height]},
+    ]
+    for _, emo in enumerate(emoji):
+        add_emoji(emo["coords"], emo["emoji"], ax)
 
     plt.show()
 

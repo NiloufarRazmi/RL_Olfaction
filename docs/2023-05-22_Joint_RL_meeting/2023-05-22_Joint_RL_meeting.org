@@ -29,6 +29,7 @@
 [[file:img/RandomWalk1D.png]]
 ** Network used
 #+begin_export latex
+% https://tikz.net/neural_networks/
 \begin{center}
 \begin{adjustbox}{max height=\textheight, keepaspectratio}
 % NEURAL NETWORK no text
@@ -67,6 +68,37 @@
 \end{adjustbox}
 \end{center}
 #+end_export
+** Algorithm
+#+begin_export latex
+%% This declares a command \Comment
+%% The argument will be surrounded by /* ... */
+\SetKwComment{Comment}{/* }{ */}
+
+\begin{center}
+    \scalebox{0.6}{
+    \begin{minipage}{\linewidth}
+\begin{algorithm}[H]
+\caption{An algorithm with caption}\label{alg:two}
+\KwData{$X = [S_1, S_2, S_3,\dots, S_n]$}
+\KwData{$y = [q_1, q_2, q_3,\dots, q_n]$}
+\KwResult{$y = x^n$}
+$q' \gets r + \gamma q$\;
+$Loss \gets (y - \hat{y}_{pred}) \times \Delta W$\;
+\While{$N \neq 0$}{
+  \eIf{$N$ is even}{
+    $X \gets X \times X$\;
+    $N \gets \frac{N}{2}$ \Comment*[r]{This is a comment}
+  }{\If{$N$ is odd}{
+      $y \gets y \times X$\;
+      $N \gets N - 1$\;
+    }
+  }
+}
+\end{algorithm}
+    \end{minipage}%
+    }
+\end{center}
+#+end_export
 ** States and actions
 [[file:img/DRL-states-actions.png]]
 [[file:img/DRL-states-actions2.png]]
@@ -87,3 +119,18 @@ Questions ?
 % org-beamer-outline-frame-options: "plain"
 % End:
 * Feedback :noexport:
+** Olivia's new task ready to model
+** Number of rewards over final episode
+** Batches as number of episodes?
+** Look at the gradients
+Should see a decay of the gradient
+** Slide with algo steps
+** Try ReLU?
+** Show a tuning curve of each neuron?
+Plot activity of each neuron for each of the 25 locations
+** Build model without biological constraint first
+\to then add biological constraints
+- Nb of layers
+- Nb of neurons
+- Architecture
+- Recurrence

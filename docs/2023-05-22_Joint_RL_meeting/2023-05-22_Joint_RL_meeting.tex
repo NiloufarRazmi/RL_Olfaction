@@ -1,4 +1,4 @@
-% Created 2023-05-22 Mon 08:31
+% Created 2023-05-25 Thu 19:05
 % Intended LaTeX compiler: lualatex
 \documentclass[bigger]{beamer}
 \usepackage{graphicx}
@@ -23,6 +23,7 @@
 \usepackage{amsmath}
 \usepackage{fontawesome5}
 \usepackage{listofitems}
+\usepackage[ruled]{algorithm2e}
 \definecolor{RedBrown}{RGB}{192, 4, 4} \setbeamercolor{progress bar}{fg=RedBrown} \setbeamercolor{title separator}{fg=RedBrown}
 \setbeamercolor{progress bar in head/foot}{fg=RedBrown} \setbeamercolor{progress bar in section page}{fg=RedBrown} \setbeamercolor{alerted text}{fg=RedBrown}
 \pretocmd{\tableofcontents}{\thispagestyle{empty}}{}{}
@@ -101,47 +102,48 @@ node 3/.style={node out},
 \end{frame}
 
 \section{Reducing the number of features in function approximation}
-\label{sec:org991eddd}
-\begin{frame}[label={sec:org9fc4b54}]{Features matrix -- allocentric agent}
+\label{sec:orgce832da}
+\begin{frame}[label={sec:orgd1a93b1}]{Features matrix -- allocentric agent}
 \(\to\) Reduced from 100 to 25 locations + 4 cues
 \begin{center}
 \includegraphics[height=0.8\textheight]{img/FuncApprox-allo-features-matrix.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org5da0e92}]{Rewards and steps -- allocentric agent}
+\begin{frame}[label={sec:org47049d8}]{Rewards and steps -- allocentric agent}
 \begin{center}
 \includegraphics[width=\textwidth]{img/FuncApprox-allo-rewards-steps.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org96bebc9}]{Q-values learned -- allocentric agent}
+\begin{frame}[label={sec:orgc72ffa1}]{Q-values learned -- allocentric agent}
 \begin{center}
 \includegraphics[width=.9\linewidth]{img/FuncApprox-allo-q-values.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:orgbe0187e}]{Features matrix -- egocentric agent}
+\begin{frame}[label={sec:org7adb428}]{Features matrix -- egocentric agent}
 \(\to\) Reduced from 400 to 100 locations (25 locations x 4 head directions) + 16 cues (4 cues x 4 head directions)
 \begin{center}
 \includegraphics[height=0.75\textheight]{img/FuncApprox-ego-features-matrix.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:orga2faaf8}]{Rewards and steps -- egocentric agent}
+\begin{frame}[label={sec:orgde732d9}]{Rewards and steps -- egocentric agent}
 \begin{center}
 \includegraphics[width=\textwidth]{img/FuncApprox-ego-rewards-steps.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:orgfdd52d7}]{Q-values learned -- egocentric agent}
+\begin{frame}[label={sec:orga88f89c}]{Q-values learned -- egocentric agent}
 \begin{center}
 \includegraphics[width=.9\linewidth]{img/FuncApprox-ego-q-values.png}
 \end{center}
 \end{frame}
 \section{Deep Reinforcement Learning -- first draft}
-\label{sec:org85270c6}
-\begin{frame}[label={sec:orgb35e4eb}]{Toy task : Random Walk 1D}
+\label{sec:org8ff6835}
+\begin{frame}[label={sec:org0ae361c}]{Toy task : Random Walk 1D}
 \begin{center}
 \includegraphics[width=.9\linewidth]{img/RandomWalk1D.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:orgca709cf}]{Network used}
+\begin{frame}[label={sec:org89ffe2b}]{Network used}
+% https://tikz.net/neural_networks/
 \begin{center}
 \begin{adjustbox}{max height=\textheight, keepaspectratio}
 % NEURAL NETWORK no text
@@ -180,7 +182,37 @@ node 3/.style={node out},
 \end{adjustbox}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org8b4cbe2}]{States and actions}
+\begin{frame}[label={sec:orgb6f07ad}]{Algorithm}
+%% This declares a command \Comment
+%% The argument will be surrounded by /* ... */
+\SetKwComment{Comment}{/* }{ */}
+
+\begin{center}
+    \scalebox{0.6}{
+    \begin{minipage}{\linewidth}
+\begin{algorithm}[H]
+\caption{An algorithm with caption}\label{alg:two}
+\KwData{$X = [S_1, S_2, S_3,\dots, S_n]$}
+\KwData{$y = [q_1, q_2, q_3,\dots, q_n]$}
+\KwResult{$y = x^n$}
+$q' \gets r + \gamma q$\;
+$Loss \gets (y - \hat{y}_{pred}) \times \Delta W$\;
+\While{$N \neq 0$}{
+  \eIf{$N$ is even}{
+    $X \gets X \times X$\;
+    $N \gets \frac{N}{2}$ \Comment*[r]{This is a comment}
+  }{\If{$N$ is odd}{
+      $y \gets y \times X$\;
+      $N \gets N - 1$\;
+    }
+  }
+}
+\end{algorithm}
+    \end{minipage}%
+    }
+\end{center}
+\end{frame}
+\begin{frame}[label={sec:org83397d0}]{States and actions}
 \begin{center}
 \includegraphics[width=.9\linewidth]{img/DRL-states-actions.png}
 \end{center}
@@ -188,7 +220,7 @@ node 3/.style={node out},
 \includegraphics[width=.9\linewidth]{img/DRL-states-actions2.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org9b282e5}]{Rewards and steps}
+\begin{frame}[label={sec:orgb0ed181}]{Rewards and steps}
 \begin{center}
 \includegraphics[width=.9\linewidth]{img/DRL-rewards-steps.png}
 \end{center}
@@ -196,7 +228,7 @@ node 3/.style={node out},
 \includegraphics[width=.9\linewidth]{img/DRL-rewards-steps2.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org47cb14d}]{Q-values learned}
+\begin{frame}[label={sec:org4a66d56}]{Q-values learned}
 \begin{center}
 \includegraphics[width=\textwidth]{img/DRL-q-values.png}
 \end{center}
@@ -204,7 +236,7 @@ node 3/.style={node out},
 \includegraphics[width=\textwidth]{img/DRL-q-values2.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org07950bc},standout]{~}
+\begin{frame}[label={sec:org8aaab3d},standout]{~}
 Questions ?
 \end{frame}
 \end{document}
