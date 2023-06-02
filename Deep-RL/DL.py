@@ -31,6 +31,7 @@ import matplotlib.pyplot as plt
 # %%
 # Import packages
 import numpy as np
+import pandas as pd
 import seaborn as sns
 from deep_learning import Network
 
@@ -164,6 +165,36 @@ chart = sns.lineplot(meanError, ax=ax)
 ax.set_ylabel("Error")
 ax.set_xlabel("Batches")
 plt.show()
+
+# %%
+weights_avg = np.nan * np.empty((1, len(net.wtMatrix)))
+weights_std = np.nan * np.empty((1, len(net.wtMatrix)))
+for w_id, w_val in enumerate(net.wtMatrix):
+    weights_avg[0, w_id] = w_val.mean()
+    weights_std[0, w_id] = w_val.std()
+weights_metrics_avg = pd.DataFrame(weights_avg)
+weights_metrics_std = pd.DataFrame(weights_std)
+
+# %%
+weights_metrics_avg
+
+# %%
+weights_metrics_std
+
+# %%
+grads_avg = np.nan * np.empty((1, len(delta)))
+grads_std = np.nan * np.empty((1, len(delta)))
+for d_id, d_val in enumerate(delta):
+    grads_avg[0, d_id] = d_val.mean()
+    grads_std[0, d_id] = d_val.std()
+grads_metrics_avg = pd.DataFrame(grads_avg)
+grads_metrics_std = pd.DataFrame(grads_std)
+
+# %%
+grads_metrics_avg
+
+# %%
+grads_metrics_std
 
 # %% [markdown]
 # ## Step 4: Test Network

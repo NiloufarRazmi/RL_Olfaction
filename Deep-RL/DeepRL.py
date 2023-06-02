@@ -51,6 +51,7 @@ from utils import Params
 # %load_ext lab_black
 # %load_ext autoreload
 # %autoreload 2
+# # %matplotlib ipympl
 
 # %%
 sns.set_theme(font_scale=1.5)
@@ -126,6 +127,7 @@ steps = np.zeros((p.total_episodes, p.n_runs))
 episodes = np.arange(p.total_episodes)
 all_states = []
 all_actions = []
+steps_global = 0
 X = np.array([])
 y = np.array([])
 
@@ -134,6 +136,8 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
         action_size=env.numActions
     )  # Reset the Q-table and the weights between runs
     meanErrors = []
+    weights_metrics = pd.DataFrame()
+    grads_metrics = pd.DataFrame()
 
     for episode in tqdm(
         episodes, desc=f"Run {run+1}/{p.n_runs} - Episodes", leave=False
@@ -194,8 +198,45 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
             all_actions.append(action)
             meanErrors.append(np.nanmean(abs(allError)))
 
+            for w_id, w_val in enumerate(net.wtMatrix):
+                weights_metrics = pd.concat(
+                    [
+                        weights_metrics,
+                        pd.DataFrame(
+                            {
+                                "avg": w_val.mean(),
+                                "std": w_val.std(),
+                                "id": w_id,
+                                "step": step,
+                                "steps_global": steps_global,
+                            },
+                            index=[steps_global],
+                        ),
+                    ],
+                    ignore_index=True,
+                )
+
+            for d_id, d_val in enumerate(delta):
+                grads_metrics = pd.concat(
+                    [
+                        grads_metrics,
+                        pd.DataFrame(
+                            {
+                                "avg": d_val.mean(),
+                                "std": d_val.std(),
+                                "id": d_id,
+                                "step": step,
+                                "steps_global": steps_global,
+                            },
+                            index=[steps_global],
+                        ),
+                    ],
+                    ignore_index=True,
+                )
+
             total_rewards += reward
             step += 1
+            steps_global += 1
 
             # Update the state
             state = new_state
@@ -203,6 +244,32 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
         # Log all rewards and steps
         rewards[episode, run] = total_rewards
         steps[episode, run] = step
+# weights_metrics.set_index("steps_global", inplace=True)
+# grads_metrics.set_index("steps_global", inplace=True)
+# grads_metrics["avg_rolling"] = grads_metrics.avg.rolling(10).mean()
+# grads_metrics["std_rolling"] = grads_metrics["std"].rolling(10).mean()
+
+# %%
+weights_metrics
+
+# %%
+grads_metrics
+
+# %%
+grads_metrics["avg_rolling"] = np.nan
+grads_metrics["std_rolling"] = np.nan
+for id in grads_metrics.id.unique():
+    grads_metrics.loc[grads_metrics[grads_metrics["id"] == id].index, "avg_rolling"] = (
+        grads_metrics.loc[grads_metrics[grads_metrics["id"] == id].index, "avg"]
+        .rolling(20)
+        .mean()
+    )
+    grads_metrics.loc[grads_metrics[grads_metrics["id"] == id].index, "std_rolling"] = (
+        grads_metrics.loc[grads_metrics[grads_metrics["id"] == id].index, "std"]
+        .rolling(20)
+        .mean()
+    )
+grads_metrics
 
 # %% [markdown]
 # ## Visualization
@@ -211,6 +278,51 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
 fig, ax = plt.subplots(figsize=(8, 6))
 ax.plot(meanErrors)
 ax.set_ylabel("Loss")
+ax.set_xlabel("Steps")
+plt.show()
+
+# %%
+fig, ax = plt.subplots(figsize=(8, 6))
+chart = sns.lineplot(x="steps_global", y="avg", hue="id", data=weights_metrics, ax=ax)
+ax.set_ylabel("Weights (avg)")
+ax.set_xlabel("Steps")
+plt.show()
+
+# %%
+fig, ax = plt.subplots(figsize=(8, 6))
+chart = sns.lineplot(x="steps_global", y="std", hue="id", data=weights_metrics, ax=ax)
+ax.set_ylabel("Weights (std)")
+ax.set_xlabel("Steps")
+plt.show()
+
+# %%
+fig, ax = plt.subplots(figsize=(8, 6))
+chart = sns.lineplot(
+    x="steps_global",
+    y="avg_rolling",
+    hue="id",
+    data=grads_metrics,
+    ax=ax,
+    palette=sns.color_palette()[0 : len(grads_metrics.id.unique())],
+)
+ax.set_ylabel("Gradients (avg)")
+ax.set_xlabel("Steps")
+plt.show()
+
+# %%
+grads_metrics.duplicated()
+
+# %%
+fig, ax = plt.subplots(figsize=(8, 6))
+chart = sns.lineplot(
+    x="steps_global",
+    y="std_rolling",
+    hue="id",
+    data=grads_metrics,
+    ax=ax,
+    palette=sns.color_palette()[0 : len(grads_metrics.id.unique())],
+)
+ax.set_ylabel("Gradients (std)")
 ax.set_xlabel("Steps")
 plt.show()
 

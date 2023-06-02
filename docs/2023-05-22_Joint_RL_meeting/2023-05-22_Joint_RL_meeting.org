@@ -62,7 +62,7 @@
   % LABELS
   \node[above=1,align=center,mygreen!60!black] at (N1-1.90) {input\\[-0.2em]layer\\[-0.2em](state)};
   \node[above=0.5,align=center,myblue!60!black] at (N2-1.90) {hidden layer};
-  \node[above=1,align=center,myred!60!black] at (N\Nnodlen-1.90) {output\\[-0.2em]layer\\[-0.2em](actions)};
+  \node[above=1,align=center,myred!60!black] at (N\Nnodlen-1.90) {output\\[-0.2em]layer\\[-0.2em](Q-value\\[-0.2em]of action)};
 
 \end{tikzpicture}
 \end{adjustbox}
