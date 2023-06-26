@@ -1,6 +1,6 @@
 #+TITLE: Joint RL meeting
 #+author: Andrea Pierré
-#+date: May 22^{nd}, 2023
+#+date: June 26, 2023
 #+EMAIL: andrea_pierre@brown.edu
 * HEADER :noexport:
 #+SETUPFILE: ./style.org
@@ -24,9 +24,9 @@
 [[file:img/FuncApprox-ego-rewards-steps.png]]
 ** Q-values learned -- egocentric agent
 [[file:img/FuncApprox-ego-q-values.png]]
-* Deep Reinforcement Learning -- first draft
+* Deep RL -- first draft & issues
 ** Toy task : Random Walk 1D
-[[file:img/RandomWalk1D.png]]
+[[file:img/RandomWalk1D-transparent.png]]
 ** Network used
 #+begin_export latex
 % https://tikz.net/neural_networks/
@@ -60,15 +60,15 @@
   }
 
   % LABELS
-  \node[above=1,align=center,mygreen!60!black] at (N1-1.90) {input\\[-0.2em]layer\\[-0.2em](state)};
-  \node[above=0.5,align=center,myblue!60!black] at (N2-1.90) {hidden layer};
+  \node[above=1.85,align=center,mygreen!60!black] at (N1-1.90) {input\\[-0.2em]layer\\[-0.2em](state)};
+  \node[above=0.55,align=center,myblue!60!black] at (N2-1.90) {hidden layer};
   \node[above=1,align=center,myred!60!black] at (N\Nnodlen-1.90) {output\\[-0.2em]layer\\[-0.2em](Q-value\\[-0.2em]of action)};
 
 \end{tikzpicture}
 \end{adjustbox}
 \end{center}
 #+end_export
-** Algorithm
+** COMMENT Algorithm
 #+begin_export latex
 %% This declares a command \Comment
 %% The argument will be surrounded by /* ... */
@@ -109,6 +109,65 @@ $Loss \gets (y - \hat{y}_{pred}) \times \Delta W$\;
 #+ATTR_LaTeX: :width \textwidth
 [[file:img/DRL-q-values.png]]
 [[file:img/DRL-q-values2.png]]
+** Network loss
+*** Left :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+#+begin_export latex
+\centering
+#+end_export
+Right leaning
+#+ATTR_LaTeX: :width \columnwidth
+[[file:img/DRL-loss.png]]
+*** Right :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+#+begin_export latex
+\centering
+#+end_export
+Left leaning
+#+ATTR_LaTeX: :width \columnwidth
+[[file:img/DRL-loss2.png]]
+** Network weights
+#+begin_export latex
+\centering
+\scriptsize
+Right leaning
+\vspace{-1em}
+#+end_export
+#+ATTR_LaTeX: :width \textwidth
+[[file:img/DRL-weights.png]]
+
+#+begin_export latex
+\vspace{-1em}
+\centering
+\scriptsize
+Left leaning
+\vspace{-1em}
+#+end_export
+#+ATTR_LaTeX: :width \textwidth
+[[file:img/DRL-weights2.png]]
+** Network gradients
+#+begin_export latex
+\centering
+\scriptsize
+Right leaning
+\vspace{-1em}
+#+end_export
+#+ATTR_LaTeX: :width \textwidth
+[[file:img/DRL-gradients.png]]
+
+#+begin_export latex
+\vspace{-1em}
+\centering
+\scriptsize
+Left leaning
+\vspace{-1em}
+#+end_export
+#+ATTR_LaTeX: :width \textwidth
+[[file:img/DRL-gradients2.png]]
 ** \nbsp{}
 :PROPERTIES:
 :BEAMER_opt: standout

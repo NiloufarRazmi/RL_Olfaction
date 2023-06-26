@@ -281,50 +281,64 @@ ax.set_ylabel("Loss")
 ax.set_xlabel("Steps")
 plt.show()
 
-# %%
-fig, ax = plt.subplots(figsize=(8, 6))
-chart = sns.lineplot(x="steps_global", y="avg", hue="id", data=weights_metrics, ax=ax)
-ax.set_ylabel("Weights (avg)")
-ax.set_xlabel("Steps")
-plt.show()
 
 # %%
-fig, ax = plt.subplots(figsize=(8, 6))
-chart = sns.lineplot(x="steps_global", y="std", hue="id", data=weights_metrics, ax=ax)
-ax.set_ylabel("Weights (std)")
-ax.set_xlabel("Steps")
-plt.show()
+def plot_weights(weights_metrics):
+    """Plot the weights."""
+    fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(15, 5))
+
+    sns.lineplot(x="steps_global", y="avg", hue="id", data=weights_metrics, ax=ax[0])
+    ax[0].set(ylabel="Weights (avg)")
+    ax[0].set(xlabel="Steps")
+
+    sns.lineplot(x="steps_global", y="std", hue="id", data=weights_metrics, ax=ax[1])
+    ax[1].set(ylabel="Weights (std)")
+    ax[1].set(xlabel="Steps")
+
+    fig.tight_layout()
+    plt.show()
+
 
 # %%
-fig, ax = plt.subplots(figsize=(8, 6))
-chart = sns.lineplot(
-    x="steps_global",
-    y="avg_rolling",
-    hue="id",
-    data=grads_metrics,
-    ax=ax,
-    palette=sns.color_palette()[0 : len(grads_metrics.id.unique())],
-)
-ax.set_ylabel("Gradients (avg)")
-ax.set_xlabel("Steps")
-plt.show()
+plot_weights(weights_metrics)
+
+
+# %%
+def plot_gradients(grads_metrics):
+    """Plot the gradienta."""
+    fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(15, 5))
+
+    sns.lineplot(
+        x="steps_global",
+        y="avg_rolling",
+        hue="id",
+        data=grads_metrics,
+        ax=ax[0],
+        palette=sns.color_palette()[0 : len(grads_metrics.id.unique())],
+    )
+    ax[0].set(ylabel="Gradients (avg)")
+    ax[0].set(xlabel="Steps")
+
+    sns.lineplot(
+        x="steps_global",
+        y="std_rolling",
+        hue="id",
+        data=grads_metrics,
+        ax=ax[1],
+        palette=sns.color_palette()[0 : len(grads_metrics.id.unique())],
+    )
+    ax[1].set(ylabel="Gradients (std)")
+    ax[1].set(xlabel="Steps")
+
+    fig.tight_layout()
+    plt.show()
+
+
+# %%
+plot_gradients(grads_metrics)
 
 # %%
 grads_metrics.duplicated()
-
-# %%
-fig, ax = plt.subplots(figsize=(8, 6))
-chart = sns.lineplot(
-    x="steps_global",
-    y="std_rolling",
-    hue="id",
-    data=grads_metrics,
-    ax=ax,
-    palette=sns.color_palette()[0 : len(grads_metrics.id.unique())],
-)
-ax.set_ylabel("Gradients (std)")
-ax.set_xlabel("Steps")
-plt.show()
 
 
 # %%
