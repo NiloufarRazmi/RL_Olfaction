@@ -1,4 +1,4 @@
-% Created 2023-06-25 Sun 23:50
+% Created 2023-06-26 Mon 10:48
 % Intended LaTeX compiler: lualatex
 \documentclass[bigger]{beamer}
 \usepackage{graphicx}
@@ -102,47 +102,47 @@ node 3/.style={node out},
 \end{frame}
 
 \section{Reducing the number of features in function approximation}
-\label{sec:org1f3d9c9}
-\begin{frame}[label={sec:orgf84cdaf}]{Features matrix -- allocentric agent}
+\label{sec:org3064f29}
+\begin{frame}[label={sec:org8335579}]{Features matrix -- allocentric agent}
 \(\to\) Reduced from 100 to 25 locations + 4 cues
 \begin{center}
 \includegraphics[height=0.8\textheight]{img/FuncApprox-allo-features-matrix.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org9d007fb}]{Rewards and steps -- allocentric agent}
+\begin{frame}[label={sec:org2b17af7}]{Rewards and steps -- allocentric agent}
 \begin{center}
 \includegraphics[width=\textwidth]{img/FuncApprox-allo-rewards-steps.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org6f1c2b2}]{Q-values learned -- allocentric agent}
+\begin{frame}[label={sec:org917fab9}]{Q-values learned -- allocentric agent}
 \begin{center}
 \includegraphics[width=.9\linewidth]{img/FuncApprox-allo-q-values.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org14c38a0}]{Features matrix -- egocentric agent}
+\begin{frame}[label={sec:orge52bd61}]{Features matrix -- egocentric agent}
 \(\to\) Reduced from 400 to 100 locations (25 locations x 4 head directions) + 16 cues (4 cues x 4 head directions)
 \begin{center}
 \includegraphics[height=0.75\textheight]{img/FuncApprox-ego-features-matrix.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org6735624}]{Rewards and steps -- egocentric agent}
+\begin{frame}[label={sec:org9b89dfb}]{Rewards and steps -- egocentric agent}
 \begin{center}
 \includegraphics[width=\textwidth]{img/FuncApprox-ego-rewards-steps.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org353ea85}]{Q-values learned -- egocentric agent}
+\begin{frame}[label={sec:org4f45185}]{Q-values learned -- egocentric agent}
 \begin{center}
 \includegraphics[width=.9\linewidth]{img/FuncApprox-ego-q-values.png}
 \end{center}
 \end{frame}
 \section{Deep RL -- first draft \& issues}
-\label{sec:orgc833944}
-\begin{frame}[label={sec:org1881447}]{Toy task : Random Walk 1D}
+\label{sec:orge8149cc}
+\begin{frame}[label={sec:orgdd36952}]{Toy task : Random Walk 1D}
 \begin{center}
 \includegraphics[width=.9\linewidth]{img/RandomWalk1D-transparent.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:orgb8dd11b}]{Network used}
+\begin{frame}[label={sec:orgdb189ea}]{Network used}
 % https://tikz.net/neural_networks/
 \begin{center}
 \begin{adjustbox}{max height=\textheight, keepaspectratio}
@@ -182,7 +182,7 @@ node 3/.style={node out},
 \end{adjustbox}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org94344ed}]{States and actions}
+\begin{frame}[label={sec:org3a04015}]{States and actions}
 \begin{center}
 \includegraphics[width=.9\linewidth]{img/DRL-states-actions.png}
 \end{center}
@@ -190,7 +190,7 @@ node 3/.style={node out},
 \includegraphics[width=.9\linewidth]{img/DRL-states-actions2.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org10dfb92}]{Rewards and steps}
+\begin{frame}[label={sec:org8eec4e0}]{Rewards and steps}
 \begin{center}
 \includegraphics[width=.9\linewidth]{img/DRL-rewards-steps.png}
 \end{center}
@@ -198,7 +198,7 @@ node 3/.style={node out},
 \includegraphics[width=.9\linewidth]{img/DRL-rewards-steps2.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:orgd88bf50}]{Q-values learned}
+\begin{frame}[label={sec:org8a19d5f}]{Q-values learned}
 \begin{center}
 \includegraphics[width=\textwidth]{img/DRL-q-values.png}
 \end{center}
@@ -206,7 +206,7 @@ node 3/.style={node out},
 \includegraphics[width=\textwidth]{img/DRL-q-values2.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org8f4cbeb}]{Network loss}
+\begin{frame}[label={sec:orga8c2deb}]{Network loss}
 \begin{columns}
 \begin{column}{0.5\columnwidth}
 \centering
@@ -224,7 +224,7 @@ Left leaning
 \end{column}
 \end{columns}
 \end{frame}
-\begin{frame}[label={sec:orge74e4b4}]{Network weights}
+\begin{frame}[label={sec:org54445f7}]{Network weights}
 \centering
 \scriptsize
 Right leaning
@@ -242,7 +242,7 @@ Left leaning
 \includegraphics[width=\textwidth]{img/DRL-weights2.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org163efb6}]{Network gradients}
+\begin{frame}[label={sec:org1a04b2e}]{Network gradients}
 \centering
 \scriptsize
 Right leaning
@@ -260,7 +260,13 @@ Left leaning
 \includegraphics[width=\textwidth]{img/DRL-gradients2.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org865fe73},standout]{~}
+\begin{frame}[label={sec:org10f1340}]{Troubleshooting next steps}
+\begin{itemize}
+\item Loss function?
+\item One more hidden layer?
+\end{itemize}
+\end{frame}
+\begin{frame}[label={sec:orgb7e4b92},standout]{~}
 Questions ?
 \end{frame}
 \end{document}

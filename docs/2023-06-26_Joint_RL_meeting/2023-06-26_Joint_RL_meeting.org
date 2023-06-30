@@ -168,6 +168,9 @@ Left leaning
 #+end_export
 #+ATTR_LaTeX: :width \textwidth
 [[file:img/DRL-gradients2.png]]
+** Troubleshooting next steps
+- Loss function?
+- One more hidden layer?
 ** \nbsp{}
 :PROPERTIES:
 :BEAMER_opt: standout
@@ -193,3 +196,36 @@ Plot activity of each neuron for each of the 25 locations
 - Nb of neurons
 - Architecture
 - Recurrence
+
+** Prelim Niloufar
+*** Medial temporal lobe
+Poo et al 2022, spatial maps
+*** Emphasis on the network, not much about RL
+*** Other metrics?
+**** Loss?
+*** Didn't understand cells maps
+*** Add a LSTM layer after the last hidden layer
+*** Constrains
+- velocity instead of locations
+- dist from boundaries
+- noise
+- Metabolic representation
+*** Mono task agent vs. human multi task agent
+**** Learning actions on a map as sequences (transformers)?
+*** What is an epoch in that case?
+*** How much do you want the model to explain the task or reflect the circuitry?
+*** Either
+**** Map layer to brain region
+**** Fancy correlation algo to say cell behaves like a particular region
+*** Explore network configurations/architecture to map to circuitry
+** Andrea
+*** Strong dependence on \epsilon-greedy to get out of some tiles?
+*** Mean path times
+*** Compare 2 neurons
+Weights attached to neurons 25 to 29
+*** Change reward to have to take an action to get the water?
+*** TODO Try to get rid of the hidden layer
+*** Next meeting
+**** DONE Monday July 3rd debug
+**** Meet with Abdullah
+**** Circuitry Alex/Olivia in July
