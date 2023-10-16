@@ -1,6 +1,7 @@
 ---
 name: rl-olfaction
 channels:
+  - pytorch
   - conda-forge
   - defaults
 dependencies:
@@ -23,5 +24,7 @@ dependencies:
   - tqdm
   - pandas
   - scikit-learn
+  - pytorch
+  - cpuonly
   - pip:
       - imojify
