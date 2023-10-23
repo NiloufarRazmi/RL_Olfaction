@@ -26,7 +26,7 @@ dependencies:
   - pandas
   - scikit-learn
   - pytorch
-  - pytorch-cuda=11.7
-#  - cpuonly
+  # - pytorch-cuda=11.7
+ - cpuonly
   - pip:
       - imojify
