@@ -21,12 +21,12 @@ dependencies:
   - ipywidgets
   - seaborn
   - nb_black
-  # - pre-commit
+  - pre-commit
   - tqdm
   - pandas
   - scikit-learn
   - pytorch
   # - pytorch-cuda=11.7
- - cpuonly
+  - cpuonly
   - pip:
       - imojify
