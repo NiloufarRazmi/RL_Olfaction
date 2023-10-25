@@ -32,9 +32,11 @@ class Ports(Enum):
 #     North = Ports.North.value
 #     South = Ports.South.value
 
+
 class OdorPorts(Enum):
     North = Ports.North.value
     South = Ports.South.value
+
 
 class Actions(Enum):
     UP = 0
@@ -60,14 +62,15 @@ CONTEXTS_LABELS = OrderedDict(
     ]
 )
 
+
 def random_choice(choices_array):
     logits = torch.ones_like(choices_array)
     idx = torch.distributions.categorical.Categorical(logits=logits).sample()
     random_choice = choices_array[idx]
     return random_choice
 
-class ActionSpace:
 
+class ActionSpace:
     def __init__(self):
         self.action_space = set([item.value for item in Actions])
 
@@ -76,6 +79,7 @@ class ActionSpace:
 
     def sample(self):
         return np.random.choice(list(self.action_space))
+
 
 class Environment:
     """Environment logic."""
@@ -108,7 +112,9 @@ class Environment:
             "cue": Cues.NoOdor,
         }
         self.odor_condition = OdorCondition.pre
-        self.odor_ID = Cues(np.random.choice([item.value for item in Cues if item.name != "NoOdor"]))
+        self.odor_ID = Cues(
+            np.random.choice([item.value for item in Cues if item.name != "NoOdor"])
+        )
         return start_state
 
     def get_allowed_tiles(self):
@@ -122,7 +128,6 @@ class Environment:
             raise ValueError("Impossible value, must be `upper` or `lower`")
         allowed_tiles = squared_tiles_array[allowed_tiles == True]
         return allowed_tiles
-
 
     def is_terminated(self, state):
         """Returns if the episode is terminated or not."""
@@ -154,7 +159,7 @@ class Environment:
 
         # Update internal states
         # if new_state["location"] == new_state["cue"].value:
-        if new_state["location"] in {item.value for item in OdorPorts}:
+        if new_state["location"].item() in {item.value for item in OdorPorts}:
             self.odor_condition = OdorCondition.post
             new_state["cue"] = self.odor_ID
 
@@ -174,23 +179,15 @@ class Environment:
 
     def move(self, row, col, a):
         """Where the agent ends up on the map."""
-        # if a == Actions.LEFT.value:
-        #     col = max(col - 1, 0)
-        # elif a == Actions.DOWN.value:
-        #     row = min(row + 1, self.rows - 1)
-        # elif a == Actions.RIGHT.value:
-        #     col = min(col + 1, self.cols - 1)
-        # elif a == Actions.UP.value:
-        #     row = max(row - 1, 0)
         row_max, col_max = self.wall(row, col, a)
         if a == Actions.LEFT.value:
-            col = max(col - 1, col_max)
+            col = torch.tensor([col - 1, col_max]).max()
         elif a == Actions.DOWN.value:
-            row = min(row + 1, row_max)
+            row = torch.tensor([row + 1, row_max]).min()
         elif a == Actions.RIGHT.value:
-            col = min(col + 1, col_max)
+            col = torch.tensor([col + 1, col_max]).min()
         elif a == Actions.UP.value:
-            row = max(row - 1, row_max)
+            row = torch.tensor([row - 1, row_max]).max()
         return (row, col)
 
     def wall(self, row, col, a):
@@ -223,7 +220,7 @@ class Environment:
 class WrappedEnvironment(Environment):
     """Wrap the base Environment class.
 
-    Results in numerical only and flattened state space"""
+    Results in numerical only state space"""
 
     def __init__(self, params, rng=None):
         # Initialize the base class to get the base properties
@@ -233,76 +230,57 @@ class WrappedEnvironment(Environment):
         self.numStates = len(self.state_space)
         self.reset()
 
-    def convert_composite_to_flat_state(self, state):
-        """Convert composite state dictionary to a flat single number."""
-        conv_state = None
-        tiles_num = len(self.tiles_locations)
+    def convert_composite_to_tensor_state(self, state):
+        """Convert composite state dictionary to a tensor."""
+        # conv_state = None
+        # tiles_num = len(self.tiles_locations)
 
-        # if self.odor_condition == OdorCondition.pre:
-        #     if state["cue"] == LightCues.North:
-        #         conv_state = state["location"]
-        #     elif state["cue"] == LightCues.South:
-        #         conv_state = state["location"] + tiles_num
-        # elif self.odor_condition == OdorCondition.post:
-        #     if state["cue"] == OdorID.A:
-        #         conv_state = state["location"] + 2 * tiles_num
-        #     elif state["cue"] == OdorID.B:
-        #         conv_state = state["location"] + 3 * tiles_num
-        if state["cue"] == Cues.NoOdor:
-            conv_state = state["location"] + 0 * tiles_num
-        elif state["cue"] == Cues.OdorA:
-            conv_state = state["location"] + 1 * tiles_num
-        elif state["cue"] == Cues.OdorB:
-            conv_state = state["location"] + 2 * tiles_num
+        # if state["cue"] == Cues.NoOdor:
+        #     conv_state = state["location"] + 0 * tiles_num
+        # elif state["cue"] == Cues.OdorA:
+        #     conv_state = state["location"] + 1 * tiles_num
+        # elif state["cue"] == Cues.OdorB:
+        #     conv_state = state["location"] + 2 * tiles_num
 
-        if conv_state is None:
-            raise ValueError("Impossible value for composite state")
+        # if conv_state is None:
+        #     raise ValueError("Impossible value for composite state")
 
+        conv_state = torch.tensor([state["location"], state["cue"].value])
         return conv_state
 
-    def convert_flat_state_to_composite(self, state):
-        """Convert back flattened state to original composite state."""
-        tiles_num = len(self.tiles_locations)
-        # if state >= 3 * tiles_num and state < 4 * tiles_num:
-        #     conv_state = {
-        #         "location": state - 3 * tiles_num,
-        #         "cue": OdorID.B,
-        #     }
-        # elif state >= 2 * tiles_num and state < 3 * tiles_num:
+    def convert_tensor_state_to_composite(self, state):
+        """Convert back tensor state to original composite state."""
+        # tiles_num = len(self.tiles_locations)
+        # if state >= 2 * tiles_num and state < 3 * tiles_num:
         #     conv_state = {
         #         "location": state - 2 * tiles_num,
-        #         "cue": OdorID.A,
+        #         "cue": Cues.OdorB,
         #     }
-        # elif state >= tiles_num and state < 2 * tiles_num:
-        #     conv_state = {"location": state - tiles_num, "cue": LightCues.South}
-        # elif state >= 0 and state < tiles_num:
-        #     conv_state = {"location": state, "cue": LightCues.North}
-        if state >= 2 * tiles_num and state < 3 * tiles_num:
-            conv_state = {
-                "location": state - 2 * tiles_num,
-                "cue": Cues.OdorB,
-            }
-        elif state >= 1 * tiles_num and state < 2 * tiles_num:
-            conv_state = {
-                "location": state - 1 * tiles_num,
-                "cue": Cues.OdorA,
-            }
-        elif state >= 0 and state < 1 * tiles_num:
-            conv_state = {"location": state, "cue": Cues.NoOdor}
-        else:
-            raise ValueError("Impossible number for flat state")
+        # elif state >= 1 * tiles_num and state < 2 * tiles_num:
+        #     conv_state = {
+        #         "location": state - 1 * tiles_num,
+        #         "cue": Cues.OdorA,
+        #     }
+        # elif state >= 0 and state < 1 * tiles_num:
+        #     conv_state = {"location": state, "cue": Cues.NoOdor}
+        # else:
+        #     raise ValueError("Impossible number for flat state")
+
+        conv_state = {
+            "location": state[0],
+            "cue": Cues(state[1].item()),
+        }
         return conv_state
 
     def step(self, action, current_state):
         """Wrapper around the base method."""
-        import ipdb; ipdb.set_trace()
-        current_conv_state = self.convert_flat_state_to_composite(current_state)
+        current_conv_state = self.convert_tensor_state_to_composite(current_state)
         new_state, reward, done = super().step(action, current_conv_state)
-        new_state_conv = self.convert_composite_to_flat_state(new_state)
+        new_state_conv = self.convert_composite_to_tensor_state(new_state)
         return new_state_conv, reward, done
 
     def reset(self):
         """Wrapper around the base method."""
         state = super().reset()
-        conv_state = self.convert_composite_to_flat_state(state)
+        conv_state = self.convert_composite_to_tensor_state(state)
         return conv_state

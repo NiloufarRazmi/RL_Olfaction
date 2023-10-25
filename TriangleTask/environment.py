@@ -31,9 +31,11 @@ class Ports(Enum):
 #     North = Ports.North.value
 #     South = Ports.South.value
 
+
 class OdorPorts(Enum):
     North = Ports.North.value
     South = Ports.South.value
+
 
 class Actions(Enum):
     UP = 0
@@ -59,8 +61,8 @@ CONTEXTS_LABELS = OrderedDict(
     ]
 )
 
-class ActionSpace:
 
+class ActionSpace:
     def __init__(self):
         self.action_space = set([item.value for item in Actions])
 
@@ -69,6 +71,7 @@ class ActionSpace:
 
     def sample(self):
         return np.random.choice(list(self.action_space))
+
 
 class Environment:
     """Environment logic."""
@@ -102,12 +105,16 @@ class Environment:
             "cue": Cues.NoOdor,
         }
         self.odor_condition = OdorCondition.pre
-        self.odor_ID = Cues(np.random.choice([item.value for item in Cues if item.name != "NoOdor"]))
+        self.odor_ID = Cues(
+            np.random.choice([item.value for item in Cues if item.name != "NoOdor"])
+        )
         return start_state
 
     def get_allowed_tiles(self):
         """Get allowed tiles based on `TriangleState`"""
-        squared_tiles_array = np.array(list(self.tiles_locations)).reshape((self.rows, self.cols))
+        squared_tiles_array = np.array(list(self.tiles_locations)).reshape(
+            (self.rows, self.cols)
+        )
         if self.TriangleState == TriangleState.lower:
             allowed_tiles = np.tri(self.rows, self.cols, 0).astype(bool)
         elif self.TriangleState == TriangleState.upper:
@@ -116,7 +123,6 @@ class Environment:
             raise ValueError("Impossible value, must be `upper` or `lower`")
         allowed_tiles = squared_tiles_array[allowed_tiles == True]
         return allowed_tiles
-
 
     def is_terminated(self, state):
         """Returns if the episode is terminated or not."""

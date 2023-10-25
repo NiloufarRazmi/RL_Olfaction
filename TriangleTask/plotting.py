@@ -6,20 +6,31 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
+
 # from curlyBrace import curlyBrace
 from imojify import imojify
 from matplotlib.offsetbox import AnnotationBbox, OffsetImage
 from utils import get_location_count
 
 sns.set_theme(font_scale=1.5)
-mpl.rcParams["font.family"] = ["Fira Sans", "sans-serif"]
+mpl.rcParams["font.family"] = ["sans-serif"]
+mpl.rcParams["font.sans-serif"] = [
+    "Fira Sans",
+    "Computer Modern Sans Serif",
+    "DejaVu Sans",
+    "Verdana",
+    "Arial",
+    "Helvetica",
+]
 # plt.rcParams['text.usetex'] = True
 
 PLOTS_PATH = Path("plots")
 
+
 def check_plots():
     if not PLOTS_PATH.exists():
         os.mkdir(PLOTS_PATH)
+
 
 def plot_steps_and_rewards(df, n_runs=0, log=None):
     fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(15, 5))
@@ -45,7 +56,7 @@ def plot_steps_and_rewards(df, n_runs=0, log=None):
 
     fig.tight_layout()
     check_plots()
-    plt.savefig(PLOTS_PATH / 'rew+steps.png', bbox_inches='tight')
+    plt.savefig(PLOTS_PATH / "rew+steps.png", bbox_inches="tight")
     plt.show()
 
 
@@ -294,7 +305,7 @@ def plot_states_actions_distribution(states, actions):
     ax[1].set_title("Actions")
     fig.tight_layout()
     check_plots()
-    plt.savefig(PLOTS_PATH / 'states+actions.png', bbox_inches='tight')
+    plt.savefig(PLOTS_PATH / "states+actions.png", bbox_inches="tight")
     plt.show()
 
 
