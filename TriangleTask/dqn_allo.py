@@ -13,6 +13,12 @@
 #     name: python3
 # ---
 
+# %% [markdown]
+# # DQN
+
+# %% [markdown]
+# ## Init
+
 # %%
 import math
 import random
@@ -39,13 +45,13 @@ import plotting
 
 # %%
 # Formatting & autoreload stuff
-# %load_ext lab_black
+# # %load_ext lab_black
 # %load_ext autoreload
 # %autoreload 2
 
 # %%
 # Choose the parameters for the task
-params = Params(epsilon=0.1, n_runs=1, numEpisodes=50)
+params = Params(epsilon=0.1, n_runs=1, numEpisodes=100000)
 params
 
 # %%
@@ -65,7 +71,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 device
 
 # %% [markdown]
-# ## Replay Memory
+# ### Replay Memory
 #
 # We'll be using experience replay memory for training our DQN. It stores
 # the transitions that the agent observes, allowing us to reuse this data
@@ -324,7 +330,7 @@ for run in range(params.n_runs):  # Run several times to account for stochastici
         # state = torch.tensor(state, dtype=torch.float32, device=device).unsqueeze(0)
         # state = torch.tensor(state, device=device).unsqueeze(0)
         # state = state.clone().float().detach().unsqueeze(0)
-        state = state.clone().float().detach()
+        state = state.clone().float().detach().to(device)
         step_count = 0
         done = False
         total_rewards = 0
@@ -395,6 +401,9 @@ state, env.TriangleState
 # %%
 observation, reward, done = env.step(action=1, current_state=torch.tensor([19, 2]))
 observation, reward, done, env.odor_condition, env.TriangleState
+
+# %% [markdown]
+# ## Visualization
 
 # %%
 res = pd.DataFrame(

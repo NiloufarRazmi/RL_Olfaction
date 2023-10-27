@@ -61,6 +61,7 @@ CONTEXTS_LABELS = OrderedDict(
         (Cues.OdorB, "Odor B"),
     ]
 )
+DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 
 def random_choice(choices_array):
@@ -89,7 +90,7 @@ class Environment:
             self.rng = rng
         self.rows = 5
         self.cols = 5
-        self.tiles_locations = torch.arange(self.rows * self.cols)
+        self.tiles_locations = torch.arange(self.rows * self.cols, device=DEVICE)
         # self.cues = [*LightCues, *OdorID]
 
         # self.action_space = set([item.value for item in Actions])
@@ -181,13 +182,13 @@ class Environment:
         """Where the agent ends up on the map."""
         row_max, col_max = self.wall(row, col, a)
         if a == Actions.LEFT.value:
-            col = torch.tensor([col - 1, col_max]).max()
+            col = torch.tensor([col - 1, col_max], device=DEVICE).max()
         elif a == Actions.DOWN.value:
-            row = torch.tensor([row + 1, row_max]).min()
+            row = torch.tensor([row + 1, row_max], device=DEVICE).min()
         elif a == Actions.RIGHT.value:
-            col = torch.tensor([col + 1, col_max]).min()
+            col = torch.tensor([col + 1, col_max], device=DEVICE).min()
         elif a == Actions.UP.value:
-            row = torch.tensor([row - 1, row_max]).max()
+            row = torch.tensor([row - 1, row_max], device=DEVICE).max()
         return (row, col)
 
     def wall(self, row, col, a):
@@ -245,7 +246,9 @@ class WrappedEnvironment(Environment):
         # if conv_state is None:
         #     raise ValueError("Impossible value for composite state")
 
-        conv_state = torch.tensor([state["location"], state["cue"].value])
+        conv_state = torch.tensor(
+            [state["location"], state["cue"].value], device=DEVICE
+        )
         return conv_state
 
     def convert_tensor_state_to_composite(self, state):

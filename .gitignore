@@ -11,3 +11,4 @@ wtMatrix.json
 **/.auctex-auto
 *.bkp
 *.dtmp
+*.venv/
