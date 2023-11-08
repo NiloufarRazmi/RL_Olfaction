@@ -24,6 +24,7 @@ import math
 import random
 from collections import namedtuple, deque
 from itertools import count
+from pathlib import Path
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -51,7 +52,7 @@ import plotting
 
 # %%
 # Choose the parameters for the task
-params = Params(epsilon=0.1, n_runs=1, numEpisodes=100000)
+params = Params(epsilon=0.1, n_runs=1, numEpisodes=6)
 params
 
 # %%
@@ -322,9 +323,27 @@ all_states = []
 all_actions = []
 losses = []
 
+checkpoints_path = Path("checkpoints")
+if not checkpoints_path.exists():
+    checkpoints_path.mkdir(parents=True, exist_ok=True)
+checkpoint_path = checkpoints_path.joinpath(f"checkpoint.pt")
+
 for run in range(params.n_runs):  # Run several times to account for stochasticity
+    # Load checkpoint
+    if checkpoint_path.exists():
+        checkpoint = torch.load(checkpoint_path)
+        target_net.load_state_dict(checkpoint["target_net_state_dict"])
+        policy_net.load_state_dict(checkpoint["policy_net_state_dict"])
+        optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
+        loss = checkpoint["loss"]
+        episode = checkpoint["episode"].item()
+    else:
+        episode = -1
+
     for episode in tqdm(
-        episodes, desc=f"Run {run+1}/{params.n_runs} - Episodes", leave=False
+        episodes[episode + 1 :],
+        desc=f"Run {run+1}/{params.n_runs} - Episodes",
+        leave=False,
     ):
         state = env.reset()  # Reset the environment
         # state = torch.tensor(state, dtype=torch.float32, device=device).unsqueeze(0)
@@ -385,6 +404,23 @@ for run in range(params.n_runs):  # Run several times to account for stochastici
         rewards[episode, run] = total_rewards
         steps[episode, run] = step_count
 
+        # Save checkpoint
+        torch.save(
+            {
+                "episode": episode,
+                "optimizer_state_dict": optimizer.state_dict(),
+                "loss": loss,
+                "target_net_state_dict": target_net.state_dict(),
+                "policy_net_state_dict": policy_net.state_dict(),
+            },
+            checkpoint_path,
+        )
+
+# %%
+checkpoint = torch.load(checkpoint_path)
+episode = checkpoint["episode"]
+print(f"Last episode number: {episode.item() + 1}")
+
 # %%
 env.action_space
 
@@ -417,14 +453,11 @@ res["cum_rewards"] = rewards.cpu().numpy().cumsum(axis=0).flatten(order="F")
 res.head(20)
 
 # %%
-all_states[:10]
-
-# %%
-tmp = []
-for idx, st in enumerate(tqdm(all_states)):
-    tmp.append(env.convert_tensor_state_to_composite(st))
-all_state_composite = pd.DataFrame(tmp)
-all_state_composite
+# tmp = []
+# for idx, st in enumerate(tqdm(all_states)):
+#     tmp.append(env.convert_tensor_state_to_composite(st))
+# all_state_composite = pd.DataFrame(tmp)
+# all_state_composite
 
 # %%
 plotting.plot_states_actions_distribution(all_states, all_actions)

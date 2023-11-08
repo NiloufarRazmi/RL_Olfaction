@@ -1,0 +1,33 @@
+#+title: To-Do
+* Running is slow
+** TODO Implement checkpointing to save the model parameters and not have to start from scratch everytime
+[[https://pytorch.org/tutorials/beginner/saving_loading_models.html#saving-loading-a-general-checkpoint-for-inference-and-or-resuming-training]]
+** Profile code on the GPU
+** Simplify model
+*** Remove target network?
+*** Remove replay traces?
+*** TODO Replace decaying \epsilon-greedy with my own
+* Remote GPU
+** TODO Run as batch script
+*** DONE Run Jupytext converted script
+*** Convert training as a script with arguments
+**** Notebook should be refactored for loading weights, inference and plotting
+**** Example:
+[[https://github.com/NICALab/SUPPORT/blob/main/src/train.py][~train.py~ example script]] which can be run with ~python -m src.train --exp_name mytest --n_epochs 11 --checkpoint_interval 10~
+** Setup Tensorboard
+*** Tuto
+- https://pytorch.org/tutorials/recipes/recipes/tensorboard_with_pytorch.html
+- https://pytorch.org/tutorials/intermediate/tensorboard_tutorial.html
+*** KILL + Make tutorial for Oscar?
+* Viz
+** Improve loss plot?
+Make number of bins not relative to the numer of episodes?
+
+** Get info during training training
+*** TODO Either screen + interactive session
+*** WAIT Or batch script that writes in a file
+Using  Tensorboard ~SummaryWriter~
+** Plot weights and neurons activations?
+Get inspiration from https://pair.withgoogle.com/explorables/grokking/
+* Model doesn't converge
+** TODO Try to apply on simple MDP

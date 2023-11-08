@@ -24,7 +24,9 @@ mpl.rcParams["font.sans-serif"] = [
 ]
 # plt.rcParams['text.usetex'] = True
 
-PLOTS_PATH = Path("plots")
+
+ROOT_PATH = Path(__file__).parent
+PLOTS_PATH = ROOT_PATH / "plots"
 
 
 def check_plots():
