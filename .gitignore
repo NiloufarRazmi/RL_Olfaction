@@ -15,3 +15,5 @@ tmp/
 *.aux
 *.fls
 *.fdb_latexmk
+.virtual_documents
+.spyproject

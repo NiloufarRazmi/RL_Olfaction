@@ -28,5 +28,8 @@ dependencies:
   - pytorch
   # - pytorch-cuda=11.7
   - cpuonly
+  - spyder
+  - spyder-notebook
+  - torchinfo
   - pip:
       - imojify
