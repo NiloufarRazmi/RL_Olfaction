@@ -576,49 +576,31 @@ def plot_q_values(q_values):
 plot_q_values(q_values)
 
 # %%
-# losses_filt = np.array(list(filter(lambda item: item != None, losses)))
-# losses_filt
-
-# %%
-losses = [torch.tensor(loss, device=device) for loss in losses]
-
-# %%
-# losses = torch.tensor(losses, device=device)
-
-# %%
-# Bins = np.round(np.linspace(0, len(losses), num=1000)).astype(int)
-
-# meanError = np.zeros_like(Bins) * np.nan
-# for i in range(len(Bins) - 1):
-#     meanError[i] = np.nanmean(abs(losses[Bins[i] : Bins[i + 1]]))
-# # meanError
-
-# %%
-# fig, ax = plt.subplots()
-# ax.plot(meanError)
-# ax.set(ylabel="Loss")
-# ax.set(xlabel="Batches")
-# fig.patch.set_alpha(0)
-# fig.patch.set_facecolor("white")
-# check_plots()
-# plt.savefig(PLOTS_PATH / "Loss.png", bbox_inches="tight")
-# plt.show()
-
-# %%
-losses_rolling_avg = nn.functional.avg_pool1d(
-    losses[1].view(1, 1, -1), kernel_size=10
-).squeeze()
+window_size = 10
+for idx, loss in enumerate(losses):
+    current_loss = torch.tensor(loss, device=device)
+    losses_rolling_avg = nn.functional.avg_pool1d(
+        current_loss.view(1, 1, -1), kernel_size=window_size
+    ).squeeze()
+    tmp_df = pd.DataFrame(
+        data={
+            "Run": idx * torch.ones(len(losses_rolling_avg), device=device).int(),
+            "Steps": torch.arange(0, len(losses_rolling_avg), device=device),
+            "Loss": losses_rolling_avg,
+        }
+    )
+    if idx == 0:
+        loss_df = tmp_df
+    else:
+        loss_df = pd.concat((loss_df, tmp_df))
+loss_df
 
 # %%
 fig, ax = plt.subplots()
-ax.plot(losses_rolling_avg)
-ax.set(ylabel="Loss")
+sns.lineplot(data=loss_df, x="Steps", y="Loss", ax=ax)
+ax.set(ylabel=f"Loss\naveraged over {p.n_runs} runs" if p.n_runs > 1 else "Loss")
 ax.set(xlabel="Batches")
-fig.patch.set_alpha(0)
-fig.patch.set_facecolor("white")
-check_plots()
-plt.savefig(PLOTS_PATH / "Loss.png", bbox_inches="tight")
-plt.show()
+fig.tight_layout()
 plt.show()
 
 # %%
