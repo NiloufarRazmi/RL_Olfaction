@@ -1,49 +1,41 @@
 from dataclasses import dataclass
+from typing import Optional
 
-import numpy as np
-from sklearn.preprocessing import minmax_scale
+import torch
 
 
 @dataclass
 class Params:
     """Container class to keep track of all hyperparameters."""
 
-    epsilon: float = 0.1  # Action-selection parameters
+    # General
+    seed: Optional[int] = None
+    rng: Optional[int] = None
 
-    # QLearning parameters
+    # Experiment
+    n_runs: int = 10
+    total_episodes: int = 100  # Set up the task
+
+    # epsilon-greedy
+    epsilon: float = 0.2  # Action-selection parameters
+
+    # Learning parameters
     gamma: float = 0.8
-    alpha: float = 0.05
-    jointRep: bool = True
+    alpha: float = 0.1
 
-    n_runs: int = 5
-    numEpisodes: int = 100  # Set up the task
+    # Deep network
+    nLayers: int = 5
+    nHiddenUnits: int = 20
+
+    # Environment
+    # action_size: Optional[int] = None
+    # state_size: Optional[int] = None
+    n_observations: Optional[int] = None
+    n_actions: Optional[int] = None
 
 
-def get_location_count(
-    all_state_composite, tiles_locations, cols, rows, cue=None, scale=True
-):
-    """Count the occurences for each tile location.
-
-    Optionally filter by `cue`"""
-    location_count = np.zeros(len(tiles_locations))
-    for tile in tiles_locations:
-        if cue:  # Select based on chosen cue
-            location_count[tile] = len(
-                all_state_composite[
-                    (all_state_composite.location == tile)
-                    & (all_state_composite.cue == cue)
-                ]
-            )
-        else:  # Select
-            location_count[tile] = len(
-                all_state_composite[all_state_composite.location == tile]
-            )
-
-    if scale:
-        # Scale to [0, 1]
-        locations_scaled = minmax_scale(location_count.flatten())
-        loc_count = locations_scaled.reshape((rows, cols))
-    else:
-        loc_count = location_count.reshape((rows, cols))
-
-    return loc_count
+def random_choice(choices_array):
+    logits = torch.ones_like(choices_array)
+    idx = torch.distributions.categorical.Categorical(logits=logits).sample()
+    random_choice = choices_array[idx]
+    return random_choice

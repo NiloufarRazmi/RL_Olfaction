@@ -28,7 +28,6 @@ import ipdb
 import matplotlib as mpl
 import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 import seaborn as sns
 
@@ -49,7 +48,7 @@ device
 from environment_tensor import CONTEXTS_LABELS, Actions, Cues, WrappedEnvironment
 
 # %%
-from utils import Params
+from utils import Params, random_choice
 
 # %%
 # Formatting & autoreload stuff
@@ -87,47 +86,12 @@ def check_plots():
 # ## Parameters
 
 # %%
-from dataclasses import dataclass
-from typing import Optional
-
-
-@dataclass
-class Params:
-    """Container class to keep track of all hyperparameters."""
-
-    # General
-    seed: Optional[int] = None
-    rng: Optional[int] = None
-
-    # Experiment
-    n_runs: int = 10
-    total_episodes: int = 100  # Set up the task
-
-    # epsilon-greedy
-    epsilon: float = 0.2  # Action-selection parameters
-
-    # Learning parameters
-    gamma: float = 0.8
-    alpha: float = 0.1
-
-    # Deep network
-    nLayers: int = 5
-    nHiddenUnits: int = 20
-
-    # Environment
-    # action_size: Optional[int] = None
-    # state_size: Optional[int] = None
-    n_observations: Optional[int] = None
-    n_actions: Optional[int] = None
-
-
-# %%
 p = Params(
     seed=42,
     n_runs=1,
     total_episodes=200,
-    epsilon=0.1,
-    alpha=0.01,
+    epsilon=0.2,
+    alpha=0.1,
     gamma=0.9,
     nHiddenUnits=5 * 5 + 2,
 )
@@ -211,12 +175,6 @@ class EpsilonGreedy:
 
     def choose_action(self, action_space, state, state_action_values):
         """Choose an action a in the current world state (s)"""
-
-        def random_choice(choices_array):
-            logits = torch.ones_like(choices_array)
-            idx = torch.distributions.categorical.Categorical(logits=logits).sample()
-            random_choice = choices_array[idx]
-            return random_choice
 
         def sample(action_space):
             return random_choice(action_space)
@@ -316,7 +274,7 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
             next_state_values = state_action_values
             if done:
                 # next_state_values[action.item()] = 0
-                next_state_values = torch.zeros(1)
+                next_state_values = torch.zeros(1, device=device)
             else:
                 # next_state_values[action.item()] = net(state).max()
                 next_state_values = net(state).max()
@@ -329,7 +287,7 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
             # loss = criterion(state_action_values, expected_state_action_values)
             # if state_action_values[action.item()].shape != expected_state_action_values.shape:
             loss = criterion(
-                state_action_values[action.item()].unsqueeze(-1),
+                state_action_values[action].unsqueeze(-1),
                 expected_state_action_values,
             )
 

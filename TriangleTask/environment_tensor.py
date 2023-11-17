@@ -1,8 +1,8 @@
 from collections import OrderedDict
 from enum import Enum
 
-import numpy as np
 import torch
+from utils import random_choice
 
 
 class OdorCondition(Enum):
@@ -79,7 +79,7 @@ def random_choice(choices_array):
 #         return self.action_space
 
 #     def sample(self):
-#         return np.random.choice(list(self.action_space))
+#         return random_choice(list(self.action_space))
 
 
 class Environment:
@@ -110,14 +110,23 @@ class Environment:
 
     def reset(self):
         """Reset the environment."""
-        self.TriangleState = np.random.choice(TriangleState)
+        self.TriangleState = TriangleState(
+            random_choice(
+                torch.tensor([item.value for item in TriangleState], device=DEVICE)
+            ).item()
+        )
         start_state = {
             "location": random_choice(self.get_allowed_tiles()),
             "cue": Cues.NoOdor,
         }
         self.odor_condition = OdorCondition.pre
         self.odor_ID = Cues(
-            np.random.choice([item.value for item in Cues if item.name != "NoOdor"])
+            random_choice(
+                torch.tensor(
+                    [item.value for item in Cues if item.name != "NoOdor"],
+                    device=DEVICE,
+                )
+            ).item()
         )
         return start_state
 
