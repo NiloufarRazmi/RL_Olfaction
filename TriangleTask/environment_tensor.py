@@ -64,13 +64,6 @@ CONTEXTS_LABELS = OrderedDict(
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 
-def random_choice(choices_array):
-    logits = torch.ones_like(choices_array)
-    idx = torch.distributions.categorical.Categorical(logits=logits).sample()
-    random_choice = choices_array[idx]
-    return random_choice
-
-
 # class ActionSpace:
 #     def __init__(self):
 #         self.action_space = set([item.value for item in Actions])
@@ -85,7 +78,7 @@ def random_choice(choices_array):
 class Environment:
     """Environment logic."""
 
-    def __init__(self, params, rng=None):
+    def __init__(self, rng=None):
         if rng:
             self.rng = rng
         self.rows = 5
@@ -235,9 +228,9 @@ class WrappedEnvironment(Environment):
 
     Results in numerical only state space"""
 
-    def __init__(self, params, rng=None):
+    def __init__(self, rng=None):
         # Initialize the base class to get the base properties
-        super().__init__(params, rng=None)
+        super().__init__(rng=None)
 
         self.state_space = torch.arange(self.rows * self.cols * len(Cues))
         self.numStates = len(self.state_space)

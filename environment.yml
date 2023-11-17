@@ -26,10 +26,11 @@ dependencies:
   - pandas
   - scikit-learn
   - pytorch
-  # - cpuonly
-  - pytorch-cuda
+  - cpuonly
+  # - pytorch-cuda
   # - spyder
   # - spyder-notebook
   - torchinfo
+  - pytest
   - pip:
       - imojify

@@ -19,35 +19,36 @@
 # %% [markdown]
 # ## Dependencies
 
-# %%
-from pathlib import Path
 import os
 
-import ipdb
+# %%
+from pathlib import Path
 
-from tqdm import tqdm
-import matplotlib.pyplot as plt
+import ipdb
 import matplotlib as mpl
 import matplotlib.patches as mpatches
-from matplotlib.offsetbox import AnnotationBbox, OffsetImage
+import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
-from imojify import imojify
 
 # %%
 import torch
 import torch.nn as nn
-import torch.optim as optim
 import torch.nn.functional as F
+import torch.optim as optim
+from imojify import imojify
+from matplotlib.offsetbox import AnnotationBbox, OffsetImage
 from torchinfo import summary
+from tqdm import tqdm
 
 # if GPU is to be used
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 device
 
+from environment_tensor import CONTEXTS_LABELS, Actions, Cues, WrappedEnvironment
+
 # %%
 from utils import Params, random_choice
-from environment_tensor import WrappedEnvironment, Actions, CONTEXTS_LABELS, Cues
 
 # %%
 # Formatting & autoreload stuff
@@ -105,7 +106,7 @@ p
 
 # %%
 # Load the environment
-env = WrappedEnvironment(p)
+env = WrappedEnvironment()
 
 # %%
 # Get number of actions
@@ -133,7 +134,7 @@ class DQN(nn.Module):
             nn.Linear(n_observations, n_units),
             nn.Linear(n_units, n_units),
             nn.Linear(n_units, n_units),
-            # nn.ReLU(),
+            nn.ReLU(),
             nn.Linear(n_units, n_actions),
         )
 
