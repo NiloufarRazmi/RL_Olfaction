@@ -19,36 +19,35 @@
 # %% [markdown]
 # ## Dependencies
 
-import os
-
 # %%
 from pathlib import Path
+import os
 
 import ipdb
+
+from tqdm import tqdm
+import matplotlib.pyplot as plt
 import matplotlib as mpl
 import matplotlib.patches as mpatches
-import matplotlib.pyplot as plt
+from matplotlib.offsetbox import AnnotationBbox, OffsetImage
 import pandas as pd
 import seaborn as sns
+from imojify import imojify
 
 # %%
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 import torch.optim as optim
-from imojify import imojify
-from matplotlib.offsetbox import AnnotationBbox, OffsetImage
+import torch.nn.functional as F
 from torchinfo import summary
-from tqdm import tqdm
 
 # if GPU is to be used
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 device
 
-from environment_tensor import CONTEXTS_LABELS, Actions, Cues, WrappedEnvironment
-
 # %%
 from utils import Params, random_choice
+from environment_tensor import WrappedEnvironment, Actions, CONTEXTS_LABELS, Cues
 
 # %%
 # Formatting & autoreload stuff
@@ -394,9 +393,9 @@ def postprocess(episodes, p, rewards, steps):
     """Convert the results of the simulation in dataframes."""
     res = pd.DataFrame(
         data={
-            "Episodes": episodes.tile(p.n_runs),
-            "Rewards": rewards.T.flatten(),
-            "Steps": steps.T.flatten(),
+            "Episodes": episodes.tile(p.n_runs).cpu(),
+            "Rewards": rewards.T.flatten().cpu(),
+            "Steps": steps.T.flatten().cpu(),
         }
     )
     # res["cum_rewards"] = rewards.cumsum(axis=0).flatten(order="F")
@@ -466,9 +465,9 @@ for idx, loss in enumerate(losses):
     ).squeeze()
     tmp_df = pd.DataFrame(
         data={
-            "Run": idx * torch.ones(len(losses_rolling_avg), device=device).int(),
-            "Steps": torch.arange(0, len(losses_rolling_avg), device=device),
-            "Loss": losses_rolling_avg,
+            "Run": idx * torch.ones(len(losses_rolling_avg), device=device).int().cpu(),
+            "Steps": torch.arange(0, len(losses_rolling_avg), device=device).cpu(),
+            "Loss": losses_rolling_avg.cpu(),
         }
     )
     if idx == 0:
