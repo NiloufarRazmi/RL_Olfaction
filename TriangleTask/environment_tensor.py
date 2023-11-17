@@ -71,15 +71,15 @@ def random_choice(choices_array):
     return random_choice
 
 
-class ActionSpace:
-    def __init__(self):
-        self.action_space = set([item.value for item in Actions])
+# class ActionSpace:
+#     def __init__(self):
+#         self.action_space = set([item.value for item in Actions])
 
-    def __call__(self):
-        return self.action_space
+#     def __call__(self):
+#         return self.action_space
 
-    def sample(self):
-        return np.random.choice(list(self.action_space))
+#     def sample(self):
+#         return np.random.choice(list(self.action_space))
 
 
 class Environment:
@@ -93,9 +93,12 @@ class Environment:
         self.tiles_locations = torch.arange(self.rows * self.cols, device=DEVICE)
         # self.cues = [*LightCues, *OdorID]
 
-        # self.action_space = set([item.value for item in Actions])
-        self.action_space = ActionSpace()
-        self.numActions = len(self.action_space())
+        self.action_space = torch.tensor(
+            [item.value for item in Actions], device=DEVICE
+        )
+        # self.action_space = ActionSpace()
+        # self.numActions = len(self.action_space())
+        self.numActions = len(self.action_space)
 
         self.state_space = {
             "location": self.tiles_locations,

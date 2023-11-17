@@ -46,12 +46,10 @@ from tqdm import tqdm
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 device
 
-from env.RandomWalk1D_tensor import Actions, RandomWalk1D
+from environment_tensor import CONTEXTS_LABELS, Actions, Cues, WrappedEnvironment
 
 # %%
 from utils import Params
-
-# from agent import EpsilonGreedy
 
 # %%
 # Formatting & autoreload stuff
@@ -89,14 +87,49 @@ def check_plots():
 # ## Parameters
 
 # %%
+from dataclasses import dataclass
+from typing import Optional
+
+
+@dataclass
+class Params:
+    """Container class to keep track of all hyperparameters."""
+
+    # General
+    seed: Optional[int] = None
+    rng: Optional[int] = None
+
+    # Experiment
+    n_runs: int = 10
+    total_episodes: int = 100  # Set up the task
+
+    # epsilon-greedy
+    epsilon: float = 0.2  # Action-selection parameters
+
+    # Learning parameters
+    gamma: float = 0.8
+    alpha: float = 0.1
+
+    # Deep network
+    nLayers: int = 5
+    nHiddenUnits: int = 20
+
+    # Environment
+    # action_size: Optional[int] = None
+    # state_size: Optional[int] = None
+    n_observations: Optional[int] = None
+    n_actions: Optional[int] = None
+
+
+# %%
 p = Params(
     seed=42,
-    n_runs=20,
+    n_runs=1,
     total_episodes=200,
     epsilon=0.1,
-    alpha=0.1,
+    alpha=0.01,
     gamma=0.9,
-    nHiddenUnits=14,
+    nHiddenUnits=5 * 5 + 2,
 )
 p
 
@@ -107,28 +140,22 @@ p
 # %% [markdown]
 # ## The environment
 
-# %% [markdown]
-# ![The task](https://juliareinforcementlearning.org/docs/assets/RandomWalk1D.png)
-
 # %%
-env = RandomWalk1D()
-
-# %%
-p.action_size = len(env.action_space)
-p.state_size = len(env.observation_space)
-print(f"Action size: {p.action_size}")
-print(f"State size: {p.state_size}")
+# Load the environment
+env = WrappedEnvironment(p)
 
 # %%
 # Get number of actions
 # n_actions = env.action_space.n
-n_actions = env.numActions
+p.n_actions = env.numActions
+
 # Get the number of state observations
 # state, info = env.reset()
 state = env.reset()
-n_observations = state.shape[0]
-print(f"Number of actions: {n_actions}")
-print(f"Number of observations: {n_observations}")
+p.n_observations = len(state)
+
+print(f"Number of actions: {p.n_actions}")
+print(f"Number of observations: {p.n_observations}")
 
 
 # %% [markdown]
@@ -141,7 +168,8 @@ class DQN(nn.Module):
         super(DQN, self).__init__()
         self.mlp = nn.Sequential(
             nn.Linear(n_observations, n_units),
-            # nn.Linear(n_units, n_units),
+            nn.Linear(n_units, n_units),
+            nn.Linear(n_units, n_units),
             # nn.ReLU(),
             nn.Linear(n_units, n_actions),
         )
@@ -152,13 +180,13 @@ class DQN(nn.Module):
 
 # %%
 net = DQN(
-    n_observations=n_observations, n_actions=n_actions, n_units=p.nHiddenUnits
+    n_observations=p.n_observations, n_actions=p.n_actions, n_units=p.nHiddenUnits
 ).to(device)
 net
 
 # %%
-print("Model parameters:")
-print(list(net.parameters()))
+# print("Model parameters:")
+# print(list(net.parameters()))
 print("\n\nParameters sizes summary:")
 print([item.shape for item in net.parameters()])
 
@@ -235,7 +263,7 @@ episode_durations = []
 for run in range(p.n_runs):  # Run several times to account for stochasticity
     # Reset model
     net = DQN(
-        n_observations=n_observations, n_actions=n_actions, n_units=p.nHiddenUnits
+        n_observations=p.n_observations, n_actions=p.n_actions, n_units=p.nHiddenUnits
     ).to(device)
     optimizer = optim.AdamW(net.parameters(), lr=p.alpha, amsgrad=True)
 
@@ -257,10 +285,12 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
             )
 
             # # Record states and actions
-            all_states.append(state.item())
+            all_states.append(state)
             all_actions.append(Actions(action.item()).name)
 
-            observation, reward, done = env.step(action.item())
+            observation, reward, done = env.step(
+                action=action.item(), current_state=state
+            )
             # if reward != 0:
             #     ipdb.set_trace()
             reward = torch.tensor([reward], device=device)
@@ -298,7 +328,6 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
             criterion = nn.MSELoss()
             # loss = criterion(state_action_values, expected_state_action_values)
             # if state_action_values[action.item()].shape != expected_state_action_values.shape:
-            #     ipdb.set_trace()
             loss = criterion(
                 state_action_values[action.item()].unsqueeze(-1),
                 expected_state_action_values,
@@ -430,7 +459,7 @@ res
 def plot_states_actions_distribution(states, actions):
     """Plot the distributions of states and actions."""
     fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(13, 5))
-    sns.histplot(data=states, ax=ax[0])
+    # sns.histplot(data=states, ax=ax[0])
     ax[0].set_title("States")
     sns.histplot(data=actions, ax=ax[1])
     ax[1].set_xticks(
@@ -471,112 +500,7 @@ def plot_steps_and_rewards(df):
 plot_steps_and_rewards(res)
 
 # %%
-q_values = torch.nan * torch.empty((p.state_size, p.action_size), device=device)
-for state_i, state_v in enumerate(torch.arange(p.state_size, device=device)):
-    if state_i in [0, len(q_values) - 1]:
-        # q_values[state_i,] = 0
-        continue
-    q_values[state_i,] = net(state_v.unsqueeze(-1).float())
-q_values
-
-# %%
-q_values.flatten()[None, :].shape
-
-# %%
-q_values.flatten().unsqueeze(0).shape
-
-
-# %%
-def plot_q_values(q_values):
-    fig, ax = plt.subplots(figsize=(15, 1.5))
-    cmap = sns.color_palette("vlag", as_cmap=True)
-    chart = sns.heatmap(
-        q_values.detach().numpy().flatten()[None, :],
-        annot=True,
-        ax=ax,
-        cmap=cmap,
-        yticklabels=False,  # linewidth=0.5
-        center=0,
-    )
-    states_nodes = torch.arange(1, 14, 2, device=device)
-    chart.set_xticks(states_nodes)
-    chart.set_xticklabels(
-        [str(item.item()) for item in torch.arange(1, 8, 1, device=device)]
-    )
-    chart.set_title("Q values")
-    ax.tick_params(bottom=True)
-
-    # Add actions arrows
-    for node in states_nodes:
-        y_height = 1.7
-        if node in [1, 13]:
-            continue
-        arrows_left = {
-            "x_tail": node,
-            "y_tail": y_height,
-            "x_head": node - 1,
-            "y_head": y_height,
-        }
-        arrow = mpatches.FancyArrowPatch(
-            (arrows_left["x_tail"], arrows_left["y_tail"]),
-            (arrows_left["x_head"], arrows_left["y_head"]),
-            mutation_scale=10,
-            clip_on=False,
-            color="k",
-        )
-        ax.add_patch(arrow)
-        arrows_right = {
-            "x_tail": node,
-            "y_tail": y_height,
-            "x_head": node + 1,
-            "y_head": y_height,
-        }
-        arrow = mpatches.FancyArrowPatch(
-            (arrows_right["x_tail"], arrows_right["y_tail"]),
-            (arrows_right["x_head"], arrows_right["y_head"]),
-            mutation_scale=10,
-            clip_on=False,
-            color="k",
-        )
-        ax.add_patch(arrow)
-
-        # Add rectangle to separate each state pair
-        rect = mpatches.Rectangle(
-            (node - 1, 0),
-            2,
-            1,
-            linewidth=2,
-            edgecolor="k",
-            facecolor="none",
-            clip_on=False,
-        )
-        ax.add_patch(rect)
-
-    def add_emoji(coords, emoji, ax):
-        """Add emoji as image at absolute coordinates."""
-        img = plt.imread(imojify.get_img_path(emoji))
-        im = OffsetImage(img, zoom=0.08)
-        im.image.axes = ax
-        ab = AnnotationBbox(
-            im, (coords[0], coords[1]), frameon=False, pad=0, annotation_clip=False
-        )
-        ax.add_artist(ab)
-
-    emoji = [
-        {"emoji": "🪨", "coords": [1, y_height]},
-        {"emoji": "💎", "coords": [13, y_height]},
-    ]
-    for _, emo in enumerate(emoji):
-        add_emoji(emo["coords"], emo["emoji"], ax)
-
-    plt.show()
-
-
-# %%
-plot_q_values(q_values)
-
-# %%
-window_size = 5
+window_size = 10
 for idx, loss in enumerate(losses):
     current_loss = torch.tensor(loss, device=device)
     losses_rolling_avg = nn.functional.avg_pool1d(
