@@ -22,27 +22,27 @@
 # %%
 import math
 import random
-from collections import namedtuple, deque
+from collections import deque, namedtuple
 from itertools import count
 from pathlib import Path
 
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
-from tqdm import tqdm
 import pandas as pd
 
+# from agent import Qlearning, EpsilonGreedy
+import plotting
 import torch
 import torch.nn as nn
-import torch.optim as optim
 import torch.nn.functional as F
+import torch.optim as optim
+from environment_tensor import CONTEXTS_LABELS, Actions, Cues, WrappedEnvironment
+from tqdm import tqdm
 
 # %%
 # Load custom functions
 from utils import Params
-from environment_tensor import WrappedEnvironment, Actions, CONTEXTS_LABELS, Cues
-from agent import Qlearning, EpsilonGreedy
-import plotting
 
 # %%
 # Formatting & autoreload stuff
@@ -52,7 +52,7 @@ import plotting
 
 # %%
 # Choose the parameters for the task
-params = Params(epsilon=0.1, n_runs=1, numEpisodes=6)
+params = Params(epsilon=0.1, n_runs=1, numEpisodes=50)
 params
 
 # %%

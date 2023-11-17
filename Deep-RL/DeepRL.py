@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.14.5
+#       jupytext_version: 1.15.2
 #   kernelspec:
 #     display_name: Python 3 (ipykernel)
 #     language: python
@@ -390,7 +390,9 @@ def plot_steps_and_rewards(df):
     fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(15, 5))
     sns.lineplot(data=df, x="Episodes", y="Rewards", ax=ax[0])
     ax[0].set(
-        ylabel=f"Rewards\naveraged over {p.n_runs} runs" if p.n_runs > 1 else "Rewards"
+        ylabel=f"Rewards\naveraged over {p.n_runs} runs"
+        if p.n_runs > 1
+        else "Steps number"
     )
 
     sns.lineplot(data=df, x="Episodes", y="Steps", ax=ax[1])

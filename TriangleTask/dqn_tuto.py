@@ -79,19 +79,19 @@
 # -  automatic differentiation (``torch.autograd``)
 #
 
-# %%
-import gymnasium as gym
 import math
 import random
-import matplotlib
-import matplotlib.pyplot as plt
-from collections import namedtuple, deque
+from collections import deque, namedtuple
 from itertools import count
 
+# %%
+import gymnasium as gym
+import matplotlib
+import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
-import torch.optim as optim
 import torch.nn.functional as F
+import torch.optim as optim
 
 env = gym.make("CartPole-v1")
 

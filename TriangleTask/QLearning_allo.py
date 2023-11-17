@@ -22,15 +22,15 @@
 # %%
 # Import packages
 import numpy as np
-from tqdm import tqdm
 import pandas as pd
+import plotting
+from agent import EpsilonGreedy, Qlearning
+from environment import CONTEXTS_LABELS, Actions, Cues, WrappedEnvironment
+from tqdm import tqdm
 
 # %%
 # Load custom functions
 from utils import Params
-from environment import WrappedEnvironment, Actions, CONTEXTS_LABELS, Cues
-from agent import Qlearning, EpsilonGreedy
-import plotting
 
 # %%
 # Formatting & autoreload stuff
