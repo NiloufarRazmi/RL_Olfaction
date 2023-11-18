@@ -438,9 +438,7 @@ def plot_steps_and_rewards(df):
     fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(15, 5))
     sns.lineplot(data=df, x="Episodes", y="Rewards", ax=ax[0])
     ax[0].set(
-        ylabel=f"Rewards\naveraged over {p.n_runs} runs"
-        if p.n_runs > 1
-        else "Steps number"
+        ylabel=f"Rewards\naveraged over {p.n_runs} runs" if p.n_runs > 1 else "Rewards"
     )
 
     sns.lineplot(data=df, x="Episodes", y="Steps", ax=ax[1])
