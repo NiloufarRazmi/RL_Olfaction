@@ -1,4 +1,4 @@
-% Created 2023-11-20 Mon 02:08
+% Created 2023-11-20 Mon 09:16
 % Intended LaTeX compiler: lualatex
 \documentclass[bigger]{beamer}
 \usepackage{graphicx}
@@ -102,8 +102,8 @@ node 3/.style={node out},
 \end{frame}
 
 \section{Context}
-\label{sec:orge7ed608}
-\begin{frame}[label={sec:org00213a1}]{Context}
+\label{sec:org3d9e5ff}
+\begin{frame}[label={sec:org71b2c60}]{Context}
 \metroset{block=fill}
 \begin{exampleblock}{Question}
     What are the representations needed to solve an spatial olfactory task?
@@ -113,12 +113,12 @@ node 3/.style={node out},
     Both the agent \& the animal need a conjuctive representation of \{location + cue\} to solve the task
 \end{exampleblock}
 \end{frame}
-\begin{frame}[label={sec:org3da6f7d}]{Half triangle task}
+\begin{frame}[label={sec:orgb6724de}]{Half triangle task}
 \begin{center}
 \includegraphics[width=.9\linewidth]{img/RL_env-triangle-task.drawio.pdf}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org69f1203}]{Paths followed until today\ldots{}}
+\begin{frame}[label={sec:org51f8f91}]{Paths followed until today\ldots{}}
 \begin{enumerate}
 \item RL package in Julia
 \item Rewrite everything in Python and do backprop by hand
@@ -130,13 +130,13 @@ node 3/.style={node out},
 \end{enumerate}
 \end{frame}
 \section{Deep RL on toy task}
-\label{sec:org00bdc1e}
-\begin{frame}[label={sec:org3473ead}]{Toy task : Random Walk 1D}
+\label{sec:org13189fe}
+\begin{frame}[label={sec:org1fb81de}]{Toy task : Random Walk 1D}
 \begin{center}
 \includegraphics[width=.9\linewidth]{img/RandomWalk1D-transparent.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:orgadc6987}]{Network used}
+\begin{frame}[label={sec:orgeebbf08}]{Network used}
 % https://tikz.net/neural_networks/
 \begin{center}
 \begin{adjustbox}{max height=\textheight, keepaspectratio}
@@ -176,39 +176,39 @@ node 3/.style={node out},
 \end{adjustbox}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:orgfb8ead0}]{Rewards and steps}
+\begin{frame}[label={sec:org482c956}]{Rewards and steps}
 \begin{center}
 \includegraphics[width=.9\linewidth]{img/toy-env-rewards-steps.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org611529d}]{Policy learned}
+\begin{frame}[label={sec:orgeae956b}]{Policy learned}
 \begin{center}
 \includegraphics[width=\textwidth]{img/toy-env-policy.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org0412cac}]{Cost function}
+\begin{frame}[label={sec:orgfd0ab7c}]{Cost function}
 \begin{center}
 \includegraphics[width=0.6\textwidth]{img/toy-env-loss.png}
 \end{center}
 \end{frame}
 \section{Deep RL on half triangle task}
-\label{sec:org0f5b0bc}
-\begin{frame}[label={sec:org3f51253}]{Network used}
+\label{sec:org85e2ec1}
+\begin{frame}[label={sec:orgf865acf}]{Network used}
 \begin{center}
 \includegraphics[height=0.9\textheight]{img/nn.pdf}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:orgf108276}]{Rewards and steps}
+\begin{frame}[label={sec:org9266189}]{Rewards and steps}
 \begin{center}
 \includegraphics[width=.9\linewidth]{img/half-triangle-env-rewards-steps.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org81e6e5a}]{Cost function}
+\begin{frame}[label={sec:org8a9f384}]{Cost function}
 \begin{center}
 \includegraphics[width=0.6\textwidth]{img/half-triangle-env-loss.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org0745579}]{Current algorithm}
+\begin{frame}[label={sec:org23acc00}]{Current algorithm}
 %% This declares a command \Comment
 %% The argument will be surrounded by /* ... */
 \SetKwComment{Comment}{/* }{ */}
@@ -218,7 +218,7 @@ node 3/.style={node out},
 %    \scalebox{0.9}{
         \begin{minipage}{\linewidth}
             \begin{algorithm}[H]
-                \caption{Deep RL algorithm used}\label{alg:dqn}
+                \caption{Deep RL algorithm implemented}\label{alg:dqn}
                 initialize network with random weights\;
                 \For{$episode \gets 1 \dots{} T$}{
                     $state \gets reset(env)$\;
@@ -245,13 +245,13 @@ node 3/.style={node out},
 \end{center}
 \end{frame}
 \section{Next steps brainstorming}
-\label{sec:orgda2a4da}
-\begin{frame}[label={sec:orgb4b5614}]{Correlation matrix between brain data vs. simulation data}
+\label{sec:orge4451af}
+\begin{frame}[label={sec:orgf5706ab}]{Correlation matrices between neural data vs. simulation data}
 \begin{center}
 \includegraphics[width=.9\linewidth]{img/activation-matrix.drawio.pdf}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org49097d1}]{Ablation study?}
+\begin{frame}[label={sec:org7fe6e7d}]{Ablation study?}
 \begin{enumerate}
 \item Train the model on the task
 \item Identify the congunctive cells
@@ -259,7 +259,7 @@ node 3/.style={node out},
 \item Measure the proportion of congiuntive cells the model needs to solve the task
 \end{enumerate}
 \end{frame}
-\begin{frame}[label={sec:orgeef6298}]{Network architecure}
+\begin{frame}[label={sec:orgf2cd624}]{Network architecure}
 \footnotesize
 \begin{columns}
 \begin{column}{0.5\columnwidth}
@@ -271,7 +271,7 @@ node 3/.style={node out},
 \end{center}
 
 \begin{center}
-    $\rightarrow$Let the architecture being optimized?
+    $\rightarrow$~Let the architecture being optimized?
     \footnotetext{\tiny{}Najarro, et al. (2023)}
 \end{center}
 \begin{center}
@@ -291,7 +291,7 @@ node 3/.style={node out},
 \end{column}
 \end{columns}
 \end{frame}
-\begin{frame}[label={sec:orgac2fb98},standout]{~}
+\begin{frame}[label={sec:orgfa44bba},standout]{~}
 Questions ?
 \end{frame}
 \end{document}

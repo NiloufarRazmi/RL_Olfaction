@@ -135,7 +135,7 @@ Left leaning
 %    \scalebox{0.9}{
         \begin{minipage}{\linewidth}
             \begin{algorithm}[H]
-                \caption{Deep RL algorithm used}\label{alg:dqn}
+                \caption{Deep RL algorithm implemented}\label{alg:dqn}
                 initialize network with random weights\;
                 \For{$episode \gets 1 \dots{} T$}{
                     $state \gets reset(env)$\;
@@ -162,7 +162,7 @@ Left leaning
 \end{center}
 #+end_export
 * Next steps brainstorming
-** Correlation matrix between brain data vs. simulation data
+** Correlation matrices between neural data vs. simulation data
 [[file:img/activation-matrix.drawio.pdf]]
 
 ** Ablation study?
@@ -188,7 +188,7 @@ Left leaning
 
 #+begin_export latex
 \begin{center}
-    $\rightarrow$Let the architecture being optimized?
+    $\rightarrow$~Let the architecture being optimized?
     \footnotetext{\tiny{}Najarro, et al. (2023)}
 \end{center}
 #+end_export
