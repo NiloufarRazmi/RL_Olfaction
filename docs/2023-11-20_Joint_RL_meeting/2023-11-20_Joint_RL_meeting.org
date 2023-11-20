@@ -1,0 +1,219 @@
+#+TITLE: Joint RL meeting
+#+author: Andrea Pierré
+#+date: November 18, 2023
+#+EMAIL: andrea_pierre@brown.edu
+* HEADER :noexport:
+#+SETUPFILE: ./style.org
+
+* Context
+** Context
+#+begin_export latex
+\metroset{block=fill}
+\begin{exampleblock}{Question}
+    What are the representations needed to solve an spatial olfactory task?
+\end{exampleblock}
+\vspace{2em}
+\begin{exampleblock}{Hypothesis}
+    Both the agent \& the animal need a conjuctive representation of \{location + cue\} to solve the task
+\end{exampleblock}
+#+end_export
+** Half triangle task
+[[file:img/RL_env-triangle-task.drawio.pdf]]
+** Paths followed until today...
+1. RL package in Julia
+2. Rewrite everything in Python and do backprop by hand
+3. Rewrite in PyTorch
+  1. Run on GPU on Oscar
+  2. Downscaled task to run on CPU
+* Deep RL on toy task
+** Toy task : Random Walk 1D
+[[file:img/RandomWalk1D-transparent.png]]
+** Network used
+#+begin_export latex
+% https://tikz.net/neural_networks/
+\begin{center}
+\begin{adjustbox}{max height=\textheight, keepaspectratio}
+% NEURAL NETWORK no text
+\begin{tikzpicture}[x=2.2cm,y=1.4cm]
+  \message{^^JNeural network without text}
+  \readlist\Nnod{1,5,2} % array of number of nodes per layer
+
+  \message{^^J  Layer}
+  \foreachitem \N \in \Nnod{ % loop over layers
+    \def\lay{\Ncnt} % alias of index of current layer
+    \pgfmathsetmacro\prev{int(\Ncnt-1)} % number of previous layer
+    \message{\lay,}
+    \foreach \i [evaluate={\y=\N/2-\i; \x=\lay; \n=\nstyle;}] in {1,...,\N}{ % loop over nodes
+
+      % NODES
+      \node[node \n] (N\lay-\i) at (\x,\y) {};
+
+      % CONNECTIONS
+      \ifnum\lay>1 % connect to previous layer
+        \foreach \j in {1,...,\Nnod[\prev]}{ % loop over nodes in previous layer
+          \draw[connect,white,line width=1.2] (N\prev-\j) -- (N\lay-\i);
+          \draw[connect] (N\prev-\j) -- (N\lay-\i);
+          %\draw[connect] (N\prev-\j.0) -- (N\lay-\i.180); % connect to left
+        }
+      \fi % else: nothing to connect first layer
+
+    }
+  }
+
+  % LABELS
+  \node[above=1.85,align=center,mygreen!60!black] at (N1-1.90) {input\\[-0.2em]layer\\[-0.2em](state)};
+  \node[above=0.55,align=center,myblue!60!black] at (N2-1.90) {hidden layer};
+  \node[above=1,align=center,myred!60!black] at (N\Nnodlen-1.90) {output\\[-0.2em]layer\\[-0.2em](Q-value\\[-0.2em]of action)};
+
+\end{tikzpicture}
+\end{adjustbox}
+\end{center}
+#+end_export
+** Rewards and steps
+[[file:img/toy-env-rewards-steps.png]]
+** Policy learned
+#+ATTR_LaTeX: :width \textwidth
+[[file:img/toy-env-policy.png]]
+** Cost function
+#+ATTR_LaTeX: :width 0.6\textwidth
+[[file:img/toy-env-loss.png]]
+** COMMENT Network weights
+#+begin_export latex
+\centering
+\scriptsize
+Right leaning
+\vspace{-1em}
+#+end_export
+#+ATTR_LaTeX: :width \textwidth
+[[file:img/DRL-weights.png]]
+
+#+begin_export latex
+\vspace{-1em}
+\centering
+\scriptsize
+Left leaning
+\vspace{-1em}
+#+end_export
+#+ATTR_LaTeX: :width \textwidth
+[[file:img/DRL-weights2.png]]
+** COMMENT Network gradients
+#+begin_export latex
+\centering
+\scriptsize
+Right leaning
+\vspace{-1em}
+#+end_export
+#+ATTR_LaTeX: :width \textwidth
+[[file:img/DRL-gradients.png]]
+
+#+begin_export latex
+\vspace{-1em}
+\centering
+\scriptsize
+Left leaning
+\vspace{-1em}
+#+end_export
+#+ATTR_LaTeX: :width \textwidth
+[[file:img/DRL-gradients2.png]]
+* Deep RL on half triangle task
+** Network used
+#+ATTR_LaTeX: :height 0.9\textheight
+[[file:img/nn.pdf]]
+** Rewards and steps
+[[file:img/half-triangle-env-rewards-steps.png]]
+** Cost function
+#+ATTR_LaTeX: :width 0.6\textwidth
+[[file:img/half-triangle-env-loss.png]]
+** Current algorithm
+#+begin_export latex
+%% This declares a command \Comment
+%% The argument will be surrounded by /* ... */
+\SetKwComment{Comment}{/* }{ */}
+\DontPrintSemicolon
+\begin{center}
+    \tiny
+%    \scalebox{0.9}{
+        \begin{minipage}{\linewidth}
+            \begin{algorithm}[H]
+                \caption{Deep RL algorithm used}\label{alg:dqn}
+                initialize network with random weights\;
+                \For{$episode \gets 1 \dots{} T$}{
+                    $state \gets reset(env)$\;
+                    $done \gets False$\;
+                    \While{$done \neq True$}{
+                        $Q \gets forward\_pass(state)$ \Comment*[r]{4 values vector}
+                        $action \gets \epsilon_{greedy}(action\_space, state, q)$\;
+                        $state_{new}, reward, done \gets env.step(action, state)$\;
+                        $Q \gets forward\_pass(state_{new})$ \Comment*[r]{4 values vector}
+                        $Q_{new} \gets reward + \gamma max(Q)$ \Comment*[r]{scalar}
+                        $y \gets max(Q)$ \Comment*[r]{scalar}
+                        \eIf{$done = True$}{
+                            $\hat{y}_{pred} \gets reward$ \Comment*[r]{scalar}
+                        }{
+                            $\hat{y}_{pred} \gets Q_{new}$ \Comment*[r]{scalar}
+                        }
+                        $Loss \gets (y - \hat{y}_{pred})^2$\;
+                        update network weights to minimize Loss\;
+                    }
+                }
+            \end{algorithm}
+        \end{minipage}%
+%    }
+\end{center}
+#+end_export
+* Next steps brainstorming
+** Correlation matrix between brain data vs. simulation data
+[[file:img/activation-matrix.drawio.pdf]]
+
+** Ablation study?
+1. Train the model on the task
+2. Identify the congunctive cells
+3. Knock-out the congunctive cells (equivalent to KO LEC?)
+4. Measure the proportion of congiuntive cells the model needs to solve the task
+** Network architecure
+#+begin_export latex
+\footnotesize
+#+end_export
+*** From brain connectivity :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+#+begin_export latex
+\begin{center}
+    From brain connectivity\dots{}
+\end{center}
+#+end_export
+#+ATTR_LaTeX: :width 0.7\textwidth
+[[file:img/brain.png]]
+
+#+begin_export latex
+\begin{center}
+    $\rightarrow$Let the architecture being optimized?
+    \footnotetext{\tiny{}Najarro, et al. (2023)}
+\end{center}
+#+end_export
+#+ATTR_LaTeX: :width \textwidth
+[[file:img/neural-dev-program.png]]
+*** To ANN architecture
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+#+begin_export latex
+\begin{center}
+    \dots{}To ANN architectures
+\end{center}
+#+end_export
+#+ATTR_LaTeX: :height 0.4\textheight
+[[file:img/nn-architecture-fully-connected.drawio.pdf]]
+#+ATTR_LaTeX: :height 0.4\textheight
+[[file:img/nn-architecture-split.drawio.pdf]]
+** \nbsp{}
+:PROPERTIES:
+:BEAMER_opt: standout
+:END:
+Questions ?
+* COMMENT Add plain option to Beamer TOC
+% Local variables:
+% org-beamer-outline-frame-options: "plain"
+% End:
+* Feedback :noexport:

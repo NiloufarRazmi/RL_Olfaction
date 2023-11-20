@@ -41,3 +41,10 @@ Get inspiration from https://pair.withgoogle.com/explorables/grokking/
 - https://discuss.pytorch.org/t/best-way-to-split-process-merge/18702
 - https://pytorch.org/docs/stable/generated/torch.tensor_split.html
 - https://discuss.pytorch.org/t/combine-linear-layers/22337/3
+* Debug
+** DONE Unit test env
+** Plot Q-values?
+** DONE Test learning gradually
+*** only get to reward with no odor
+*** always odor A
+*** full
