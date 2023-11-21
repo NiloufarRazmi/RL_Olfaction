@@ -2,6 +2,7 @@ from collections import OrderedDict
 from enum import Enum
 
 import torch
+import torch.nn.functional as F
 from utils import random_choice
 
 
@@ -164,7 +165,6 @@ class Environment:
         new_state["location"] = self.to_state_location(newrow, newcol)
 
         # Update internal states
-        # if new_state["location"] == new_state["cue"].value:
         if new_state["location"].item() in {item.value for item in OdorPorts}:
             self.odor_condition = OdorCondition.post
             new_state["cue"] = self.odor_ID
@@ -238,18 +238,8 @@ class WrappedEnvironment(Environment):
 
     def convert_composite_to_tensor_state(self, state):
         """Convert composite state dictionary to a tensor."""
-        # conv_state = None
-        # tiles_num = len(self.tiles_locations)
 
-        # if state["cue"] == Cues.NoOdor:
-        #     conv_state = state["location"] + 0 * tiles_num
-        # elif state["cue"] == Cues.OdorA:
-        #     conv_state = state["location"] + 1 * tiles_num
-        # elif state["cue"] == Cues.OdorB:
-        #     conv_state = state["location"] + 2 * tiles_num
-
-        # if conv_state is None:
-        #     raise ValueError("Impossible value for composite state")
+        # state = F.one_hot(state.long(), num_classes=self.state_dim[0]).float().squeeze()
 
         conv_state = torch.tensor(
             [state["location"], state["cue"].value], device=DEVICE
@@ -258,22 +248,6 @@ class WrappedEnvironment(Environment):
 
     def convert_tensor_state_to_composite(self, state):
         """Convert back tensor state to original composite state."""
-        # tiles_num = len(self.tiles_locations)
-        # if state >= 2 * tiles_num and state < 3 * tiles_num:
-        #     conv_state = {
-        #         "location": state - 2 * tiles_num,
-        #         "cue": Cues.OdorB,
-        #     }
-        # elif state >= 1 * tiles_num and state < 2 * tiles_num:
-        #     conv_state = {
-        #         "location": state - 1 * tiles_num,
-        #         "cue": Cues.OdorA,
-        #     }
-        # elif state >= 0 and state < 1 * tiles_num:
-        #     conv_state = {"location": state, "cue": Cues.NoOdor}
-        # else:
-        #     raise ValueError("Impossible number for flat state")
-
         conv_state = {
             "location": state[0],
             "cue": Cues(state[1].item()),
@@ -285,10 +259,16 @@ class WrappedEnvironment(Environment):
         current_conv_state = self.convert_tensor_state_to_composite(current_state)
         new_state, reward, done = super().step(action, current_conv_state)
         new_state_conv = self.convert_composite_to_tensor_state(new_state)
+        reward = torch.tensor([reward], device=DEVICE).float()  # Convert to tensor
+        new_state_conv = (
+            new_state_conv.float()
+        )  # Cast to float for PyTorch multiplication
+
         return new_state_conv, reward, done
 
     def reset(self):
         """Wrapper around the base method."""
         state = super().reset()
         conv_state = self.convert_composite_to_tensor_state(state)
+        conv_state = conv_state.float()  # Cast to float for PyTorch multiplication
         return conv_state

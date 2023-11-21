@@ -10,7 +10,7 @@
 #+begin_export latex
 \metroset{block=fill}
 \begin{exampleblock}{Question}
-    What are the representations needed to solve an spatial olfactory task?
+    What are the representations needed to solve a spatial olfactory task?
 \end{exampleblock}
 \vspace{2em}
 \begin{exampleblock}{Hypothesis}
@@ -217,3 +217,16 @@ Questions ?
 % org-beamer-outline-frame-options: "plain"
 % End:
 * Feedback :noexport:
+** Feed raw visual inputs
+** DONE Not max but Q of the chosen action
+** DONE Check update rule
+** TODO Vector or zeros instead of scalar Q value in the loss function
+** TODO One hot encoding of state inputs
+** See correlation matrices of Wilson's paper
+** See Yanniv's paper
+** Add a time dimsension to correlation matrices
+** Check MIND algorithm
+** RNN
+** TODO Monhly default schedule
+** TODO Next session plan with gantt chart
+** TODO Meet with Niloufar to compare code next week

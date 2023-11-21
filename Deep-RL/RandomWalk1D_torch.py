@@ -283,6 +283,7 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
             #     next_state_values = net(state).max(1)[0]
 
             # Update only the weights related to action taken
+            # with torch.no_grad():
             next_state_values = state_action_values
             if done:
                 # next_state_values[action.item()] = 0
@@ -487,7 +488,7 @@ q_values.flatten().unsqueeze(0).shape
 
 
 # %%
-def plot_q_values(q_values):
+def plot_policy(q_values):
     fig, ax = plt.subplots(figsize=(15, 1.5))
     cmap = sns.color_palette("vlag", as_cmap=True)
     chart = sns.heatmap(
@@ -497,13 +498,15 @@ def plot_q_values(q_values):
         cmap=cmap,
         yticklabels=False,  # linewidth=0.5
         center=0,
+        # cbar_kws={"label": "Q-values"},
     )
+    fig.axes[-1].set_title("Q-values")
     states_nodes = torch.arange(1, 14, 2, device=device)
     chart.set_xticks(states_nodes)
     chart.set_xticklabels(
         [str(item.item()) for item in torch.arange(1, 8, 1, device=device)]
     )
-    chart.set_title("Q values")
+    # chart.set_title("Q values")
     ax.tick_params(bottom=True)
 
     # Add actions arrows
@@ -573,7 +576,7 @@ def plot_q_values(q_values):
 
 
 # %%
-plot_q_values(q_values)
+plot_policy(q_values)
 
 # %%
 window_size = 5
