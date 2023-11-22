@@ -28,6 +28,7 @@ import ipdb
 import matplotlib as mpl
 import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 import seaborn as sns
 
@@ -106,7 +107,8 @@ p
 
 # %%
 # Load the environment
-env = WrappedEnvironment()
+# env = WrappedEnvironment(one_hot_state=True)
+env = WrappedEnvironment(one_hot_state=False)
 
 # %%
 # Get number of actions
@@ -495,7 +497,106 @@ with torch.no_grad():
             #     continue
             state = torch.tensor([tile_v, cue_v.value], device=device).float()
             q_values[tile_i, cue_i, :] = net(state).to(device)
-q_values
+q_values.shape
+
+
+# %%
+def qtable_directions_map(qtable, rows, cols):
+    """Get the best learned action & map it to arrows."""
+    qtable_val_max = qtable.max(axis=1).values.reshape(rows, cols)
+    qtable_best_action = qtable.argmax(axis=1).reshape(rows, cols)
+    directions = {0: "↑", 1: "↓", 2: "←", 3: "→"}
+    qtable_directions = np.empty(qtable_best_action.flatten().shape, dtype=str)
+    eps = torch.finfo(torch.float32).eps  # Minimum float number on the machine
+    for idx, val in enumerate(qtable_best_action.flatten()):
+        if qtable_val_max.flatten()[idx] > eps:
+            # Assign an arrow only if a minimal Q-value has been learned as best action
+            # otherwise since 0 is a direction, it also gets mapped on the tiles where
+            # it didn't actually learn anything
+            qtable_directions[idx] = directions[val.item()]
+    qtable_directions = qtable_directions.reshape(rows, cols)
+    return qtable_val_max, qtable_directions
+
+
+# %%
+idx = 0
+qtable_directions_map(qtable=q_values[:, idx, :], rows=env.rows, cols=env.cols)
+
+
+# %%
+def plot_policies(q_values, labels):
+    """Plot the heatmap of the Q-values.
+
+    Also plot the best action's direction with arrows."""
+
+    fig, ax = plt.subplots(1, 3, figsize=(13, 4))
+    for idx, cue in enumerate(labels):
+        qtable_val_max, qtable_directions = qtable_directions_map(
+            qtable=q_values[:, idx, :], rows=env.rows, cols=env.cols
+        )
+        sns.heatmap(
+            qtable_val_max,
+            annot=qtable_directions,
+            fmt="",
+            ax=ax.flatten()[idx],
+            cmap=sns.color_palette("Blues", as_cmap=True),
+            linewidths=0.7,
+            linecolor="black",
+            xticklabels=[],
+            yticklabels=[],
+            annot_kws={"fontsize": "xx-large"},
+            cbar_kws={"label": "Q-value"},
+        ).set(title=labels[cue])
+        for _, spine in ax.flatten()[idx].spines.items():
+            spine.set_visible(True)
+            spine.set_linewidth(0.7)
+            spine.set_color("black")
+
+        # Annotate the ports names
+        bbox = {
+            "facecolor": "black",
+            "edgecolor": "none",
+            "boxstyle": "round",
+            "alpha": 0.1,
+        }
+        ax.flatten()[idx].text(
+            x=4.7,
+            y=0.3,
+            s="N",
+            bbox=bbox,
+            color="white",
+        )
+        ax.flatten()[idx].text(
+            x=0.05,
+            y=4.9,
+            s="S",
+            bbox=bbox,
+            color="white",
+        )
+        ax.flatten()[idx].text(
+            x=4.7,
+            y=4.9,
+            s="E",
+            bbox=bbox,
+            color="white",
+        )
+        ax.flatten()[idx].text(
+            x=0.05,
+            y=0.3,
+            s="W",
+            bbox=bbox,
+            color="white",
+        )
+
+    # Make background transparent
+    fig.patch.set_alpha(0)
+    fig.patch.set_facecolor("white")
+    fig.tight_layout()
+    plt.show()
+
+
+# %%
+plot_policies(q_values=q_values, labels=CONTEXTS_LABELS)
 
 # %%
 env.tiles_locations.reshape((env.rows, env.cols))

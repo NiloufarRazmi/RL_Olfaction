@@ -228,8 +228,9 @@ class WrappedEnvironment(Environment):
 
     Results in numerical only state space"""
 
-    def __init__(self, rng=None):
+    def __init__(self, rng=None, one_hot_state=True):
         # Initialize the base class to get the base properties
+        self.one_hot_state = one_hot_state
         super().__init__(rng=None)
 
         # self.state_space = torch.arange(self.rows * self.cols * len(Cues))
@@ -242,24 +243,30 @@ class WrappedEnvironment(Environment):
         conv_state = torch.tensor(
             [state["location"], state["cue"].value], device=DEVICE
         )
-        # return conv_state
-        loc_one_hot = F.one_hot(
-            conv_state[0].long(), num_classes=len(self.tiles_locations)
-        )
-        cue_one_hot = F.one_hot(conv_state[1].long(), num_classes=len(Cues))
-        state_one_hot = torch.cat((loc_one_hot, cue_one_hot))
-        return state_one_hot
+        if self.one_hot_state:
+            loc_one_hot = F.one_hot(
+                conv_state[0].long(), num_classes=len(self.tiles_locations)
+            )
+            cue_one_hot = F.one_hot(conv_state[1].long(), num_classes=len(Cues))
+            state_one_hot = torch.cat((loc_one_hot, cue_one_hot))
+            return state_one_hot
+        else:
+            return conv_state
 
     def convert_tensor_state_to_composite(self, state):
         """Convert back tensor state to original composite state."""
-        loc = state[0 : len(self.tiles_locations)].argwhere().item()
-        cue = state[-len(Cues) :].argwhere().item()
-        conv_state = {
-            # "location": state[0],
-            # "cue": Cues(state[1].item()),
-            "location": loc,
-            "cue": Cues(cue),
-        }
+        if self.one_hot_state:
+            loc = state[0 : len(self.tiles_locations)].argwhere().item()
+            cue = state[-len(Cues) :].argwhere().item()
+            conv_state = {
+                "location": loc,
+                "cue": Cues(cue),
+            }
+        else:
+            conv_state = {
+                "location": state[0],
+                "cue": Cues(state[1].item()),
+            }
         return conv_state
 
     def step(self, action, current_state):

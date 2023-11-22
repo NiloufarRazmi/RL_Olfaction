@@ -221,7 +221,7 @@ Questions ?
 ** DONE Not max but Q of the chosen action
 ** DONE Check update rule
 ** TODO Vector or zeros instead of scalar Q value in the loss function
-** TODO One hot encoding of state inputs
+** DONE One hot encoding of state inputs
 ** See correlation matrices of Wilson's paper
 ** See Yanniv's paper
 ** Add a time dimsension to correlation matrices
