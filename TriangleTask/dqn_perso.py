@@ -264,6 +264,7 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
             # else:
             #     # next_state_values[action.item()] = net(state).max()
 
+            # See DQN paper for equations: https://arxiv.org/abs/1312.5602
             state_action_value = state_action_values[action].unsqueeze(-1)  # Q(s_t, a)
             if done:
                 expected_state_action_values = reward
@@ -481,5 +482,34 @@ plt.show()
 
 # %%
 loss_df.iloc[-1].Loss
+
+# %%
+with torch.no_grad():
+    q_values = torch.nan * torch.empty(
+        (len(env.tiles_locations), len(Cues), p.n_actions), device=device
+    )
+    for tile_i, tile_v in enumerate(env.tiles_locations):
+        for cue_i, cue_v in enumerate(Cues):
+            # if state_i in [0, len(q_values) - 1]:
+            #     # q_values[state_i,] = 0
+            #     continue
+            state = torch.tensor([tile_v, cue_v.value], device=device).float()
+            q_values[tile_i, cue_i, :] = net(state).to(device)
+q_values
+
+# %%
+env.tiles_locations.reshape((env.rows, env.cols))
+
+# %%
+[item for item in Actions]
+
+# %%
+[item for item in Cues]
+
+# %%
+net(torch.tensor([4, 1]).float())
+
+# %%
+net(torch.tensor([19, 1]).float()).argmax()
 
 # %%

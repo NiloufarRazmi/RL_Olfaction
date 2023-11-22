@@ -19,7 +19,7 @@
 - https://pytorch.org/tutorials/recipes/recipes/tensorboard_with_pytorch.html
 - https://pytorch.org/tutorials/intermediate/tensorboard_tutorial.html
 *** KILL + Make tutorial for Oscar?
-* Viz
+* TODO Viz
 ** DONE Improve loss plot?
 Make number of bins not relative to the numer of episodes?
 
@@ -27,9 +27,9 @@ Make number of bins not relative to the numer of episodes?
 *** TODO Either screen + interactive session
 *** WAIT Or batch script that writes in a file
 Using  Tensorboard ~SummaryWriter~
-** Plot weights and neurons activations?
+** TODO Plot weights and neurons activations
 Get inspiration from https://pair.withgoogle.com/explorables/grokking/
-** WAIT Plot policy learned
+** TODO Plot policy learned
 * DONE Model doesn't converge
 ** DONE Try to apply on simple MDP
 * Experiments
@@ -41,10 +41,13 @@ Get inspiration from https://pair.withgoogle.com/explorables/grokking/
 - https://discuss.pytorch.org/t/best-way-to-split-process-merge/18702
 - https://pytorch.org/docs/stable/generated/torch.tensor_split.html
 - https://discuss.pytorch.org/t/combine-linear-layers/22337/3
-* Debug
+* TODO Debug
 ** DONE Unit test env
-** Plot Q-values?
 ** DONE Test learning gradually
 *** only get to reward with no odor
 *** always odor A
 *** full
+** DONE Not max but Q of the chosen action
+** DONE Check update rule
+** TODO Vector or zeros instead of scalar Q value in the loss function
+** TODO One hot encoding of state inputs

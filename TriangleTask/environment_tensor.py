@@ -232,25 +232,33 @@ class WrappedEnvironment(Environment):
         # Initialize the base class to get the base properties
         super().__init__(rng=None)
 
-        self.state_space = torch.arange(self.rows * self.cols * len(Cues))
-        self.numStates = len(self.state_space)
+        # self.state_space = torch.arange(self.rows * self.cols * len(Cues))
+        # self.numStates = len(self.state_space)
         self.reset()
 
     def convert_composite_to_tensor_state(self, state):
         """Convert composite state dictionary to a tensor."""
 
-        # state = F.one_hot(state.long(), num_classes=self.state_dim[0]).float().squeeze()
-
         conv_state = torch.tensor(
             [state["location"], state["cue"].value], device=DEVICE
         )
-        return conv_state
+        # return conv_state
+        loc_one_hot = F.one_hot(
+            conv_state[0].long(), num_classes=len(self.tiles_locations)
+        )
+        cue_one_hot = F.one_hot(conv_state[1].long(), num_classes=len(Cues))
+        state_one_hot = torch.cat((loc_one_hot, cue_one_hot))
+        return state_one_hot
 
     def convert_tensor_state_to_composite(self, state):
         """Convert back tensor state to original composite state."""
+        loc = state[0 : len(self.tiles_locations)].argwhere().item()
+        cue = state[-len(Cues) :].argwhere().item()
         conv_state = {
-            "location": state[0],
-            "cue": Cues(state[1].item()),
+            # "location": state[0],
+            # "cue": Cues(state[1].item()),
+            "location": loc,
+            "cue": Cues(cue),
         }
         return conv_state
 

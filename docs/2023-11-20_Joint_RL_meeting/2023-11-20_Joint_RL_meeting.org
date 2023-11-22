@@ -229,4 +229,4 @@ Questions ?
 ** RNN
 ** TODO Monhly default schedule
 ** TODO Next session plan with gantt chart
-** TODO Meet with Niloufar to compare code next week
+** DONE Meet with Niloufar to compare code next week
