@@ -90,11 +90,11 @@ def check_plots():
 p = Params(
     seed=42,
     n_runs=1,
-    total_episodes=200,
+    total_episodes=1000,
     epsilon=0.2,
-    alpha=0.1,
+    alpha=0.05,
     gamma=0.9,
-    nHiddenUnits=5 * 5 + 2,
+    nHiddenUnits=(5 * 5 + 2) * 2,
 )
 p
 
@@ -107,8 +107,7 @@ p
 
 # %%
 # Load the environment
-# env = WrappedEnvironment(one_hot_state=True)
-env = WrappedEnvironment(one_hot_state=False)
+env = WrappedEnvironment(one_hot_state=True)
 
 # %%
 # Get number of actions
@@ -135,6 +134,7 @@ class DQN(nn.Module):
         self.mlp = nn.Sequential(
             nn.Linear(n_observations, n_units),
             nn.Linear(n_units, n_units),
+            nn.Linear(n_units, n_units),
             # nn.ReLU(),
             nn.Linear(n_units, n_actions),
         )
@@ -145,7 +145,12 @@ class DQN(nn.Module):
 
 # %%
 net = DQN(
-    n_observations=p.n_observations, n_actions=p.n_actions, n_units=p.nHiddenUnits
+    n_observations=p.n_observations,
+    n_actions=p.n_actions,
+    n_units=3 * p.n_observations
+    # n_observations=p.n_observations,
+    # n_actions=p.n_actions,
+    # n_units=p.nHiddenUnits,
 ).to(device)
 net
 
@@ -251,25 +256,10 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
                 action=action.item(), current_state=state
             )
 
-            # # Compute V(s_{t+1}) for all next states.
-            # # Expected values of actions are computed based
-            # # on the "older" network, then selecting their best reward.
-            # # Should be either the expected state value or 0 in case the state is final.
-            # next_state_values = torch.zeros_like(state_action_values, device=device)
-
-            # Update only the weights related to action taken
-            # next_state_values = state_action_values
-            # if done:
-            #     # next_state_values[action.item()] = 0
-            #     next_state_values = torch.zeros(1, device=device)
-            #     expected_state_action_values = reward
-            # else:
-            #     # next_state_values[action.item()] = net(state).max()
-
             # See DQN paper for equations: https://arxiv.org/abs/1312.5602
             state_action_value = state_action_values[action].unsqueeze(-1)  # Q(s_t, a)
             if done:
-                expected_state_action_values = reward
+                expected_state_action_value = reward
             else:
                 with torch.no_grad():
                     next_state_values = (
@@ -284,6 +274,27 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
             loss = criterion(
                 input=state_action_value, target=expected_state_action_value
             )  # TD update
+
+            # # See DQN paper for equations: https://arxiv.org/abs/1312.5602
+            # expected_state_action_values = torch.zeros_like(
+            #     state_action_values, device=device
+            # )
+            # if done:
+            #     expected_state_action_values[action] = reward
+            # else:
+            #     with torch.no_grad():
+            #         next_state_value = (
+            #             net(next_state).to(device).max()  # .unsqueeze(-1)
+            #         )  # Q(s_t+1, a)
+            #     expected_state_action_values[action] = (
+            #         reward + p.gamma * next_state_value
+            #     )  # y_j (Bellman optimality equation)
+
+            # # Compute loss
+            # criterion = nn.MSELoss()
+            # loss = criterion(
+            #     input=state_action_values, target=expected_state_action_values
+            # )  # TD update
 
             # Optimize the model
             optimizer.zero_grad()
@@ -505,7 +516,12 @@ def qtable_directions_map(qtable, rows, cols):
     """Get the best learned action & map it to arrows."""
     qtable_val_max = qtable.max(axis=1).values.reshape(rows, cols)
     qtable_best_action = qtable.argmax(axis=1).reshape(rows, cols)
-    directions = {0: "↑", 1: "↓", 2: "←", 3: "→"}
+    directions = {
+        Actions.UP: "↑",
+        Actions.DOWN: "↓",
+        Actions.LEFT: "←",
+        Actions.RIGHT: "→",
+    }
     qtable_directions = np.empty(qtable_best_action.flatten().shape, dtype=str)
     eps = torch.finfo(torch.float32).eps  # Minimum float number on the machine
     for idx, val in enumerate(qtable_best_action.flatten()):
@@ -513,14 +529,9 @@ def qtable_directions_map(qtable, rows, cols):
             # Assign an arrow only if a minimal Q-value has been learned as best action
             # otherwise since 0 is a direction, it also gets mapped on the tiles where
             # it didn't actually learn anything
-            qtable_directions[idx] = directions[val.item()]
+            qtable_directions[idx] = directions[Actions(val.item())]
     qtable_directions = qtable_directions.reshape(rows, cols)
     return qtable_val_max, qtable_directions
-
-
-# %%
-idx = 0
-qtable_directions_map(qtable=q_values[:, idx, :], rows=env.rows, cols=env.cols)
 
 
 # %%

@@ -92,9 +92,9 @@ def check_plots():
 p = Params(
     seed=42,
     n_runs=20,
-    total_episodes=200,
+    total_episodes=500,
     epsilon=0.1,
-    alpha=0.1,
+    alpha=0.05,
     gamma=0.9,
     nHiddenUnits=14,
 )
@@ -224,6 +224,107 @@ explorer = EpsilonGreedy(epsilon=p.epsilon, rng=p.rng)
 # ### Main loop
 
 # %%
+# rewards = torch.zeros((p.total_episodes, p.n_runs), device=device)
+# steps = torch.zeros((p.total_episodes, p.n_runs), device=device)
+# episodes = torch.arange(p.total_episodes, device=device)
+# all_states = []
+# all_actions = []
+# losses = [[] for _ in range(p.n_runs)]
+# episode_durations = []
+
+# for run in range(p.n_runs):  # Run several times to account for stochasticity
+#     # Reset model
+#     net = DQN(
+#         n_observations=n_observations, n_actions=n_actions, n_units=p.nHiddenUnits
+#     ).to(device)
+#     optimizer = optim.AdamW(net.parameters(), lr=p.alpha, amsgrad=True)
+
+#     for episode in tqdm(
+#         episodes, desc=f"Run {run+1}/{p.n_runs} - Episodes", leave=False
+#     ):
+#         state = env.reset()  # Reset the environment
+#         state = state.clone().float().detach().to(device)
+#         step_count = 0
+#         done = False
+#         total_rewards = 0
+
+#         while not done:
+#             state_action_values = net(state).to(device)
+#             action = explorer.choose_action(
+#                 action_space=env.action_space,
+#                 state=state,
+#                 state_action_values=state_action_values,
+#             )
+
+#             # # Record states and actions
+#             all_states.append(state.item())
+#             all_actions.append(Actions(action.item()).name)
+
+#             observation, reward, done = env.step(action.item())
+#             # if reward != 0:
+#             #     ipdb.set_trace()
+#             reward = torch.tensor([reward], device=device)
+
+#             # if terminated:
+#             if done:
+#                 next_state = None
+#             else:
+#                 next_state = observation.clone().float().detach()
+
+#             # Move to the next state
+#             state = next_state
+
+#             # # Compute V(s_{t+1}) for all next states.
+#             # # Expected values of actions are computed based
+#             # # on the "older" network, then selecting their best reward.
+#             # # Should be either the expected state value or 0 in case the state is final.
+#             # next_state_values = torch.zeros_like(state_action_values, device=device)
+#             # with torch.no_grad():
+#             #     next_state_values = net(state).max(1)[0]
+
+#             # Update only the weights related to action taken
+#             # with torch.no_grad():
+#             next_state_values = state_action_values
+#             if done:
+#                 # next_state_values[action.item()] = 0
+#                 next_state_values = torch.zeros(1)
+#             else:
+#                 # next_state_values[action.item()] = net(state).max()
+#                 next_state_values = net(state).max()
+
+#             # Compute the expected Q values
+#             expected_state_action_values = reward + p.gamma * next_state_values
+
+#             # Compute loss
+#             criterion = nn.MSELoss()
+#             # loss = criterion(state_action_values, expected_state_action_values)
+#             # if state_action_values[action.item()].shape != expected_state_action_values.shape:
+#             #     ipdb.set_trace()
+#             loss = criterion(
+#                 state_action_values[action.item()].unsqueeze(-1),
+#                 expected_state_action_values,
+#             )
+
+#             # Optimize the model
+#             optimizer.zero_grad()
+#             loss.backward()
+
+#             # In-place gradient clipping
+#             torch.nn.utils.clip_grad_value_(net.parameters(), 100)
+#             optimizer.step()
+
+#             if done:
+#                 episode_durations.append(step_count + 1)
+#                 # plot_durations()
+
+#             total_rewards += reward
+#             step_count += 1
+#             losses[run].append(loss.item())
+
+#         rewards[episode, run] = total_rewards
+#         steps[episode, run] = step_count
+
+# %%
 rewards = torch.zeros((p.total_episodes, p.n_runs), device=device)
 steps = torch.zeros((p.total_episodes, p.n_runs), device=device)
 episodes = torch.arange(p.total_episodes, device=device)
@@ -243,67 +344,66 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
         episodes, desc=f"Run {run+1}/{p.n_runs} - Episodes", leave=False
     ):
         state = env.reset()  # Reset the environment
-        state = state.clone().float().detach().to(device)
+        state = state.clone().float().detach().to(device).float()
         step_count = 0
         done = False
         total_rewards = 0
 
         while not done:
-            state_action_values = net(state).to(device)
+            state_action_values = net(state).to(device)  # Q(s_t)
             action = explorer.choose_action(
                 action_space=env.action_space,
                 state=state,
                 state_action_values=state_action_values,
             )
 
-            # # Record states and actions
+            # Record states and actions
             all_states.append(state.item())
             all_actions.append(Actions(action.item()).name)
 
-            observation, reward, done = env.step(action.item())
-            # if reward != 0:
-            #     ipdb.set_trace()
-            reward = torch.tensor([reward], device=device)
+            next_state, reward, done = env.step(action=action.item())
+            next_state = next_state.float()
+            reward = torch.tensor(reward).unsqueeze(-1).float()
 
-            # if terminated:
+            # See DQN paper for equations: https://arxiv.org/abs/1312.5602
+            state_action_value = state_action_values[action].unsqueeze(-1)  # Q(s_t, a)
             if done:
-                next_state = None
+                expected_state_action_value = reward
             else:
-                next_state = observation.clone().float().detach()
-
-            # Move to the next state
-            state = next_state
-
-            # # Compute V(s_{t+1}) for all next states.
-            # # Expected values of actions are computed based
-            # # on the "older" network, then selecting their best reward.
-            # # Should be either the expected state value or 0 in case the state is final.
-            # next_state_values = torch.zeros_like(state_action_values, device=device)
-            # with torch.no_grad():
-            #     next_state_values = net(state).max(1)[0]
-
-            # Update only the weights related to action taken
-            # with torch.no_grad():
-            next_state_values = state_action_values
-            if done:
-                # next_state_values[action.item()] = 0
-                next_state_values = torch.zeros(1)
-            else:
-                # next_state_values[action.item()] = net(state).max()
-                next_state_values = net(state).max()
-
-            # Compute the expected Q values
-            expected_state_action_values = reward + p.gamma * next_state_values
+                with torch.no_grad():
+                    next_state_values = (
+                        net(next_state).to(device).max().unsqueeze(-1)
+                    )  # Q(s_t+1, a)
+                expected_state_action_value = (
+                    reward + p.gamma * next_state_values
+                )  # y_j (Bellman optimality equation)
 
             # Compute loss
             criterion = nn.MSELoss()
-            # loss = criterion(state_action_values, expected_state_action_values)
-            # if state_action_values[action.item()].shape != expected_state_action_values.shape:
-            #     ipdb.set_trace()
             loss = criterion(
-                state_action_values[action.item()].unsqueeze(-1),
-                expected_state_action_values,
-            )
+                input=state_action_value, target=expected_state_action_value
+            )  # TD update
+
+            # # See DQN paper for equations: https://arxiv.org/abs/1312.5602
+            # expected_state_action_values = torch.zeros_like(
+            #     state_action_values, device=device
+            # )
+            # if done:
+            #     expected_state_action_values[action] = reward
+            # else:
+            #     with torch.no_grad():
+            #         next_state_value = (
+            #             net(next_state).to(device).max()  # .unsqueeze(-1)
+            #         )  # Q(s_t+1, a)
+            #     expected_state_action_values[action] = (
+            #         reward + p.gamma * next_state_value
+            #     )  # y_j (Bellman optimality equation)
+
+            # # Compute loss
+            # criterion = nn.MSELoss()
+            # loss = criterion(
+            #     input=state_action_values, target=expected_state_action_values
+            # )  # TD update
 
             # Optimize the model
             optimizer.zero_grad()
@@ -313,14 +413,14 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
             torch.nn.utils.clip_grad_value_(net.parameters(), 100)
             optimizer.step()
 
-            if done:
-                episode_durations.append(step_count + 1)
-                # plot_durations()
+            # Move to the next state
+            state = next_state
 
             total_rewards += reward
             step_count += 1
             losses[run].append(loss.item())
 
+        episode_durations.append(step_count + 1)
         rewards[episode, run] = total_rewards
         steps[episode, run] = step_count
 
