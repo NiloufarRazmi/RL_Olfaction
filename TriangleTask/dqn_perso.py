@@ -133,9 +133,11 @@ class DQN(nn.Module):
         super(DQN, self).__init__()
         self.mlp = nn.Sequential(
             nn.Linear(n_observations, n_units),
+            nn.ReLU(),
             nn.Linear(n_units, n_units),
+            nn.ReLU(),
             nn.Linear(n_units, n_units),
-            # nn.ReLU(),
+            nn.ReLU(),
             nn.Linear(n_units, n_actions),
         )
 
@@ -144,14 +146,18 @@ class DQN(nn.Module):
 
 
 # %%
-net = DQN(
-    n_observations=p.n_observations,
-    n_actions=p.n_actions,
-    n_units=3 * p.n_observations
-    # n_observations=p.n_observations,
-    # n_actions=p.n_actions,
-    # n_units=p.nHiddenUnits,
-).to(device)
+if env.one_hot_state:
+    net = DQN(
+        n_observations=p.n_observations,
+        n_actions=p.n_actions,
+        n_units=3 * p.n_observations,
+    ).to(device)
+else:
+    net = DQN(
+        n_observations=p.n_observations,
+        n_actions=p.n_actions,
+        n_units=p.nHiddenUnits,
+    ).to(device)
 net
 
 # %%
@@ -161,7 +167,7 @@ print("\n\nParameters sizes summary:")
 print([item.shape for item in net.parameters()])
 
 # %%
-summary(net, input_size=[state.shape], verbose=0)
+# summary(net, input_size=[state.shape], verbose=0)
 
 # %%
 optimizer = optim.AdamW(net.parameters(), lr=p.alpha, amsgrad=True)
