@@ -509,10 +509,9 @@ with torch.no_grad():
     )
     for tile_i, tile_v in enumerate(env.tiles_locations):
         for cue_i, cue_v in enumerate(Cues):
-            # if state_i in [0, len(q_values) - 1]:
-            #     # q_values[state_i,] = 0
-            #     continue
             state = torch.tensor([tile_v, cue_v.value], device=device).float()
+            if env.one_hot_state:
+                state = env.to_one_hot(state).float()
             q_values[tile_i, cue_i, :] = net(state).to(device)
 q_values.shape
 
@@ -552,7 +551,7 @@ def plot_policies(q_values, labels):
             qtable=q_values[:, idx, :], rows=env.rows, cols=env.cols
         )
         sns.heatmap(
-            qtable_val_max,
+            qtable_val_max.cpu(),
             annot=qtable_directions,
             fmt="",
             ax=ax.flatten()[idx],

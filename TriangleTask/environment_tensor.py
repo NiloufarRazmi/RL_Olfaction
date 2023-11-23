@@ -244,11 +244,7 @@ class WrappedEnvironment(Environment):
             [state["location"], state["cue"].value], device=DEVICE
         )
         if self.one_hot_state:
-            loc_one_hot = F.one_hot(
-                conv_state[0].long(), num_classes=len(self.tiles_locations)
-            )
-            cue_one_hot = F.one_hot(conv_state[1].long(), num_classes=len(Cues))
-            state_one_hot = torch.cat((loc_one_hot, cue_one_hot))
+            state_one_hot = self.to_one_hot(conv_state)
             return state_one_hot
         else:
             return conv_state
@@ -256,17 +252,11 @@ class WrappedEnvironment(Environment):
     def convert_tensor_state_to_composite(self, state):
         """Convert back tensor state to original composite state."""
         if self.one_hot_state:
-            loc = state[0 : len(self.tiles_locations)].argwhere().item()
-            cue = state[-len(Cues) :].argwhere().item()
-            conv_state = {
-                "location": loc,
-                "cue": Cues(cue),
-            }
-        else:
-            conv_state = {
-                "location": state[0],
-                "cue": Cues(state[1].item()),
-            }
+            state = self.from_one_hot(state)
+        conv_state = {
+            "location": state[0],
+            "cue": Cues(state[1].item()),
+        }
         return conv_state
 
     def step(self, action, current_state):
@@ -286,4 +276,18 @@ class WrappedEnvironment(Environment):
         state = super().reset()
         conv_state = self.convert_composite_to_tensor_state(state)
         conv_state = conv_state.float()  # Cast to float for PyTorch multiplication
+        return conv_state
+
+    def to_one_hot(self, state):
+        """Convert state to one-hot vector."""
+        loc_one_hot = F.one_hot(state[0].long(), num_classes=len(self.tiles_locations))
+        cue_one_hot = F.one_hot(state[1].long(), num_classes=len(Cues))
+        state_one_hot = torch.cat((loc_one_hot, cue_one_hot))
+        return state_one_hot
+
+    def from_one_hot(self, state):
+        """Convert state from one-hot vector to regular tensor."""
+        loc = state[0 : len(self.tiles_locations)].argwhere().item()
+        cue = state[-len(Cues) :].argwhere().item()
+        conv_state = torch.tensor([loc, cue], device=DEVICE)
         return conv_state

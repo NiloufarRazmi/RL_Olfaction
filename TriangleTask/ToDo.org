@@ -49,5 +49,5 @@ Get inspiration from https://pair.withgoogle.com/explorables/grokking/
 *** full
 ** DONE Not max but Q of the chosen action
 ** DONE Check update rule
-** TODO Vector or zeros instead of scalar Q value in the loss function
+** DONE Vector or zeros instead of scalar Q value in the loss function
 ** DONE One hot encoding of state inputs

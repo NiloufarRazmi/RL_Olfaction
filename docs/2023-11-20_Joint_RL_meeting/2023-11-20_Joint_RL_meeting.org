@@ -220,13 +220,13 @@ Questions ?
 ** Feed raw visual inputs
 ** DONE Not max but Q of the chosen action
 ** DONE Check update rule
-** TODO Vector or zeros instead of scalar Q value in the loss function
+** DONE Vector or zeros instead of scalar Q value in the loss function
 ** DONE One hot encoding of state inputs
 ** See correlation matrices of Wilson's paper
 ** See Yanniv's paper
 ** Add a time dimsension to correlation matrices
 ** Check MIND algorithm
 ** RNN
-** TODO Monhly default schedule
+** DONE Monhly default schedule
 ** TODO Next session plan with gantt chart
 ** DONE Meet with Niloufar to compare code next week
