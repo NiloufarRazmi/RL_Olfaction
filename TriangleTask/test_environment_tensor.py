@@ -11,12 +11,17 @@ from environment_tensor import (
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 
-def test_TriangleTask_general_props():
-    env = WrappedEnvironment()
+@pytest.mark.parametrize(
+    "one_hot_state, state_len",
+    [(False, 2), (True, 28)],
+    ids=["normal state", "state one hot encoded"],
+)
+def test_TriangleTask_general_props(one_hot_state, state_len):
+    env = WrappedEnvironment(one_hot_state=one_hot_state)
     assert env
     assert env.numActions == 4
     state = env.reset()
-    assert len(state) == 2
+    assert len(state) == state_len
     assert env.odor_condition == OdorCondition.pre
 
 
@@ -203,18 +208,33 @@ def test_TriangleTask_moves(
             [15, 16, 17, 18, 19],
             [20, 21, 22, 23, 24]])
     """
-    env = WrappedEnvironment()
-    state = torch.tensor([tile_num, cue_val], device=DEVICE)
-    action = torch.tensor(action_val, device=DEVICE)
-    env.TriangleState = trianglestate
-    observation, reward, done = env.step(action=action, current_state=state)
-    assert torch.equal(
-        observation, torch.tensor([exp_tile_num, exp_cue_val], device=DEVICE)
-    )
-    assert reward == exp_reward
-    assert done == exp_reward
-    assert env.TriangleState == trianglestate
-    assert env.odor_condition == odor_cond
+    envs = [
+        WrappedEnvironment(one_hot_state=False),
+        WrappedEnvironment(one_hot_state=True),
+    ]
+    for env in envs:
+        if env.one_hot_state:
+            state = env.to_one_hot(torch.tensor([tile_num, cue_val], device=DEVICE))
+        else:
+            state = torch.tensor([tile_num, cue_val], device=DEVICE)
+        action = torch.tensor(action_val, device=DEVICE)
+        env.TriangleState = trianglestate
+        observation, reward, done = env.step(action=action, current_state=state)
+        if env.one_hot_state:
+            assert torch.equal(
+                observation,
+                env.to_one_hot(
+                    torch.tensor([exp_tile_num, exp_cue_val], device=DEVICE)
+                ),
+            )
+        else:
+            assert torch.equal(
+                observation, torch.tensor([exp_tile_num, exp_cue_val], device=DEVICE)
+            )
+        assert reward == exp_reward
+        assert done == exp_reward
+        assert env.TriangleState == trianglestate
+        assert env.odor_condition == odor_cond
 
 
 @pytest.mark.parametrize(
@@ -272,64 +292,79 @@ def test_TriangleTask_logic(trianglestate, cue_val, correct_reward_port):
             [15, 16, 17, 18, 19],
             [20, 21, 22, 23, 24]])
     """
-
-    # Go to the odor port
-    if trianglestate == TriangleState.upper:
-        tile_num = 3
-        action_val = Actions.RIGHT.value
-    elif trianglestate == TriangleState.lower:
-        tile_num = 21
-        action_val = Actions.LEFT.value
-    env = WrappedEnvironment()
-    assert env.odor_condition == OdorCondition.pre
-    env.odor_ID = Cues(cue_val)
-    state = torch.tensor([tile_num, 0], device=DEVICE)
-    action = torch.tensor(action_val, device=DEVICE)
-    env.TriangleState = trianglestate
-    observation, reward, done = env.step(action=action, current_state=state)
-    assert observation[1] == cue_val.value
-    assert reward == 0
-    assert done == False
-    assert env.TriangleState == trianglestate
-    assert env.odor_condition == OdorCondition.post
-
-    # Get the reward
-    if trianglestate == TriangleState.upper:
-        if correct_reward_port:
-            if cue_val == Cues.OdorA:
-                tile_num = 1
-                action_val = Actions.LEFT.value
-            elif cue_val == Cues.OdorB:
-                tile_num = 19
-                action_val = Actions.DOWN.value
+    envs = [
+        WrappedEnvironment(one_hot_state=False),
+        WrappedEnvironment(one_hot_state=True),
+    ]
+    for env in envs:
+        # Go to the odor port
+        if trianglestate == TriangleState.upper:
+            tile_num = 3
+            action_val = Actions.RIGHT.value
+        elif trianglestate == TriangleState.lower:
+            tile_num = 21
+            action_val = Actions.LEFT.value
+        assert env.odor_condition == OdorCondition.pre
+        env.odor_ID = Cues(cue_val)
+        if env.one_hot_state:
+            state = env.to_one_hot(torch.tensor([tile_num, 0], device=DEVICE))
         else:
-            if cue_val == Cues.OdorA:
-                tile_num = 19
-                action_val = Actions.DOWN.value
-            elif cue_val == Cues.OdorB:
-                tile_num = 1
-                action_val = Actions.LEFT.value
-    elif trianglestate == TriangleState.lower:
-        if correct_reward_port:
-            if cue_val == Cues.OdorA:
-                tile_num = 5
-                action_val = Actions.UP.value
-            elif cue_val == Cues.OdorB:
-                tile_num = 23
-                action_val = Actions.RIGHT.value
+            state = torch.tensor([tile_num, 0], device=DEVICE)
+
+        action = torch.tensor(action_val, device=DEVICE)
+        env.TriangleState = trianglestate
+        observation, reward, done = env.step(action=action, current_state=state)
+        if env.one_hot_state:
+            assert env.from_one_hot(observation)[1] == cue_val.value
         else:
-            if cue_val == Cues.OdorA:
-                tile_num = 23
-                action_val = Actions.RIGHT.value
-            elif cue_val == Cues.OdorB:
-                tile_num = 5
-                action_val = Actions.UP.value
-    state = torch.tensor([tile_num, cue_val.value], device=DEVICE)
-    action = torch.tensor(action_val, device=DEVICE)
-    observation, reward, done = env.step(action=action, current_state=state)
-    if correct_reward_port:
-        assert reward > 0
-        assert done == True
-    else:
-        assert reward <= 0
-        assert done == True
+            assert observation[1] == cue_val.value
+        assert reward == 0
+        assert done == False
+        assert env.TriangleState == trianglestate
+        assert env.odor_condition == OdorCondition.post
+
+        # Get the reward
+        if trianglestate == TriangleState.upper:
+            if correct_reward_port:
+                if cue_val == Cues.OdorA:
+                    tile_num = 1
+                    action_val = Actions.LEFT.value
+                elif cue_val == Cues.OdorB:
+                    tile_num = 19
+                    action_val = Actions.DOWN.value
+            else:
+                if cue_val == Cues.OdorA:
+                    tile_num = 19
+                    action_val = Actions.DOWN.value
+                elif cue_val == Cues.OdorB:
+                    tile_num = 1
+                    action_val = Actions.LEFT.value
+        elif trianglestate == TriangleState.lower:
+            if correct_reward_port:
+                if cue_val == Cues.OdorA:
+                    tile_num = 5
+                    action_val = Actions.UP.value
+                elif cue_val == Cues.OdorB:
+                    tile_num = 23
+                    action_val = Actions.RIGHT.value
+            else:
+                if cue_val == Cues.OdorA:
+                    tile_num = 23
+                    action_val = Actions.RIGHT.value
+                elif cue_val == Cues.OdorB:
+                    tile_num = 5
+                    action_val = Actions.UP.value
+        if env.one_hot_state:
+            state = env.to_one_hot(
+                torch.tensor([tile_num, cue_val.value], device=DEVICE)
+            )
+        else:
+            state = torch.tensor([tile_num, cue_val.value], device=DEVICE)
+        action = torch.tensor(action_val, device=DEVICE)
+        observation, reward, done = env.step(action=action, current_state=state)
+        if correct_reward_port:
+            assert reward > 0
+            assert done == True
+        else:
+            assert reward <= 0
+            assert done == True

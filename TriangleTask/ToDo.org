@@ -43,6 +43,7 @@ Get inspiration from https://pair.withgoogle.com/explorables/grokking/
 - https://discuss.pytorch.org/t/combine-linear-layers/22337/3
 * TODO Debug
 ** DONE Unit test env
+** DONE Unit test one hot case
 ** DONE Test learning gradually
 *** only get to reward with no odor
 *** always odor A
@@ -51,3 +52,7 @@ Get inspiration from https://pair.withgoogle.com/explorables/grokking/
 ** DONE Check update rule
 ** DONE Vector or zeros instead of scalar Q value in the loss function
 ** DONE One hot encoding of state inputs
+* Improvments
+** Minibatches
+** Experience replay
+** Target network

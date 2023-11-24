@@ -228,7 +228,7 @@ class WrappedEnvironment(Environment):
 
     Results in numerical only state space"""
 
-    def __init__(self, rng=None, one_hot_state=True):
+    def __init__(self, rng=None, one_hot_state=False):
         # Initialize the base class to get the base properties
         self.one_hot_state = one_hot_state
         super().__init__(rng=None)
