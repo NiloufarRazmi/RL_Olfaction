@@ -90,9 +90,9 @@ def check_plots():
 p = Params(
     seed=42,
     n_runs=1,
-    total_episodes=100,
+    total_episodes=1000,
     epsilon=0.2,
-    alpha=0.05,
+    alpha=0.0001,
     gamma=0.9,
     nHiddenUnits=(5 * 5 + 2) * 2,
 )
@@ -139,6 +139,7 @@ class DQN(nn.Module):
             nn.Linear(n_units, n_units),
             nn.ReLU(),
             nn.Linear(n_units, n_actions),
+            nn.ReLU(),
         )
 
     def forward(self, x):
