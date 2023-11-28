@@ -90,7 +90,7 @@ def check_plots():
 p = Params(
     seed=42,
     n_runs=1,
-    total_episodes=1000,
+    total_episodes=100,
     epsilon=0.2,
     alpha=0.05,
     gamma=0.9,
@@ -218,6 +218,55 @@ class EpsilonGreedy:
 # %%
 explorer = EpsilonGreedy(epsilon=p.epsilon, rng=p.rng)
 
+
+# %%
+def collect_weights_biases():
+    biases = []
+    weights = []
+    for layer in net.mlp.children():
+        layer_params = layer.parameters()
+        for idx, subparams in enumerate(layer_params):
+            if idx > 2:
+                raise ValueError(
+                    "There should be max 2 sets of parameters: weights and biases"
+                )
+            if len(subparams.shape) > 2:
+                raise ValueError("The weights have more dimensions than expected")
+
+            if len(subparams.shape) == 1:
+                biases.append(subparams)
+            elif len(subparams.shape) == 2:
+                weights.append(subparams)
+    return weights, biases
+
+
+# %%
+def params_df_stats(weights, current_df=None):
+    if not current_df is None:
+        last_idx = current_df.index[-1] + 1
+        df = current_df
+    else:
+        last_idx = 0
+        df = None
+
+    for idx, val in enumerate(weights):
+        tmp_df = pd.DataFrame(
+            data={
+                "Std": val.detach().numpy().std(),
+                "Avg": val.detach().numpy().mean(),
+                "Layer": idx,
+                "Index": [last_idx + idx],
+            },
+            index=[last_idx + idx],
+        )
+
+        if df is None:
+            df = tmp_df
+        else:
+            df = pd.concat((df, tmp_df))
+    return df
+
+
 # %% [markdown]
 # ### Main loop
 
@@ -229,6 +278,8 @@ all_states = []
 all_actions = []
 losses = [[] for _ in range(p.n_runs)]
 episode_durations = []
+weights_stats = None
+biases_stats = None
 
 for run in range(p.n_runs):  # Run several times to account for stochasticity
     # Reset model
@@ -320,13 +371,12 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
         episode_durations.append(step_count + 1)
         rewards[episode, run] = total_rewards
         steps[episode, run] = step_count
+        weights, biases = collect_weights_biases()
+        weights_stats = params_df_stats(weights, current_df=weights_stats)
+        biases_stats = params_df_stats(biases, current_df=biases_stats)
+    weights_stats.set_index("Index", inplace=True)
+    biases_stats.set_index("Index", inplace=True)
 
-
-# %%
-# weights_metrics
-
-# %%
-# grads_metrics
 
 # %%
 # grads_metrics["avg_rolling"] = np.nan
@@ -528,7 +578,7 @@ def qtable_directions_map(qtable, rows, cols):
         Actions.RIGHT: "→",
     }
     qtable_directions = np.empty(qtable_best_action.flatten().shape, dtype=str)
-    eps = torch.finfo(torch.float32).eps  # Minimum float number on the machine
+    eps = torch.finfo(torch.float64).eps  # Minimum float number on the machine
     for idx, val in enumerate(qtable_best_action.flatten()):
         if qtable_val_max.flatten()[idx] > eps:
             # Assign an arrow only if a minimal Q-value has been learned as best action
@@ -615,18 +665,142 @@ def plot_policies(q_values, labels):
 plot_policies(q_values=q_values, labels=CONTEXTS_LABELS)
 
 # %%
-env.tiles_locations.reshape((env.rows, env.cols))
+weights, biases = collect_weights_biases()
+
 
 # %%
-[item for item in Actions]
+def params_df_flat(weights):
+    for idx, val in enumerate(weights):
+        tmp_df = pd.DataFrame(
+            data={
+                "Val": val.detach().numpy().flatten(),
+                "Layer": idx,
+            }
+        )
+        if idx == 0:
+            df = tmp_df
+        else:
+            df = pd.concat((df, tmp_df))
+    return df
+
 
 # %%
-[item for item in Cues]
+weights_df = params_df_flat(weights)
+weights_df
 
 # %%
-net(torch.tensor([4, 1]).float())
+biases_df = params_df_flat(biases)
+biases_df
+
 
 # %%
-net(torch.tensor([19, 1]).float()).argmax()
+def plot_weights_biases_distributions(weights_df, biases_df):
+    fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(13, 5))
+
+    ax[0].set_title("Weights")
+    ax[0].set_xlabel("Values")
+    palette = sns.color_palette()[0 : len(weights_df.Layer.unique())]
+    sns.histplot(
+        data=weights_df,
+        x="Val",
+        hue="Layer",
+        kde=True,
+        # log_scale=True,
+        palette=palette,
+        ax=ax[0],
+    )
+
+    ax[1].set_title("Biases")
+    ax[1].set_xlabel("Values")
+    eps = torch.finfo(torch.float64).eps
+    palette = sns.color_palette()[
+        0 : len(biases_df[biases_df.Val > eps].Layer.unique())
+    ]
+    sns.histplot(
+        data=biases_df[biases_df.Val > eps],
+        x="Val",
+        hue="Layer",
+        kde=True,
+        log_scale=True,
+        palette=palette,
+        ax=ax[1],
+    )
+
+    fig.tight_layout()
+    plt.show()
+
+
+# %%
+plot_weights_biases_distributions(weights_df, biases_df)
+
+# %%
+weights_stats
+
+# %%
+biases_stats
+
+
+# %%
+def plot_weights_biases_stats(weights_stats, biases_stats):
+    fig, ax = plt.subplots(nrows=2, ncols=2, figsize=(13, 8))
+
+    ax[0, 0].set_title("Weights")
+    ax[0, 0].set_xlabel("Episodes")
+    palette = sns.color_palette()[0 : len(weights_stats.Layer.unique())]
+    sns.lineplot(
+        data=weights_stats,
+        x="Index",
+        y="Std",
+        hue="Layer",
+        palette=palette,
+        ax=ax[0, 0],
+    )
+    # ax[0, 0].set(yscale="log")
+
+    ax[0, 1].set_title("Weights")
+    ax[0, 1].set_xlabel("Episodes")
+    palette = sns.color_palette()[0 : len(weights_stats.Layer.unique())]
+    sns.lineplot(
+        data=weights_stats,
+        x="Index",
+        y="Avg",
+        hue="Layer",
+        palette=palette,
+        ax=ax[0, 1],
+    )
+    # ax[0, 1].set(yscale="log")
+
+    ax[1, 0].set_title("Biases")
+    ax[1, 0].set_xlabel("Episodes")
+    palette = sns.color_palette()[0 : len(biases_stats.Layer.unique())]
+    sns.lineplot(
+        data=biases_stats,
+        x="Index",
+        y="Std",
+        hue="Layer",
+        palette=palette,
+        ax=ax[1, 0],
+    )
+    # ax[1, 0].set(yscale="log")
+
+    ax[1, 1].set_title("Biases")
+    ax[1, 1].set_xlabel("Episodes")
+    palette = sns.color_palette()[0 : len(biases_stats.Layer.unique())]
+    sns.lineplot(
+        data=biases_stats,
+        x="Index",
+        y="Avg",
+        hue="Layer",
+        palette=palette,
+        ax=ax[1, 1],
+    )
+    # ax[1, 1].set(yscale="log")
+
+    fig.tight_layout()
+    plt.show()
+
+
+# %%
+plot_weights_biases_stats(weights_stats, biases_stats)
 
 # %%
