@@ -19,41 +19,41 @@
 # %% [markdown]
 # ## Dependencies
 
-import os
-
 # %%
 from pathlib import Path
+import os
 
 import ipdb
+
+import numpy as np
+from tqdm import tqdm
+import matplotlib.pyplot as plt
 import matplotlib as mpl
 import matplotlib.patches as mpatches
-import matplotlib.pyplot as plt
-import numpy as np
+from matplotlib.offsetbox import AnnotationBbox, OffsetImage
 import pandas as pd
 import seaborn as sns
+from imojify import imojify
 
 # %%
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 import torch.optim as optim
-from imojify import imojify
-from matplotlib.offsetbox import AnnotationBbox, OffsetImage
-from torchinfo import summary
-from tqdm import tqdm
+import torch.nn.functional as F
+
+# from torchinfo import summary
 
 # if GPU is to be used
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 device
 
-from environment_tensor import CONTEXTS_LABELS, Actions, Cues, WrappedEnvironment
-
 # %%
 from utils import Params, random_choice
+from environment_tensor import WrappedEnvironment, Actions, CONTEXTS_LABELS, Cues
 
 # %%
 # Formatting & autoreload stuff
-# %load_ext lab_black
+# # %load_ext lab_black
 # %load_ext autoreload
 # %autoreload 2
 # # %matplotlib ipympl
@@ -90,7 +90,7 @@ def check_plots():
 p = Params(
     seed=42,
     n_runs=1,
-    total_episodes=1000,
+    total_episodes=100000,
     epsilon=0.2,
     alpha=0.0001,
     gamma=0.9,
@@ -253,8 +253,8 @@ def params_df_stats(weights, current_df=None):
     for idx, val in enumerate(weights):
         tmp_df = pd.DataFrame(
             data={
-                "Std": val.detach().numpy().std(),
-                "Avg": val.detach().numpy().mean(),
+                "Std": val.detach().cpu().std().item(),
+                "Avg": val.detach().cpu().mean().item(),
                 "Layer": idx,
                 "Index": [last_idx + idx],
             },
@@ -283,11 +283,11 @@ weights_stats = None
 biases_stats = None
 
 for run in range(p.n_runs):  # Run several times to account for stochasticity
-    # Reset model
-    net = DQN(
-        n_observations=p.n_observations, n_actions=p.n_actions, n_units=p.nHiddenUnits
-    ).to(device)
-    optimizer = optim.AdamW(net.parameters(), lr=p.alpha, amsgrad=True)
+    # # Reset model
+    # net = DQN(
+    #     n_observations=p.n_observations, n_actions=p.n_actions, n_units=p.nHiddenUnits
+    # ).to(device)
+    # optimizer = optim.AdamW(net.parameters(), lr=p.alpha, amsgrad=True)
 
     for episode in tqdm(
         episodes, desc=f"Run {run+1}/{p.n_runs} - Episodes", leave=False
@@ -674,7 +674,7 @@ def params_df_flat(weights):
     for idx, val in enumerate(weights):
         tmp_df = pd.DataFrame(
             data={
-                "Val": val.detach().numpy().flatten(),
+                "Val": val.detach().cpu().flatten(),
                 "Layer": idx,
             }
         )
