@@ -54,7 +54,7 @@ Get inspiration from https://pair.withgoogle.com/explorables/grokking/
 ** DONE One hot encoding of state inputs
 ** DONE Plot stats of weights and biases
 ** TODO Plot gradients
-* Improvments
+* TODO Improvments
 ** Minibatches
-** Experience replay
+** TODO Experience replay
 ** Target network
