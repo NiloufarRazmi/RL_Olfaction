@@ -19,27 +19,27 @@
 # %% [markdown]
 # ## Dependencies
 
-# %%
-from pathlib import Path
 import os
 
-import ipdb
+# %%
+from pathlib import Path
 
-import numpy as np
-from tqdm import tqdm
-import matplotlib.pyplot as plt
+import ipdb
 import matplotlib as mpl
 import matplotlib.patches as mpatches
-from matplotlib.offsetbox import AnnotationBbox, OffsetImage
+import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 import seaborn as sns
-from imojify import imojify
 
 # %%
 import torch
 import torch.nn as nn
-import torch.optim as optim
 import torch.nn.functional as F
+import torch.optim as optim
+from imojify import imojify
+from matplotlib.offsetbox import AnnotationBbox, OffsetImage
+from tqdm import tqdm
 
 # from torchinfo import summary
 
@@ -47,13 +47,14 @@ import torch.nn.functional as F
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 device
 
+from environment_tensor import CONTEXTS_LABELS, Actions, Cues, WrappedEnvironment
+
 # %%
 from utils import Params, random_choice
-from environment_tensor import WrappedEnvironment, Actions, CONTEXTS_LABELS, Cues
 
 # %%
 # Formatting & autoreload stuff
-# # %load_ext lab_black
+# %load_ext lab_black
 # %load_ext autoreload
 # %autoreload 2
 # # %matplotlib ipympl
@@ -90,7 +91,7 @@ def check_plots():
 p = Params(
     seed=42,
     n_runs=1,
-    total_episodes=100000,
+    total_episodes=1000,
     epsilon=0.2,
     alpha=0.0001,
     gamma=0.9,
@@ -221,9 +222,9 @@ explorer = EpsilonGreedy(epsilon=p.epsilon, rng=p.rng)
 
 
 # %%
-def collect_weights_biases():
-    biases = []
-    weights = []
+def collect_weights_biases(net):
+    biases = {"val": [], "grad": []}
+    weights = {"val": [], "grad": []}
     for layer in net.mlp.children():
         layer_params = layer.parameters()
         for idx, subparams in enumerate(layer_params):
@@ -235,14 +236,16 @@ def collect_weights_biases():
                 raise ValueError("The weights have more dimensions than expected")
 
             if len(subparams.shape) == 1:
-                biases.append(subparams)
+                biases["val"].append(subparams)
+                biases["grad"].append(subparams.grad)
             elif len(subparams.shape) == 2:
-                weights.append(subparams)
+                weights["val"].append(subparams)
+                weights["grad"].append(subparams.grad)
     return weights, biases
 
 
 # %%
-def params_df_stats(weights, current_df=None):
+def params_df_stats(weights, key, current_df=None):
     if not current_df is None:
         last_idx = current_df.index[-1] + 1
         df = current_df
@@ -250,7 +253,7 @@ def params_df_stats(weights, current_df=None):
         last_idx = 0
         df = None
 
-    for idx, val in enumerate(weights):
+    for idx, val in enumerate(weights[key]):
         tmp_df = pd.DataFrame(
             data={
                 "Std": val.detach().cpu().std().item(),
@@ -279,8 +282,10 @@ all_states = []
 all_actions = []
 losses = [[] for _ in range(p.n_runs)]
 episode_durations = []
-weights_stats = None
-biases_stats = None
+weights_val_stats = None
+biases_val_stats = None
+weights_grad_stats = None
+biases_grad_stats = None
 
 for run in range(p.n_runs):  # Run several times to account for stochasticity
     # # Reset model
@@ -372,11 +377,23 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
         episode_durations.append(step_count + 1)
         rewards[episode, run] = total_rewards
         steps[episode, run] = step_count
-        weights, biases = collect_weights_biases()
-        weights_stats = params_df_stats(weights, current_df=weights_stats)
-        biases_stats = params_df_stats(biases, current_df=biases_stats)
-    weights_stats.set_index("Index", inplace=True)
-    biases_stats.set_index("Index", inplace=True)
+        weights, biases = collect_weights_biases(net=net)
+        weights_val_stats = params_df_stats(
+            weights, key="val", current_df=weights_grad_stats
+        )
+        biases_val_stats = params_df_stats(
+            biases, key="val", current_df=biases_val_stats
+        )
+        biases_grad_stats = params_df_stats(
+            biases, key="grad", current_df=biases_grad_stats
+        )
+        weights_grad_stats = params_df_stats(
+            weights, key="grad", current_df=weights_val_stats
+        )
+    weights_val_stats.set_index("Index", inplace=True)
+    biases_val_stats.set_index("Index", inplace=True)
+    biases_grad_stats.set_index("Index", inplace=True)
+    weights_grad_stats.set_index("Index", inplace=True)
 
 
 # %%
@@ -666,7 +683,7 @@ def plot_policies(q_values, labels):
 plot_policies(q_values=q_values, labels=CONTEXTS_LABELS)
 
 # %%
-weights, biases = collect_weights_biases()
+weights, biases = collect_weights_biases(net=net)
 
 
 # %%
@@ -686,20 +703,31 @@ def params_df_flat(weights):
 
 
 # %%
-weights_df = params_df_flat(weights)
-weights_df
+weights_val_df = params_df_flat(weights["val"])
+weights_val_df
 
 # %%
-biases_df = params_df_flat(biases)
-biases_df
+biases_val_df = params_df_flat(biases["val"])
+biases_val_df
+
+# %%
+weights_grad_df = params_df_flat(weights["grad"])
+weights_grad_df
+
+# %%
+biases_grad_df = params_df_flat(biases["grad"])
+biases_grad_df
 
 
 # %%
-def plot_weights_biases_distributions(weights_df, biases_df):
+def plot_weights_biases_distributions(weights_df, biases_df, label=None):
     fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(13, 5))
 
     ax[0].set_title("Weights")
-    ax[0].set_xlabel("Values")
+    if label:
+        ax[0].set_xlabel(label)
+    else:
+        ax[0].set_xlabel("Values")
     palette = sns.color_palette()[0 : len(weights_df.Layer.unique())]
     sns.histplot(
         data=weights_df,
@@ -712,7 +740,10 @@ def plot_weights_biases_distributions(weights_df, biases_df):
     )
 
     ax[1].set_title("Biases")
-    ax[1].set_xlabel("Values")
+    if label:
+        ax[1].set_xlabel(label)
+    else:
+        ax[1].set_xlabel("Values")
     eps = torch.finfo(torch.float64).eps
     palette = sns.color_palette()[
         0 : len(biases_df[biases_df.Val > eps].Layer.unique())
@@ -732,20 +763,32 @@ def plot_weights_biases_distributions(weights_df, biases_df):
 
 
 # %%
-plot_weights_biases_distributions(weights_df, biases_df)
+plot_weights_biases_distributions(weights_val_df, biases_val_df, label="Values")
 
 # %%
-weights_stats
+plot_weights_biases_distributions(weights_grad_df, biases_grad_df, label="Gradients")
 
 # %%
-biases_stats
+weights_val_stats
+
+# %%
+biases_val_stats
+
+# %%
+weights_grad_stats
+
+# %%
+biases_grad_stats
 
 
 # %%
-def plot_weights_biases_stats(weights_stats, biases_stats):
+def plot_weights_biases_stats(weights_stats, biases_stats, label=None):
     fig, ax = plt.subplots(nrows=2, ncols=2, figsize=(13, 8))
 
-    ax[0, 0].set_title("Weights")
+    if label:
+        ax[0, 0].set_title("Weights " + label)
+    else:
+        ax[0, 0].set_title("Weights")
     ax[0, 0].set_xlabel("Episodes")
     palette = sns.color_palette()[0 : len(weights_stats.Layer.unique())]
     sns.lineplot(
@@ -758,7 +801,10 @@ def plot_weights_biases_stats(weights_stats, biases_stats):
     )
     # ax[0, 0].set(yscale="log")
 
-    ax[0, 1].set_title("Weights")
+    if label:
+        ax[0, 1].set_title("Weights " + label)
+    else:
+        ax[0, 1].set_title("Weights")
     ax[0, 1].set_xlabel("Episodes")
     palette = sns.color_palette()[0 : len(weights_stats.Layer.unique())]
     sns.lineplot(
@@ -771,7 +817,10 @@ def plot_weights_biases_stats(weights_stats, biases_stats):
     )
     # ax[0, 1].set(yscale="log")
 
-    ax[1, 0].set_title("Biases")
+    if label:
+        ax[1, 0].set_title("Biases " + label)
+    else:
+        ax[1, 0].set_title("Biases")
     ax[1, 0].set_xlabel("Episodes")
     palette = sns.color_palette()[0 : len(biases_stats.Layer.unique())]
     sns.lineplot(
@@ -784,7 +833,10 @@ def plot_weights_biases_stats(weights_stats, biases_stats):
     )
     # ax[1, 0].set(yscale="log")
 
-    ax[1, 1].set_title("Biases")
+    if label:
+        ax[1, 1].set_title("Biases " + label)
+    else:
+        ax[1, 1].set_title("Biases")
     ax[1, 1].set_xlabel("Episodes")
     palette = sns.color_palette()[0 : len(biases_stats.Layer.unique())]
     sns.lineplot(
@@ -802,6 +854,9 @@ def plot_weights_biases_stats(weights_stats, biases_stats):
 
 
 # %%
-plot_weights_biases_stats(weights_stats, biases_stats)
+plot_weights_biases_stats(weights_val_stats, biases_val_stats, label="values")
+
+# %%
+plot_weights_biases_stats(weights_grad_stats, biases_grad_stats, label="gradients")
 
 # %%
