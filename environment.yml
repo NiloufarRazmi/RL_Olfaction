@@ -30,7 +30,8 @@ dependencies:
   # - pytorch-cuda
   # - spyder
   # - spyder-notebook
-  - torchinfo
+  # - torchinfo
   - pytest
+  - tensordict
   - pip:
       - imojify
