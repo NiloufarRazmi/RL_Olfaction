@@ -94,9 +94,10 @@ p = Params(
     n_runs=1,
     total_episodes=1000,
     epsilon=0.2,
-    alpha=0.0001,
+    alpha=0.001,
     gamma=0.9,
     nHiddenUnits=(5 * 5 + 2) * 2,
+    replay_buffer_max_size=1000,
 )
 p
 
@@ -293,6 +294,7 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
     biases_val_stats = None
     weights_grad_stats = None
     biases_grad_stats = None
+    replay_buffer = []
 
     for episode in tqdm(
         episodes, desc=f"Run {run+1}/{p.n_runs} - Episodes", leave=False
@@ -319,17 +321,33 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
                 action=action.item(), current_state=state
             )
 
+            # Store transition in replay buffer
+            if len(replay_buffer) >= p.replay_buffer_max_size:
+                replay_buffer = replay_buffer[1:]
+            # [current_state (2 or 28 x1), action (1x1), next_state (2 or 28 x1), reward (1x1), done (1x1 bool)]
+            replay_buffer.append([state, action, reward, next_state, done])
+            (
+                state_sampled,
+                action_sampled,
+                reward_sampled,
+                next_state_sampled,
+                done_sampled,
+            ) = random_choice(replay_buffer, length=len(replay_buffer))
+
             # See DQN paper for equations: https://arxiv.org/abs/1312.5602
-            state_action_value = state_action_values[action].unsqueeze(-1)  # Q(s_t, a)
-            if done:
-                expected_state_action_value = reward
+            state_action_values_sampled = net(state_sampled).to(device)  # Q(s_t)
+            state_action_value = state_action_values_sampled[action_sampled].unsqueeze(
+                -1
+            )  # Q(s_t, a)
+            if done_sampled:
+                expected_state_action_value = reward_sampled
             else:
                 with torch.no_grad():
                     next_state_values = (
-                        net(next_state).to(device).max().unsqueeze(-1)
+                        net(next_state_sampled).to(device).max().unsqueeze(-1)
                     )  # Q(s_t+1, a)
                 expected_state_action_value = (
-                    reward + p.gamma * next_state_values
+                    reward_sampled + p.gamma * next_state_values
                 )  # y_j (Bellman optimality equation)
 
             # Compute loss
@@ -337,27 +355,6 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
             loss = criterion(
                 input=state_action_value, target=expected_state_action_value
             )  # TD update
-
-            # # See DQN paper for equations: https://arxiv.org/abs/1312.5602
-            # expected_state_action_values = torch.zeros_like(
-            #     state_action_values, device=device
-            # )
-            # if done:
-            #     expected_state_action_values[action] = reward
-            # else:
-            #     with torch.no_grad():
-            #         next_state_value = (
-            #             net(next_state).to(device).max()  # .unsqueeze(-1)
-            #         )  # Q(s_t+1, a)
-            #     expected_state_action_values[action] = (
-            #         reward + p.gamma * next_state_value
-            #     )  # y_j (Bellman optimality equation)
-
-            # # Compute loss
-            # criterion = nn.MSELoss()
-            # loss = criterion(
-            #     input=state_action_values, target=expected_state_action_values
-            # )  # TD update
 
             # Optimize the model
             optimizer.zero_grad()
@@ -367,12 +364,12 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
             torch.nn.utils.clip_grad_value_(net.parameters(), 100)
             optimizer.step()
 
-            # Move to the next state
-            state = next_state
-
             total_rewards += reward
             step_count += 1
             losses[run].append(loss.item())
+
+            # Move to the next state
+            state = next_state
 
         rewards[episode, run] = total_rewards
         steps[episode, run] = step_count

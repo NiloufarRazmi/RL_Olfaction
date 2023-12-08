@@ -6,11 +6,13 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
+import torch
 
 # from curlyBrace import curlyBrace
 from imojify import imojify
 from matplotlib.offsetbox import AnnotationBbox, OffsetImage
-from utils import get_location_count
+
+# from utils import get_location_count
 
 sns.set_theme(font_scale=1.5)
 mpl.rcParams["font.family"] = ["sans-serif"]
@@ -426,5 +428,47 @@ def plot_location_count(
         chart.set(title="Locations count during training")
         ax.set_xticks([])
         ax.set_yticks([])
+    fig.tight_layout()
+    plt.show()
+
+
+def plot_weights_biases_distributions(weights_df, biases_df, label=None):
+    fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(13, 5))
+
+    ax[0].set_title("Weights")
+    if label:
+        ax[0].set_xlabel(label)
+    else:
+        ax[0].set_xlabel("Values")
+    palette = sns.color_palette()[0 : len(weights_df.Layer.unique())]
+    sns.histplot(
+        data=weights_df,
+        x="Val",
+        hue="Layer",
+        # kde=True,
+        log_scale=True,  # if label == "Gradients" else False,
+        palette=palette,
+        ax=ax[0],
+    )
+
+    ax[1].set_title("Biases")
+    if label:
+        ax[1].set_xlabel(label)
+    else:
+        ax[1].set_xlabel("Values")
+    eps = torch.finfo(torch.float64).eps
+    palette = sns.color_palette()[
+        0 : len(biases_df[biases_df.Val > eps].Layer.unique())
+    ]
+    sns.histplot(
+        data=biases_df[biases_df.Val > eps],
+        x="Val",
+        hue="Layer",
+        kde=True,
+        log_scale=True,
+        palette=palette,
+        ax=ax[1],
+    )
+
     fig.tight_layout()
     plt.show()

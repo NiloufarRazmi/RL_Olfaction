@@ -33,9 +33,19 @@ class Params:
     n_observations: Optional[int] = None
     n_actions: Optional[int] = None
 
+    replay_buffer_max_size: int = 1000
 
-def random_choice(choices_array):
-    logits = torch.ones_like(choices_array)
+
+def random_choice(choices_array, length=None):
+    """
+    PyTorch version of `numpy.random.choice`.
+
+    Generates a random sample from a given 1-D array
+    """
+    if length:
+        logits = torch.ones(length)
+    else:
+        logits = torch.ones_like(choices_array)
     idx = torch.distributions.categorical.Categorical(logits=logits).sample()
-    random_choice = choices_array[idx]
-    return random_choice
+    random_res = choices_array[idx]
+    return random_res
