@@ -18,6 +18,10 @@ class Params:
 
     # epsilon-greedy
     epsilon: float = 0.2  # Action-selection parameters
+    epsilon_min: float = (0.1,)
+    epsilon_max: float = (1.0,)
+    decay_rate: float = (0.05,)
+    epsilon_warmup: float = (100,)
 
     # Learning parameters
     gamma: float = 0.8

@@ -98,6 +98,10 @@ p = Params(
     gamma=0.9,
     nHiddenUnits=(5 * 5 + 2) * 2,
     replay_buffer_max_size=1000,
+    epsilon_min=0.1,
+    epsilon_max=1.0,
+    decay_rate=0.05,
+    epsilon_warmup=200,
 )
 p
 
@@ -183,11 +187,19 @@ class EpsilonGreedy:
     def __init__(
         self,
         epsilon,
+        epsilon_min=0.1,
+        epsilon_max=1.0,
+        decay_rate=0.05,
+        epsilon_warmup=25,
         rng=None,
     ):
         self.epsilon = epsilon
-        # if rng:
-        #     self.rng = rng
+        self.epsilon_min = epsilon_min
+        self.epsilon_max = epsilon_max
+        self.decay_rate = decay_rate
+        self.epsilon_warmup = epsilon_warmup
+        if rng:
+            self.rng = rng
 
     def choose_action(self, action_space, state, state_action_values):
         """Choose an action a in the current world state (s)"""
@@ -218,9 +230,25 @@ class EpsilonGreedy:
                 action = torch.argmax(state_action_values)
         return action
 
+    def update_epsilon(self, ep):
+        if ep > self.epsilon_warmup:
+            """Reduce epsilon (because we need less and less exploration)"""
+            epsilon = self.epsilon_min + (
+                self.epsilon_max - self.epsilon_min
+            ) * torch.exp(-self.decay_rate * (ep - self.epsilon_warmup))
+        else:
+            epsilon = self.epsilon
+        return epsilon
+
 
 # %%
-explorer = EpsilonGreedy(epsilon=p.epsilon, rng=p.rng)
+explorer = EpsilonGreedy(
+    epsilon=p.epsilon,
+    epsilon_min=p.epsilon_min,
+    epsilon_max=p.epsilon_max,
+    decay_rate=p.decay_rate,
+    epsilon_warmup=p.epsilon_warmup,
+)
 
 
 # %%
@@ -370,6 +398,8 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
 
             # Move to the next state
             state = next_state
+
+        explorer.epsilon = explorer.update_epsilon(episode)
 
         rewards[episode, run] = total_rewards
         steps[episode, run] = step_count
@@ -703,21 +733,57 @@ weights_val_df = params_df_flat(weights["val"])
 weights_val_df
 
 # %%
+weights_val_df.describe()
+
+# %%
 biases_val_df = params_df_flat(biases["val"])
 biases_val_df
+
+# %%
+biases_val_df.describe()
 
 # %%
 weights_grad_df = params_df_flat(weights["grad"])
 weights_grad_df
 
 # %%
+weights_grad_df.describe()
+
+# %%
 biases_grad_df = params_df_flat(biases["grad"])
 biases_grad_df
+
+# %%
+biases_grad_df.describe()
+
+
+# %%
+def check_grad_stats(grad_df):
+    grad_stats = torch.tensor(
+        [
+            grad_df.Val.mean(),
+            grad_df.Val.std(),
+            grad_df.Val.min(),
+            grad_df.Val.max(),
+        ],
+        device=device,
+    )
+    assert not torch.equal(
+        torch.zeros_like(grad_stats),
+        grad_stats,
+    ), "Gradients are zero"
+
 
 # %%
 plotting.plot_weights_biases_distributions(
     weights_val_df, biases_val_df, label="Values"
 )
+
+# %%
+check_grad_stats(weights_grad_df)
+
+# %%
+check_grad_stats(biases_grad_df)
 
 # %%
 plotting.plot_weights_biases_distributions(
@@ -755,7 +821,7 @@ def plot_weights_biases_stats(weights_stats, biases_stats, label=None):
         palette=palette,
         ax=ax[0, 0],
     )
-    # ax[0, 0].set(yscale="log")
+    ax[0, 0].set(yscale="log")
 
     if label:
         ax[0, 1].set_title("Weights " + label)
@@ -771,7 +837,7 @@ def plot_weights_biases_stats(weights_stats, biases_stats, label=None):
         palette=palette,
         ax=ax[0, 1],
     )
-    # ax[0, 1].set(yscale="log")
+    ax[0, 1].set(yscale="log")
 
     if label:
         ax[1, 0].set_title("Biases " + label)
@@ -787,7 +853,7 @@ def plot_weights_biases_stats(weights_stats, biases_stats, label=None):
         palette=palette,
         ax=ax[1, 0],
     )
-    # ax[1, 0].set(yscale="log")
+    ax[1, 0].set(yscale="log")
 
     if label:
         ax[1, 1].set_title("Biases " + label)
@@ -803,7 +869,7 @@ def plot_weights_biases_stats(weights_stats, biases_stats, label=None):
         palette=palette,
         ax=ax[1, 1],
     )
-    # ax[1, 1].set(yscale="log")
+    ax[1, 1].set(yscale="log")
 
     fig.tight_layout()
     plt.show()
