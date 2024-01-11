@@ -233,9 +233,11 @@ class EpsilonGreedy:
     def update_epsilon(self, ep):
         if ep > self.epsilon_warmup:
             """Reduce epsilon (because we need less and less exploration)"""
-            epsilon = self.epsilon_min + (
-                self.epsilon_max - self.epsilon_min
-            ) * torch.exp(-self.decay_rate * (ep - self.epsilon_warmup))
+            epsilon = (
+                self.epsilon_min
+                + (self.epsilon_max - self.epsilon_min)
+                * torch.exp(-self.decay_rate * (ep - self.epsilon_warmup)).item()
+            )
         else:
             epsilon = self.epsilon
         return epsilon
@@ -243,7 +245,29 @@ class EpsilonGreedy:
 
 # %%
 explorer = EpsilonGreedy(
-    epsilon=p.epsilon,
+    epsilon=p.epsilon_max,
+    epsilon_min=p.epsilon_min,
+    epsilon_max=p.epsilon_max,
+    decay_rate=p.decay_rate,
+    epsilon_warmup=p.epsilon_warmup,
+)
+episodes = torch.arange(p.total_episodes, device=device)
+epsilons = torch.empty_like(episodes) * torch.nan
+for eps_i, epsi in enumerate(epsilons):
+    epsilons[eps_i] = explorer.epsilon
+    explorer.epsilon = explorer.update_epsilon(episodes[eps_i])
+
+# %%
+fig, ax = plt.subplots()
+sns.lineplot(epsilons)
+ax.set(ylabel="Epsilon")
+ax.set(xlabel="Episodes")
+fig.tight_layout()
+plt.show()
+
+# %%
+explorer = EpsilonGreedy(
+    epsilon=p.epsilon_max,
     epsilon_min=p.epsilon_min,
     epsilon_max=p.epsilon_max,
     decay_rate=p.decay_rate,
@@ -313,7 +337,7 @@ all_actions = []
 losses = [[] for _ in range(p.n_runs)]
 
 for run in range(p.n_runs):  # Run several times to account for stochasticity
-    # # Reset model
+    # Reset model
     # net = DQN(
     #     n_observations=p.n_observations, n_actions=p.n_actions, n_units=p.nHiddenUnits
     # ).to(device)
@@ -362,7 +386,7 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
                 done_sampled,
             ) = random_choice(replay_buffer, length=len(replay_buffer))
 
-            # See DQN paper for equations: https://arxiv.org/abs/1312.5602
+            # See DQN paper for equations: https://doi.org/10.1038/nature14236
             state_action_values_sampled = net(state_sampled).to(device)  # Q(s_t)
             state_action_value = state_action_values_sampled[action_sampled].unsqueeze(
                 -1

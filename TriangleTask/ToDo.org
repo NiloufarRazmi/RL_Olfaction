@@ -32,7 +32,7 @@ Get inspiration from https://pair.withgoogle.com/explorables/grokking/
 ** DONE Plot policy learned
 * DONE Model doesn't converge
 ** DONE Try to apply on simple MDP
-* Experiments
+* TODO Experiments
 ** Representations
 *** Look at the last layer
 *** Split Hyp and olfactory cortex in 2 layers
@@ -41,6 +41,8 @@ Get inspiration from https://pair.withgoogle.com/explorables/grokking/
 - https://discuss.pytorch.org/t/best-way-to-split-process-merge/18702
 - https://pytorch.org/docs/stable/generated/torch.tensor_split.html
 - https://discuss.pytorch.org/t/combine-linear-layers/22337/3
+** TODO Test input fixed replay buffer with all the transitions
+** TODO Check 50% chance if 100% random actions + add CI test
 * DONE Debug
 ** DONE Unit test env
 ** DONE Unit test one hot case
@@ -54,7 +56,9 @@ Get inspiration from https://pair.withgoogle.com/explorables/grokking/
 ** DONE One hot encoding of state inputs
 ** DONE Plot stats of weights and biases
 ** DONE Plot gradients
-* TODO Improvments
-** Minibatches
-** TODO Experience replay
+* TODO Improvements
+** TODO Minibatches
+** DONE Experience replay
 ** Target network
+** Replace list type for replay buffer by ~dequeu()~
+** TODO Add \epsilon-greedy starting from ~\epsilon=1~ + add test
