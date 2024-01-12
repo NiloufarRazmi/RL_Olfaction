@@ -17,7 +17,10 @@
 # # DQN
 
 # %% [markdown]
-# ## Dependencies
+# ## Setup
+
+# %% [markdown]
+# ### Initialization
 
 import os
 
@@ -86,22 +89,22 @@ def check_plots():
 
 
 # %% [markdown]
-# ## Parameters
+# ### Parameters
 
 # %%
 p = Params(
     seed=42,
     n_runs=1,
-    total_episodes=1000,
-    epsilon=0.2,
+    total_episodes=600,
+    # epsilon=0.2,
     alpha=0.001,
     gamma=0.9,
     nHiddenUnits=(5 * 5 + 2) * 2,
     replay_buffer_max_size=1000,
     epsilon_min=0.1,
     epsilon_max=1.0,
-    decay_rate=0.05,
-    epsilon_warmup=200,
+    decay_rate=0.01,
+    epsilon_warmup=100,
 )
 p
 
@@ -110,7 +113,7 @@ p
 # p.rng = np.random.default_rng(p.seed)
 
 # %% [markdown]
-# ## The environment
+# ### Environment definition
 
 # %%
 # Load the environment
@@ -131,7 +134,7 @@ print(f"Number of observations: {p.n_observations}")
 
 
 # %% [markdown]
-# ## Running the environment
+# ### Network definition
 
 
 # %%
@@ -177,9 +180,16 @@ print([item.shape for item in net.parameters()])
 # %%
 # summary(net, input_size=[state.shape], verbose=0)
 
+# %% [markdown]
+# ### Optimizer
+
 # %%
 optimizer = optim.AdamW(net.parameters(), lr=p.alpha, amsgrad=True)
 optimizer
+
+
+# %% [markdown]
+# ### Explorer
 
 
 # %%
@@ -326,7 +336,7 @@ def params_df_stats(weights, key, current_df=None):
 
 
 # %% [markdown]
-# ### Main loop
+# ## Main loop
 
 # %%
 rewards = torch.zeros((p.total_episodes, p.n_runs), device=device)
@@ -337,7 +347,7 @@ all_actions = []
 losses = [[] for _ in range(p.n_runs)]
 
 for run in range(p.n_runs):  # Run several times to account for stochasticity
-    # Reset model
+    # # Reset model
     # net = DQN(
     #     n_observations=p.n_observations, n_actions=p.n_actions, n_units=p.nHiddenUnits
     # ).to(device)
@@ -446,76 +456,11 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
     weights_grad_stats.set_index("Index", inplace=True)
 
 
-# %%
-# grads_metrics["avg_rolling"] = np.nan
-# grads_metrics["std_rolling"] = np.nan
-# for id in grads_metrics.id.unique():
-#     grads_metrics.loc[grads_metrics[grads_metrics["id"] == id].index, "avg_rolling"] = (
-#         grads_metrics.loc[grads_metrics[grads_metrics["id"] == id].index, "avg"]
-#         .rolling(20)
-#         .mean()
-#     )
-#     grads_metrics.loc[grads_metrics[grads_metrics["id"] == id].index, "std_rolling"] = (
-#         grads_metrics.loc[grads_metrics[grads_metrics["id"] == id].index, "std"]
-#         .rolling(20)
-#         .mean()
-#     )
-# grads_metrics
-
 # %% [markdown]
 # ## Visualization
 
-# %%
-# def plot_weights(weights_metrics):
-#     """Plot the weights."""
-#     fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(15, 5))
-
-#     sns.lineplot(x="steps_global", y="avg", hue="id", data=weights_metrics, ax=ax[0])
-#     ax[0].set(ylabel="Weights (avg)")
-#     ax[0].set(xlabel="Steps")
-
-#     sns.lineplot(x="steps_global", y="std", hue="id", data=weights_metrics, ax=ax[1])
-#     ax[1].set(ylabel="Weights (std)")
-#     ax[1].set(xlabel="Steps")
-
-#     fig.tight_layout()
-#     plt.show()
-
-# %%
-# plot_weights(weights_metrics)
-
-# %%
-# def plot_gradients(grads_metrics):
-#     """Plot the gradienta."""
-#     fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(15, 5))
-
-#     sns.lineplot(
-#         x="steps_global",
-#         y="avg_rolling",
-#         hue="id",
-#         data=grads_metrics,
-#         ax=ax[0],
-#         palette=sns.color_palette()[0 : len(grads_metrics.id.unique())],
-#     )
-#     ax[0].set(ylabel="Gradients (avg)")
-#     ax[0].set(xlabel="Steps")
-
-#     sns.lineplot(
-#         x="steps_global",
-#         y="std_rolling",
-#         hue="id",
-#         data=grads_metrics,
-#         ax=ax[1],
-#         palette=sns.color_palette()[0 : len(grads_metrics.id.unique())],
-#     )
-#     ax[1].set(ylabel="Gradients (std)")
-#     ax[1].set(xlabel="Steps")
-
-#     fig.tight_layout()
-#     plt.show()
-
-# %%
-# plot_gradients(grads_metrics)
+# %% [markdown]
+# ### States & actions distributions
 
 
 # %%
@@ -561,6 +506,10 @@ def plot_states_actions_distribution(states, actions):
 plot_states_actions_distribution(all_states, all_actions)
 
 
+# %% [markdown]
+# ### Steps & rewards
+
+
 # %%
 def plot_steps_and_rewards(df):
     """Plot the steps and rewards from dataframes."""
@@ -583,6 +532,9 @@ def plot_steps_and_rewards(df):
 
 # %%
 plot_steps_and_rewards(res)
+
+# %% [markdown]
+# ### Loss
 
 # %%
 window_size = 10
@@ -619,6 +571,9 @@ plt.show()
 
 # %%
 loss_df.iloc[-1].Loss
+
+# %% [markdown]
+# ### Policy learned
 
 # %%
 with torch.no_grad():
@@ -731,6 +686,9 @@ def plot_policies(q_values, labels):
 
 # %%
 plot_policies(q_values=q_values, labels=CONTEXTS_LABELS)
+
+# %% [markdown]
+# ### Weights & gradients metrics
 
 # %%
 weights, biases = collect_weights_biases(net=net)
