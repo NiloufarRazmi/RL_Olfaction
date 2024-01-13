@@ -61,4 +61,7 @@ Get inspiration from https://pair.withgoogle.com/explorables/grokking/
 ** DONE Experience replay
 ** Target network
 ** Replace list type for replay buffer by ~dequeu()~
-** TODO Add \epsilon-greedy starting from ~\epsilon=1~ + add test
+** DONE Add \epsilon-greedy starting from ~\epsilon=1~ + add test
+** Metrics
+*** Reward histogram
+*** average entropy of action distribution
