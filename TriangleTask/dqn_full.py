@@ -531,6 +531,22 @@ def plot_steps_and_rewards(df):
 # %%
 plot_steps_and_rewards(res)
 
+
+# %%
+def plot_steps_and_rewards_dist(df):
+    """Plot the steps and rewards distributions from dataframes."""
+    fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(15, 5))
+    sns.histplot(data=df, x="Rewards", ax=ax[0], kde=True)
+
+    sns.histplot(data=df, x="Steps", ax=ax[1], kde=True)
+
+    fig.tight_layout()
+    plt.show()
+
+
+# %%
+plot_steps_and_rewards_dist(res)
+
 # %% [markdown]
 # ### Loss
 
