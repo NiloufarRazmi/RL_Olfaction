@@ -42,7 +42,7 @@ Get inspiration from https://pair.withgoogle.com/explorables/grokking/
 - https://pytorch.org/docs/stable/generated/torch.tensor_split.html
 - https://discuss.pytorch.org/t/combine-linear-layers/22337/3
 ** TODO Test input fixed replay buffer with all the transitions
-** TODO Check 50% chance if 100% random actions + add CI test
+** DONE Check 50% chance if 100% random actions + add CI test
 * DONE Debug
 ** DONE Unit test env
 ** DONE Unit test one hot case

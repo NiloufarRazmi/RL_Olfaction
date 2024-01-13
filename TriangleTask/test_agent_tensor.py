@@ -1,3 +1,4 @@
+import pandas as pd
 import torch
 from agent_tensor import EpsilonGreedy
 
@@ -25,3 +26,5 @@ def test_decrease_epsilon():
     assert epsilons[200] > 0.4 and epsilons[200] < 0.5
     assert epsilons[300] > 0.2 and epsilons[300] < 0.4
     assert epsilons[400] > 0.1 and epsilons[400] < 0.2
+    df = pd.DataFrame({"episodes": episodes, "epsilons": epsilons})
+    assert df.epsilons.is_monotonic_decreasing

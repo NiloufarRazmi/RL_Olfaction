@@ -1,5 +1,6 @@
 import pytest
 import torch
+from agent_tensor import EpsilonGreedy
 from environment_tensor import (
     Actions,
     Cues,
@@ -368,3 +369,45 @@ def test_TriangleTask_logic(trianglestate, cue_val, correct_reward_port):
         else:
             assert reward <= 0
             assert done == True
+
+
+@pytest.mark.parametrize(
+    "one_hot_state",
+    [(False), (True)],
+)
+def test_random_actions(one_hot_state):
+    total_ep = 100
+    env = WrappedEnvironment(one_hot_state=one_hot_state)
+    episodes = torch.arange(total_ep, device=DEVICE)
+    explorer = EpsilonGreedy(epsilon=1)
+    rewards = torch.empty_like(episodes) * torch.nan
+
+    for episode in episodes:
+        state = env.reset()  # Reset the environment
+        state = state.clone().float().detach().to(DEVICE)
+        done = False
+        total_rewards = 0
+
+        while not done:
+            state_action_values = torch.rand(len(env.action_space))
+            action = explorer.choose_action(
+                action_space=env.action_space,
+                state=state,
+                state_action_values=state_action_values,
+            )
+            next_state, reward, done = env.step(
+                action=action.item(), current_state=state
+            )
+            total_rewards += reward
+
+            # Move to the next state
+            state = next_state
+
+        rewards[episode] = total_rewards
+    ep_counts = torch.histc(rewards, bins=len(rewards.unique()))
+    torch.testing.assert_close(
+        actual=ep_counts,
+        expected=torch.tensor(len(episodes) / len(ep_counts)).repeat(len(ep_counts)),
+        atol=total_ep * 15 / 100,  # allow 15% random error
+        rtol=1e-2,
+    )
