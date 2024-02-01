@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.16.0
+#       jupytext_version: 1.16.1
 #   kernelspec:
 #     display_name: Python 3 (ipykernel)
 #     language: python
@@ -173,6 +173,7 @@ allError = np.nan * np.ones(nTot)
 catPredict = np.nan * np.ones(nTot)
 
 for i in tqdm(range(nTrain)):
+
     # Generate model prediction (forward pass of activity through units):
     activity = [np.array([]) for _ in range(nLayers)]
     for j in range(nLayers):

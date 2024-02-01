@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.16.0
+#       jupytext_version: 1.16.1
 #   kernelspec:
 #     display_name: Python 3 (ipykernel)
 #     language: python
@@ -329,6 +329,7 @@ if not checkpoints_path.exists():
 checkpoint_path = checkpoints_path.joinpath(f"checkpoint.pt")
 
 for run in range(params.n_runs):  # Run several times to account for stochasticity
+
     # Load checkpoint
     if checkpoint_path.exists():
         checkpoint = torch.load(checkpoint_path)

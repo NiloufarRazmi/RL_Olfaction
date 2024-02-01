@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.16.0
+#       jupytext_version: 1.16.1
 #   kernelspec:
 #     display_name: Python 3 (ipykernel)
 #     language: python
@@ -552,16 +552,20 @@ def plot_steps_and_rewards(df):
     fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(15, 5))
     sns.lineplot(data=df, x="Episodes", y="Rewards", ax=ax[0])
     ax[0].set(
-        ylabel=f"Rewards\naveraged over {p.n_runs} runs"
-        if p.n_runs > 1
-        else "Steps number"
+        ylabel=(
+            f"Rewards\naveraged over {p.n_runs} runs"
+            if p.n_runs > 1
+            else "Steps number"
+        )
     )
 
     sns.lineplot(data=df, x="Episodes", y="Steps", ax=ax[1])
     ax[1].set(
-        ylabel=f"Steps number\naveraged over {p.n_runs} runs"
-        if p.n_runs > 1
-        else "Steps number"
+        ylabel=(
+            f"Steps number\naveraged over {p.n_runs} runs"
+            if p.n_runs > 1
+            else "Steps number"
+        )
     )
 
     fig.tight_layout()
@@ -702,9 +706,11 @@ loss_df
 fig, ax = plt.subplots()
 sns.lineplot(data=loss_df, x="Steps", y="Loss", ax=ax)
 ax.set(
-    ylabel=f"$Log_{{10}}(\\text{{Loss}})$\naveraged over {p.n_runs} runs"
-    if p.n_runs > 1
-    else "$Log_{10}(\\text{Loss})$"
+    ylabel=(
+        f"$Log_{{10}}(\\text{{Loss}})$\naveraged over {p.n_runs} runs"
+        if p.n_runs > 1
+        else "$Log_{10}(\\text{Loss})$"
+    )
 )
 ax.set(xlabel="Steps")
 ax.set(yscale="log")

@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.16.0
+#       jupytext_version: 1.16.1
 #   kernelspec:
 #     display_name: Python 3 (ipykernel)
 #     language: python
@@ -277,9 +277,9 @@ rotated_tiles_map
 head_naive["tile"] = np.full(shape=len(head_naive), fill_value=np.nan)
 for row in range(rows):
     for col in range(cols):
-        head_naive.loc[
-            (head_naive.row == row) & (head_naive.col == col), "tile"
-        ] = rotated_tiles_map[row, col]
+        head_naive.loc[(head_naive.row == row) & (head_naive.col == col), "tile"] = (
+            rotated_tiles_map[row, col]
+        )
 head_naive
 
 # %%

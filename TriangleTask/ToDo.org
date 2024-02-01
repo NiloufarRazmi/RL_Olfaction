@@ -23,7 +23,7 @@
 ** DONE Improve loss plot?
 Make number of bins not relative to the numer of episodes?
 
-** Get info during training training
+** Get info during training
 *** TODO Either screen + interactive session
 *** WAIT Or batch script that writes in a file
 Using  Tensorboard ~SummaryWriter~
