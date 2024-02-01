@@ -57,11 +57,13 @@ Get inspiration from https://pair.withgoogle.com/explorables/grokking/
 ** DONE Plot stats of weights and biases
 ** DONE Plot gradients
 * TODO Improvements
-** TODO Minibatches
+** DONE Batches
 ** DONE Experience replay
 ** Target network
-** Replace list type for replay buffer by ~dequeu()~
+** Replace list type for replay buffer by ~dequeu()~ or ~NamedTuple~?
 ** DONE Add \epsilon-greedy starting from ~\epsilon=1~ + add test
 ** Metrics
 *** Reward histogram
 *** average entropy of action distribution
+* Recurrence
+** Only pass the odor information at the port, not at each time step

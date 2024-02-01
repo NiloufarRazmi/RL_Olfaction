@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.16.0
+#       jupytext_version: 1.16.1
 #   kernelspec:
 #     display_name: Python 3 (ipykernel)
 #     language: python
@@ -23,6 +23,7 @@
 # ### Initialization
 
 import os
+from collections import namedtuple
 
 # %%
 from pathlib import Path
@@ -106,6 +107,7 @@ p = Params(
     epsilon_max=1.0,
     decay_rate=0.01,
     epsilon_warmup=100,
+    batch_size=32,
 )
 p
 
@@ -192,66 +194,6 @@ optimizer
 # ### Explorer
 
 # %%
-# class EpsilonGreedy:
-#     def __init__(
-#         self,
-#         epsilon,
-#         epsilon_min=0.1,
-#         epsilon_max=1.0,
-#         decay_rate=0.05,
-#         epsilon_warmup=25,
-#         rng=None,
-#     ):
-#         self.epsilon = epsilon
-#         self.epsilon_min = epsilon_min
-#         self.epsilon_max = epsilon_max
-#         self.decay_rate = decay_rate
-#         self.epsilon_warmup = epsilon_warmup
-#         if rng:
-#             self.rng = rng
-
-#     def choose_action(self, action_space, state, state_action_values):
-#         """Choose an action a in the current world state (s)"""
-
-#         def sample(action_space):
-#             return random_choice(action_space)
-
-#         # # First we randomize a number
-#         # if hasattr(self, "rng"):
-#         #     explor_exploit_tradeoff = self.rng.uniform(0, 1)
-#         # else:
-#         #     explor_exploit_tradeoff = np.random.uniform(0, 1)
-#         explor_exploit_tradeoff = torch.rand(1)
-
-#         # Exploration
-#         if explor_exploit_tradeoff.item() < self.epsilon:
-#             # action = action_space.sample()
-#             action = sample(action_space)
-
-#         # Exploitation (taking the biggest Q-value for this state)
-#         else:
-#             # Break ties randomly
-#             # If all actions are the same for this state we choose a random one
-#             # (otherwise `argmax()` would always take the first one)
-#             if torch.all(state_action_values == state_action_values[0]):
-#                 action = sample(action_space)
-#             else:
-#                 action = torch.argmax(state_action_values)
-#         return action
-
-#     def update_epsilon(self, ep):
-#         if ep > self.epsilon_warmup:
-#             """Reduce epsilon (because we need less and less exploration)"""
-#             epsilon = (
-#                 self.epsilon_min
-#                 + (self.epsilon_max - self.epsilon_min)
-#                 * torch.exp(-self.decay_rate * (ep - self.epsilon_warmup)).item()
-#             )
-#         else:
-#             epsilon = self.epsilon
-#         return epsilon
-
-# %%
 explorer = EpsilonGreedy(
     epsilon=p.epsilon_max,
     epsilon_min=p.epsilon_min,
@@ -334,7 +276,12 @@ def params_df_stats(weights, key, current_df=None):
 
 
 # %% [markdown]
-# ## Main loop
+# ## Training loop
+
+# %%
+Transition = namedtuple(
+    "Transition", ("state", "action", "reward", "next_state", "done")
+)
 
 # %%
 rewards = torch.zeros((p.total_episodes, p.n_runs), device=device)
@@ -371,62 +318,141 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
                 action_space=env.action_space,
                 state=state,
                 state_action_values=state_action_values,
-            )
+            ).item()
 
             # Record states and actions
             all_states.append(state)
-            all_actions.append(Actions(action.item()).name)
+            # all_actions.append(Actions(action.item()).name)
+            all_actions.append(Actions(action).name)
 
-            next_state, reward, done = env.step(
-                action=action.item(), current_state=state
-            )
+            next_state, reward, done = env.step(action=action, current_state=state)
 
             # Store transition in replay buffer
             if len(replay_buffer) >= p.replay_buffer_max_size:
                 replay_buffer = replay_buffer[1:]
             # [current_state (2 or 28 x1), action (1x1), next_state (2 or 28 x1), reward (1x1), done (1x1 bool)]
-            replay_buffer.append([state, action, reward, next_state, done])
-            (
-                state_sampled,
-                action_sampled,
-                reward_sampled,
-                next_state_sampled,
-                done_sampled,
-            ) = random_choice(replay_buffer, length=len(replay_buffer))
+            done = torch.tensor(done, device=device).unsqueeze(-1)
+            replay_buffer.append(
+                Transition(
+                    state,
+                    action,
+                    reward,
+                    next_state,
+                    done,
+                )
+            )
+            if len(replay_buffer) >= p.batch_size:
+                transitions = random_choice(
+                    replay_buffer,
+                    length=len(replay_buffer),
+                    num_samples=p.batch_size,
+                )
+                if p.batch_size > 1:
+                    batch = Transition(*zip(*transitions, strict=True))
+                else:
+                    batch = Transition(*transitions)
+                if p.batch_size > 1:
+                    state_batch = torch.stack(batch.state)
+                    # action_batch = torch.cat(batch.action)
+                    action_batch = torch.tensor(batch.action, device=device)
+                    reward_batch = torch.cat(batch.reward)
+                    next_state_batch = torch.stack(batch.next_state)
+                    done_batch = torch.cat(batch.done)
+                else:
+                    state_batch = batch.state
+                    action_batch = batch.action
+                    reward_batch = batch.reward
+                    next_state_batch = batch.next_state
+                    done_batch = batch.done
+                # (
+                #     state_sampled,
+                #     action_sampled,
+                #     reward_batch,
+                #     next_state_batch,
+                #     done_sampled,
+                # ) = random_choice(replay_buffer, length=len(replay_buffer), num_samples=p.batch_size)
 
-            # See DQN paper for equations: https://doi.org/10.1038/nature14236
-            state_action_values_sampled = net(state_sampled).to(device)  # Q(s_t)
-            state_action_value = state_action_values_sampled[action_sampled].unsqueeze(
-                -1
-            )  # Q(s_t, a)
-            if done_sampled:
-                expected_state_action_value = reward_sampled
-            else:
+                # See DQN paper for equations: https://doi.org/10.1038/nature14236
+                state_action_values_sampled = net(state_batch).to(device)  # Q(s_t)
+                if p.batch_size > 1:
+                    state_action_value = torch.gather(
+                        input=state_action_values_sampled,
+                        dim=1,
+                        index=action_batch.unsqueeze(-1),
+                    ).squeeze()  # Q(s_t, a)
+                else:
+                    state_action_value = state_action_values_sampled[
+                        action_batch
+                    ].unsqueeze(
+                        -1
+                    )  # Q(s_t, a)
+
+                # if done_batch:
+                #     expected_state_action_value = reward_batch
+                # else:
+                #     with torch.no_grad():
+                #         next_state_values = (
+                #             net(next_state_batch).to(device).max().unsqueeze(-1)
+                #         )  # Q(s_t+1, a)
+                #     expected_state_action_value = (
+                #         reward_batch + p.gamma * next_state_values
+                #     )  # y_j (Bellman optimality equation)
+
+                done_false = torch.argwhere(done_batch == False).squeeze()
+                done_true = torch.argwhere(done_batch == True).squeeze()
+                expected_state_action_value = torch.empty_like(done_batch) * torch.nan
                 with torch.no_grad():
-                    next_state_values = (
-                        net(next_state_sampled).to(device).max().unsqueeze(-1)
-                    )  # Q(s_t+1, a)
-                expected_state_action_value = (
-                    reward_sampled + p.gamma * next_state_values
-                )  # y_j (Bellman optimality equation)
+                    if done_true.numel() > 0:
+                        expected_state_action_value[done_true] = reward_batch[done_true]
+                    if done_false.numel() > 0:
+                        if len(next_state_batch.shape) > 1:
+                            next_state_values = (
+                                net(next_state_batch[done_false]).to(device).max(1)
+                            )  # Q(s_t+1, a)
+                            expected_state_action_value[done_false] = (
+                                reward_batch[done_false]
+                                + p.gamma * next_state_values.values
+                            )  # y_j (Bellman optimality equation)
+                        else:
+                            next_state_values = (
+                                net(next_state_batch).to(device).max()
+                            )  # Q(s_t+1, a)
+                            expected_state_action_value[done_false] = (
+                                reward_batch[done_false] + p.gamma * next_state_values
+                            )  # y_j (Bellman optimality equation)
 
-            # Compute loss
-            criterion = nn.MSELoss()
-            loss = criterion(
-                input=state_action_value, target=expected_state_action_value
-            )  # TD update
+                # Compute loss
+                criterion = nn.MSELoss()
+                loss = criterion(
+                    input=state_action_value, target=expected_state_action_value
+                )  # TD update
 
-            # Optimize the model
-            optimizer.zero_grad()
-            loss.backward()
+                # Optimize the model
+                optimizer.zero_grad()
+                loss.backward()
 
-            # In-place gradient clipping
-            torch.nn.utils.clip_grad_value_(net.parameters(), 100)
-            optimizer.step()
+                # In-place gradient clipping
+                torch.nn.utils.clip_grad_value_(net.parameters(), 100)
+                optimizer.step()
+
+                losses[run].append(loss.item())
+
+                weights, biases = collect_weights_biases(net=net)
+                weights_val_stats = params_df_stats(
+                    weights, key="val", current_df=weights_grad_stats
+                )
+                biases_val_stats = params_df_stats(
+                    biases, key="val", current_df=biases_val_stats
+                )
+                biases_grad_stats = params_df_stats(
+                    biases, key="grad", current_df=biases_grad_stats
+                )
+                weights_grad_stats = params_df_stats(
+                    weights, key="grad", current_df=weights_val_stats
+                )
 
             total_rewards += reward
             step_count += 1
-            losses[run].append(loss.item())
 
             # Move to the next state
             state = next_state
@@ -435,19 +461,6 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
 
         rewards[episode, run] = total_rewards
         steps[episode, run] = step_count
-        weights, biases = collect_weights_biases(net=net)
-        weights_val_stats = params_df_stats(
-            weights, key="val", current_df=weights_grad_stats
-        )
-        biases_val_stats = params_df_stats(
-            biases, key="val", current_df=biases_val_stats
-        )
-        biases_grad_stats = params_df_stats(
-            biases, key="grad", current_df=biases_grad_stats
-        )
-        weights_grad_stats = params_df_stats(
-            weights, key="grad", current_df=weights_val_stats
-        )
     weights_val_stats.set_index("Index", inplace=True)
     biases_val_stats.set_index("Index", inplace=True)
     biases_grad_stats.set_index("Index", inplace=True)
@@ -519,9 +532,11 @@ def plot_steps_and_rewards(df):
 
     sns.lineplot(data=df, x="Episodes", y="Steps", ax=ax[1])
     ax[1].set(
-        ylabel=f"Steps number\naveraged over {p.n_runs} runs"
-        if p.n_runs > 1
-        else "Steps number"
+        ylabel=(
+            f"Steps number\naveraged over {p.n_runs} runs"
+            if p.n_runs > 1
+            else "Steps number"
+        )
     )
 
     fig.tight_layout()
@@ -572,9 +587,11 @@ loss_df
 fig, ax = plt.subplots()
 sns.lineplot(data=loss_df, x="Steps", y="Loss", ax=ax)
 ax.set(
-    ylabel=f"$Log_{{10}}(\\text{{Loss}})$\naveraged over {p.n_runs} runs"
-    if p.n_runs > 1
-    else "$Log_{10}(\\text{Loss})$"
+    ylabel=(
+        f"$Log_{{10}}(\\text{{Loss}})$\naveraged over {p.n_runs} runs"
+        if p.n_runs > 1
+        else "$Log_{10}(\\text{Loss})$"
+    )
 )
 ax.set(xlabel="Steps")
 ax.set(yscale="log")
@@ -874,5 +891,3 @@ plot_weights_biases_stats(weights_val_stats, biases_val_stats, label="values")
 
 # %%
 plot_weights_biases_stats(weights_grad_stats, biases_grad_stats, label="gradients")
-
-# %%
