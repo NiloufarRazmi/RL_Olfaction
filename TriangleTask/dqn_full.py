@@ -22,28 +22,28 @@
 # %% [markdown]
 # ### Initialization
 
-import os
-from collections import namedtuple
-
 # %%
 from pathlib import Path
+import os
 
 import ipdb
+
+import numpy as np
+from tqdm import tqdm
+import matplotlib.pyplot as plt
 import matplotlib as mpl
 import matplotlib.patches as mpatches
-import matplotlib.pyplot as plt
-import numpy as np
+from matplotlib.offsetbox import AnnotationBbox, OffsetImage
 import pandas as pd
 import seaborn as sns
+from imojify import imojify
+from collections import namedtuple
 
 # %%
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 import torch.optim as optim
-from imojify import imojify
-from matplotlib.offsetbox import AnnotationBbox, OffsetImage
-from tqdm import tqdm
+import torch.nn.functional as F
 
 # from torchinfo import summary
 
@@ -51,16 +51,15 @@ from tqdm import tqdm
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 device
 
-import plotting
-from agent_tensor import EpsilonGreedy
-from environment_tensor import CONTEXTS_LABELS, Actions, Cues, WrappedEnvironment
-
 # %%
 from utils import Params, random_choice
+from environment_tensor import WrappedEnvironment, Actions, CONTEXTS_LABELS, Cues
+from agent_tensor import EpsilonGreedy
+import plotting
 
 # %%
 # Formatting & autoreload stuff
-# %load_ext lab_black
+# # %load_ext lab_black
 # %load_ext autoreload
 # %autoreload 2
 # # %matplotlib ipympl
@@ -97,17 +96,17 @@ def check_plots():
 p = Params(
     seed=42,
     n_runs=1,
-    total_episodes=1000,
+    total_episodes=600,
     # epsilon=0.2,
-    alpha=0.001,
+    alpha=0.005,
     gamma=0.9,
     nHiddenUnits=(5 * 5 + 2) * 2,
-    replay_buffer_max_size=1000,
+    replay_buffer_max_size=10000,
     epsilon_min=0.1,
     epsilon_max=1.0,
     decay_rate=0.01,
-    epsilon_warmup=300,
-    batch_size=128,
+    epsilon_warmup=100,
+    batch_size=32,
 )
 p
 
@@ -221,7 +220,7 @@ for eps_i, epsi in enumerate(epsilons):
 
 # %%
 fig, ax = plt.subplots()
-sns.lineplot(epsilons)
+sns.lineplot(epsilons.cpu())
 ax.set(ylabel="Epsilon")
 ax.set(xlabel="Episodes")
 fig.tight_layout()
