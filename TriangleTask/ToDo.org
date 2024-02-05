@@ -30,6 +30,9 @@ Using  Tensorboard ~SummaryWriter~
 ** TODO Plot weights and neurons activations
 Get inspiration from https://pair.withgoogle.com/explorables/grokking/
 ** DONE Plot policy learned
+** Add loss info in progress bar
+[[https://aladdinpersson.medium.com/how-to-get-a-progress-bar-in-pytorch-72bdbf19b35c]]
+** Plot loss updates during training
 * DONE Model doesn't converge
 ** DONE Try to apply on simple MDP
 * TODO Experiments
@@ -59,11 +62,11 @@ Get inspiration from https://pair.withgoogle.com/explorables/grokking/
 * TODO Improvements
 ** DONE Batches
 ** DONE Experience replay
-** Target network
+** TODO Target network
 ** Replace list type for replay buffer by ~dequeu()~ or ~NamedTuple~?
 ** DONE Add \epsilon-greedy starting from ~\epsilon=1~ + add test
 ** Metrics
-*** Reward histogram
+*** DONE Reward histogram
 *** average entropy of action distribution
 * Recurrence
 ** Only pass the odor information at the port, not at each time step

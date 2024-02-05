@@ -97,7 +97,7 @@ def check_plots():
 p = Params(
     seed=42,
     n_runs=1,
-    total_episodes=600,
+    total_episodes=1000,
     # epsilon=0.2,
     alpha=0.001,
     gamma=0.9,
@@ -106,8 +106,8 @@ p = Params(
     epsilon_min=0.1,
     epsilon_max=1.0,
     decay_rate=0.01,
-    epsilon_warmup=100,
-    batch_size=32,
+    epsilon_warmup=300,
+    batch_size=128,
 )
 p
 
@@ -160,18 +160,30 @@ class DQN(nn.Module):
 
 
 # %%
-if env.one_hot_state:
-    net = DQN(
-        n_observations=p.n_observations,
-        n_actions=p.n_actions,
-        n_units=3 * p.n_observations,
-    ).to(device)
-else:
+def neural_network():
+    # if env.one_hot_state:
+    #     net = DQN(
+    #         n_observations=p.n_observations,
+    #         n_actions=p.n_actions,
+    #         n_units=4 * p.n_observations,
+    #     ).to(device)
+    # else:
+    #     net = DQN(
+    #         n_observations=p.n_observations,
+    #         n_actions=p.n_actions,
+    #         n_units=p.nHiddenUnits,
+    #     ).to(device)
+    # net
     net = DQN(
         n_observations=p.n_observations,
         n_actions=p.n_actions,
         n_units=p.nHiddenUnits,
     ).to(device)
+    return net
+
+
+# %%
+net = neural_network()
 net
 
 # %%
@@ -292,11 +304,10 @@ all_actions = []
 losses = [[] for _ in range(p.n_runs)]
 
 for run in range(p.n_runs):  # Run several times to account for stochasticity
-    # # Reset model
-    # net = DQN(
-    #     n_observations=p.n_observations, n_actions=p.n_actions, n_units=p.nHiddenUnits
-    # ).to(device)
-    # optimizer = optim.AdamW(net.parameters(), lr=p.alpha, amsgrad=True)
+
+    # Reset weights
+    net = neural_network()
+    optimizer = optim.AdamW(net.parameters(), lr=p.alpha, amsgrad=True)
     weights_val_stats = None
     biases_val_stats = None
     weights_grad_stats = None
@@ -594,7 +605,7 @@ ax.set(
     )
 )
 ax.set(xlabel="Steps")
-ax.set(yscale="log")
+# ax.set(yscale="log")
 fig.tight_layout()
 plt.show()
 
