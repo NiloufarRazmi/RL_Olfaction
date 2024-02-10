@@ -22,28 +22,28 @@
 # %% [markdown]
 # ### Initialization
 
+import os
+from collections import namedtuple
+
 # %%
 from pathlib import Path
-import os
 
 import ipdb
-
-import numpy as np
-from tqdm import tqdm
-import matplotlib.pyplot as plt
 import matplotlib as mpl
 import matplotlib.patches as mpatches
-from matplotlib.offsetbox import AnnotationBbox, OffsetImage
+import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 import seaborn as sns
-from imojify import imojify
-from collections import namedtuple
 
 # %%
 import torch
 import torch.nn as nn
-import torch.optim as optim
 import torch.nn.functional as F
+import torch.optim as optim
+from imojify import imojify
+from matplotlib.offsetbox import AnnotationBbox, OffsetImage
+from tqdm import tqdm
 
 # from torchinfo import summary
 
@@ -51,15 +51,16 @@ import torch.nn.functional as F
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 device
 
+import plotting
+from agent_tensor import EpsilonGreedy
+from environment_tensor import CONTEXTS_LABELS, Actions, Cues, WrappedEnvironment
+
 # %%
 from utils import Params, random_choice
-from environment_tensor import WrappedEnvironment, Actions, CONTEXTS_LABELS, Cues
-from agent_tensor import EpsilonGreedy
-import plotting
 
 # %%
 # Formatting & autoreload stuff
-# # %load_ext lab_black
+# %load_ext lab_black
 # %load_ext autoreload
 # %autoreload 2
 # # %matplotlib ipympl
@@ -107,6 +108,7 @@ p = Params(
     decay_rate=0.01,
     epsilon_warmup=100,
     batch_size=32,
+    target_net_update=30,
 )
 p
 
@@ -173,17 +175,25 @@ def neural_network():
     #         n_units=p.nHiddenUnits,
     #     ).to(device)
     # net
+
     net = DQN(
         n_observations=p.n_observations,
         n_actions=p.n_actions,
         n_units=p.nHiddenUnits,
     ).to(device)
-    return net
+
+    target_net = DQN(
+        n_observations=p.n_observations,
+        n_actions=p.n_actions,
+        n_units=p.nHiddenUnits,
+    ).to(device)
+
+    return net, target_net
 
 
 # %%
-net = neural_network()
-net
+net, target_net = neural_network()
+net, target_net
 
 # %%
 # print("Model parameters:")
@@ -305,7 +315,7 @@ losses = [[] for _ in range(p.n_runs)]
 for run in range(p.n_runs):  # Run several times to account for stochasticity
 
     # Reset weights
-    net = neural_network()
+    net, target_net = neural_network()
     optimizer = optim.AdamW(net.parameters(), lr=p.alpha, amsgrad=True)
     weights_val_stats = None
     biases_val_stats = None
@@ -417,7 +427,9 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
                     if done_false.numel() > 0:
                         if len(next_state_batch.shape) > 1:
                             next_state_values = (
-                                net(next_state_batch[done_false]).to(device).max(1)
+                                target_net(next_state_batch[done_false])
+                                .to(device)
+                                .max(1)
                             )  # Q(s_t+1, a)
                             expected_state_action_value[done_false] = (
                                 reward_batch[done_false]
@@ -425,7 +437,7 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
                             )  # y_j (Bellman optimality equation)
                         else:
                             next_state_values = (
-                                net(next_state_batch).to(device).max()
+                                target_net(next_state_batch).to(device).max()
                             )  # Q(s_t+1, a)
                             expected_state_action_value[done_false] = (
                                 reward_batch[done_false] + p.gamma * next_state_values
@@ -434,15 +446,14 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
                 # Compute loss
                 criterion = nn.MSELoss()
                 loss = criterion(
-                    input=state_action_value, target=expected_state_action_value
+                    input=expected_state_action_value,
+                    target=state_action_value,
                 )  # TD update
 
                 # Optimize the model
                 optimizer.zero_grad()
                 loss.backward()
-
-                # In-place gradient clipping
-                torch.nn.utils.clip_grad_value_(net.parameters(), 100)
+                # torch.nn.utils.clip_grad_value_(net.parameters(), 100)  # In-place gradient clipping
                 optimizer.step()
 
                 losses[run].append(loss.item())
@@ -463,6 +474,10 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
 
             total_rewards += reward
             step_count += 1
+
+            # Reset the target network
+            if step_count % p.target_net_update == 0:
+                target_net.load_state_dict(net.state_dict())
 
             # Move to the next state
             state = next_state
