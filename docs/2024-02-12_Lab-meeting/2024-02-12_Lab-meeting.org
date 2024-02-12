@@ -1,0 +1,208 @@
+#+TITLE: Lab meeting
+#+SUBTITLE: Deep dive into deep RL
+#+author: Andrea Pierré
+#+date: February 12^{th}, 2024
+* HEADER :noexport:
+#+SETUPFILE: ./style.org
+
+* Context
+** How do neurons in the LEC integrate sensory and spatial information?
+*** Text :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.45
+:END:
+#+begin_export latex
+%\pause
+%\scriptsize
+%\footnotesize
+\footnotesize
+#+end_export
+- *Piriform Cortex* encodes olfactory information
+- *Hippocampus* encodes spatial information
+- *Lateral Entorhinal Cortex (LEC)* encodes both olfactory & spatial information
+*** Image :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.55
+:END:
+#+ATTR_LaTeX: :width \textwidth
+[[file:img/brain.png]]
+** The half-triangle task
+[[file:img/RL_env-triangle-task.drawio.pdf]]
+** Mapping states to action
+#+begin_export latex
+\centering
+\vspace{2em}
+%\fbox{%
+        \includegraphics[height=0.8\textheight, trim=0cm 6cm 15cm 2cm]{img/RL_mapping-states-to-actions.drawio.pdf}
+%}
+#+end_export
+* Deep RL algorithm & building blocs
+** Deep RL lessons learned
+:PROPERTIES:
+:BEAMER_act: [<+->]
+:END:
+#+begin_export latex
+\small
+#+end_export
+*** Left :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.9
+:END:
+- Deep RL is different from supervised learning \to the data to optimize on is not fixed (moving target)
+- DQN tricks:
+  - *Replay buffer* \to save the data experienced in a buffer and sample from it to break the temporal correlation of the data
+  - *Exploration warm up* with \epsilon-greedy \to experience more diverse data
+  - *Batching* \to update the weights of the network based on several data examples at the same time instead of only one
+  - *Target network* \to use 2 networks to stabilize learning (one of them is updated with a lag)
+*** Right :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.1
+:END:
+#+ATTR_LaTeX: :width 1.5\textwidth
+[[file:img/epsilon-warm-up.png]]
+** Deep RL implementation
+#+begin_export latex
+\SetKwComment{Comment}{/* }{ */}
+\DontPrintSemicolon
+
+\begin{center}
+    \tiny
+    \scalebox{0.9}{
+        \begin{minipage}{\linewidth}
+            \begin{algorithm}[H]
+                \caption{Deep Q-Network (DQN)}\label{alg:dqn}
+Initialize replay memory D to capacity N\;
+Initialize action-value network Q with random weights $\theta$\;
+Initialize target action-value network $\hat{Q}$ with random weights $\theta^-=\theta$\;
+\For{$episode \gets 1 \dots{} M$}{
+    $state \gets reset(env)$\;
+    $done \gets False$\;
+    \While{$done \neq True$}{
+        $Q \gets forward\_pass(state)$ \Comment*[r]{4 action values vector}
+        $action \gets \epsilon_{greedy}(action\_space, state, Q)$\;
+        $state_{new}, reward, done \gets env.step(action, state)$\;
+        Store transition (state, action, reward, next\_state, done) in D\;
+        Sample random minibatch of transitions from D\;
+        $Q \gets forward\_pass(state_{new})$ \Comment*[r]{4 action values vector}
+        $Q_{new} \gets reward + \gamma max(\hat{Q})$ \Comment*[r]{scalar}
+        $y \gets max(Q)$ \Comment*[r]{scalar}
+        \eIf{$done = True$}{
+            $\hat{y}_{pred} \gets reward$ \Comment*[r]{scalar}
+        }{
+            $\hat{y}_{pred} \gets Q_{new}$ \Comment*[r]{scalar}
+        }
+        $Loss \gets (y - \hat{y}_{pred})^2$\;
+        Perform a gradient descent step on Loss with respect to the network parameters $\theta$\;
+        Every C steps reset $\hat{Q}=Q$\;
+    }
+}
+            \end{algorithm}
+        \end{minipage}%
+    }
+\end{center}
+#+end_export
+
+#+begin_export latex
+\begin{textblock}{5}(1,15.5)%
+\tiny
+Inspired from (Mnih et al., 2015)
+\end{textblock}
+#+end_export
+* Results
+** How deep RL feels like
+:PROPERTIES:
+:BEAMER_opt: standout
+:END:
+[[file:img/blog-main-img_pen-balance-with-energel-pens.jpg]]
+** Networks architectures
+#+begin_export latex
+\centering
+#+end_export
+28 \to 54 \to 54 \to 54 \to 4
+#+ATTR_LaTeX: :height 0.8\textheight
+[[file:img/nn-archi.png]]
+** Rewards & steps
+#+ATTR_LaTeX: :height 0.29\textheight
+[[file:img/rewards-steps-1-run-working.png]]
+#+ATTR_LaTeX: :height 0.29\textheight
+[[file:img/rewards-steps-1-run-not-working.png]]
+#+ATTR_LaTeX: :height 0.29\textheight
+[[file:img/rewards-steps-avg-10-runs.png]]
+** Loss, rewards & steps distributions
+*** Left :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.3
+:END:
+[[file:img/loss-1-run-working.png]]
+[[file:img/loss-1-run-not-working.png]]
+[[file:img/loss-avg-10-runs.png]]
+*** Right :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.7
+:END:
+[[file:img/rewards-steps-distrib-1-run-working.png]]
+[[file:img/rewards-steps-distrib-1-run-not-working.png]]
+[[file:img/rewards-steps-distrib-10-runs.png]]
+** Policy learned (when it works)
+[[file:img/policy-learned.png]]
+* Future directions
+** Adding memory into the task
+*** Left :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+Current environment
+#+begin_export latex
+\scriptsize
+#+end_export
+|------+----------+---------+--------|
+| step | location | cue     | reward |
+|------+----------+---------+--------|
+|    1 |        2 | No odor |      0 |
+|    2 |        3 | No odor |      0 |
+|    3 |        4 | Odor A  |      0 |
+|    4 |        3 | Odor A  |      0 |
+|    5 |        2 | Odor A  |      0 |
+|    6 |        1 | Odor A  |      0 |
+|    7 |        0 | Odor A  |     10 |
+|------+----------+---------+--------|
+*** Right :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+With memorization needed
+#+begin_export latex
+\scriptsize
+#+end_export
+|------+----------+--------+--------|
+| step | location | cue    | reward |
+|------+----------+--------+--------|
+|    1 |        2 | \empty |      0 |
+|    2 |        3 | \empty |      0 |
+|    3 |        4 | Odor A |      0 |
+|    4 |        3 | \empty |      0 |
+|    5 |        2 | \empty |      0 |
+|    6 |        1 | \empty |      0 |
+|    7 |        0 | \empty |     10 |
+|------+----------+--------+--------|
+** RNN for memorization and sequence modeling
+#+ATTR_LaTeX: :width 0.7\textwidth
+[[file:img/RNN-transparent.png]]
+** Feedback connectivity
+#+ATTR_LaTeX: :width 0.6\textwidth
+[[file:img/Network types - The Computational Brain - transparent.png]]
+** Network of networks
+[[file:img/mRNN-transparent.png]]
+
+#+begin_export latex
+\begin{textblock}{5}(1,15)%
+\tiny
+(Perich and Rajan, 2020)
+\end{textblock}
+#+end_export
+** \nbsp{}
+:PROPERTIES:
+:BEAMER_opt: standout
+:END:
+Questions ?
+* Feedback :noexport:

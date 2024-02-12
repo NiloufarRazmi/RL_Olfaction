@@ -69,5 +69,6 @@ Get inspiration from https://pair.withgoogle.com/explorables/grokking/
 *** DONE Reward histogram
 *** average entropy of action distribution
 ** KILL Modify warm up episodes to warm up steps
+** TODO Soft update of the target network's weights
 * Recurrence
 ** Only pass the odor information at the port, not at each time step
