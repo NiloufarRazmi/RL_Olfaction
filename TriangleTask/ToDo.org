@@ -7,10 +7,10 @@
 *** DONE Remove target network?
 *** DONE Remove replay traces?
 *** DONE Replace decaying \epsilon-greedy with my own
-* Remote GPU
-** Run as batch script
+* TODO Remote GPU
+** TODO Run as batch script
 *** DONE Run Jupytext converted script
-*** Convert training as a script with arguments
+*** TODO Convert training as a script with arguments
 **** Notebook should be refactored for loading weights, inference and plotting
 **** Example:
 [[https://github.com/NICALab/SUPPORT/blob/main/src/train.py][~train.py~ example script]] which can be run with ~python -m src.train --exp_name mytest --n_epochs 11 --checkpoint_interval 10~
@@ -33,6 +33,126 @@ Get inspiration from https://pair.withgoogle.com/explorables/grokking/
 ** TODO Add loss info in progress bar
 [[https://aladdinpersson.medium.com/how-to-get-a-progress-bar-in-pytorch-72bdbf19b35c]]
 ** TODO Plot loss updates during training
+** Plot distributions
+#+begin_src python
+##############################################################
+
+
+def plot_dists(val_dict, color="C0", xlabel=None, stat="count", use_kde=True):
+    columns = len(val_dict)
+    fig, ax = plt.subplots(1, columns, figsize=(columns * 3, 2.5))
+    fig_index = 0
+    for key in sorted(val_dict.keys()):
+        key_ax = ax[fig_index % columns]
+        sns.histplot(
+            val_dict[key],
+            ax=key_ax,
+            color=color,
+            bins=50,
+            stat=stat,
+            kde=use_kde and ((val_dict[key].max() - val_dict[key].min()) > 1e-8),
+        )  # Only plot kde if there is variance
+        hidden_dim_str = (
+            r"(%i $\to$ %i)" % (val_dict[key].shape[1], val_dict[key].shape[0]) if len(val_dict[key].shape) > 1 else ""
+        )
+        key_ax.set_title(f"{key} {hidden_dim_str}")
+        if xlabel is not None:
+            key_ax.set_xlabel(xlabel)
+        fig_index += 1
+    fig.subplots_adjust(wspace=0.4)
+    return fig
+
+
+##############################################################
+
+
+def visualize_weight_distribution(model, color="C0"):
+    weights = {}
+    for name, param in model.named_parameters():
+        if name.endswith(".bias"):
+            continue
+        key_name = f"Layer {name.split('.')[1]}"
+        weights[key_name] = param.detach().view(-1).cpu().numpy()
+
+    # Plotting
+    fig = plot_dists(weights, color=color, xlabel="Weight vals")
+    fig.suptitle("Weight distribution", fontsize=14, y=1.05)
+    plt.show()
+    plt.close()
+
+
+##############################################################
+
+
+def visualize_gradients(model, color="C0", print_variance=False):
+    """
+    Args:
+        net: Object of class BaseNetwork
+        color: Color in which we want to visualize the histogram (for easier separation of activation functions)
+    """
+    model.eval()
+    small_loader = data.DataLoader(train_set, batch_size=1024, shuffle=False)
+    imgs, labels = next(iter(small_loader))
+    imgs, labels = imgs.to(device), labels.to(device)
+
+    # Pass one batch through the network, and calculate the gradients for the weights
+    model.zero_grad()
+    preds = model(imgs)
+    loss = F.cross_entropy(preds, labels)  # Same as nn.CrossEntropyLoss, but as a function instead of module
+    loss.backward()
+    # We limit our visualization to the weight parameters and exclude the bias to reduce the number of plots
+    grads = {
+        name: params.grad.view(-1).cpu().clone().numpy()
+        for name, params in model.named_parameters()
+        if "weight" in name
+    }
+    model.zero_grad()
+
+    # Plotting
+    fig = plot_dists(grads, color=color, xlabel="Grad magnitude")
+    fig.suptitle("Gradient distribution", fontsize=14, y=1.05)
+    plt.show()
+    plt.close()
+
+    if print_variance:
+        for key in sorted(grads.keys()):
+            print(f"{key} - Variance: {np.var(grads[key])}")
+
+
+##############################################################
+
+
+def visualize_activations(model, color="C0", print_variance=False):
+    model.eval()
+    small_loader = data.DataLoader(train_set, batch_size=1024, shuffle=False)
+    imgs, labels = next(iter(small_loader))
+    imgs, labels = imgs.to(device), labels.to(device)
+
+    # Pass one batch through the network, and calculate the gradients for the weights
+    feats = imgs.view(imgs.shape[0], -1)
+    activations = {}
+    with torch.no_grad():
+        for layer_index, layer in enumerate(model.layers):
+            feats = layer(feats)
+            if isinstance(layer, nn.Linear):
+                activations[f"Layer {layer_index}"] = feats.view(-1).detach().cpu().numpy()
+
+    # Plotting
+    fig = plot_dists(activations, color=color, stat="density", xlabel="Activation vals")
+    fig.suptitle("Activation distribution", fontsize=14, y=1.05)
+    plt.show()
+    plt.close()
+
+    if print_variance:
+        for key in sorted(activations.keys()):
+            print(f"{key} - Variance: {np.var(activations[key])}")
+
+
+##############################################################
+#+end_src
+[[https://lightning.ai/docs/pytorch/stable/notebooks/course_UvA-DL/03-initialization-and-optimization.html]]
+** 2D Weights histogram?
+[[https://wandb.ai/sauravmaheshkar/initialization/reports/A-Gentle-Introduction-To-Weight-Initialization-for-Neural-Networks--Vmlldzo2ODExMTg#he-initialization-]]
 * DONE Model doesn't converge
 ** DONE Try to apply on simple MDP
 * TODO Experiments
@@ -44,7 +164,7 @@ Get inspiration from https://pair.withgoogle.com/explorables/grokking/
 - https://discuss.pytorch.org/t/best-way-to-split-process-merge/18702
 - https://pytorch.org/docs/stable/generated/torch.tensor_split.html
 - https://discuss.pytorch.org/t/combine-linear-layers/22337/3
-** TODO Test input fixed replay buffer with all the transitions
+** TODO Test input fixed replay buffer with all the right transitions
 ** DONE Check 50% chance if 100% random actions + add CI test
 * DONE Debug
 ** DONE Unit test env
@@ -63,12 +183,20 @@ Get inspiration from https://pair.withgoogle.com/explorables/grokking/
 ** DONE Batches
 ** DONE Experience replay
 ** DONE Target network
-** TODO Replace list type for replay buffer by ~dequeu()~ or ~NamedTuple~?
+** DONE Replace list type for replay buffer by ~dequeu()~ or ~NamedTuple~?
 ** DONE Add \epsilon-greedy starting from ~\epsilon=1~ + add test
-** Metrics
-*** DONE Reward histogram
-*** average entropy of action distribution
-** KILL Modify warm up episodes to warm up steps
+** Modify warm up episodes to warm up steps
 ** TODO Soft update of the target network's weights
+** KILL Huber loss
+** [?] Adaptive \epsilon-greedy
+[[https://doi.org/10.1016/j.procs.2017.05.431]]
+** TODO Seed everything to be able to test runs that don't work
+** [?] Unit test DQN algo??
+* TODO Metrics
+** DONE Reward histogram
+** average entropy of action distribution
+** TODO Add logging
+- [[https://mlflow.org/docs/latest/python_api/mlflow.pytorch.html]]
+- [[https://dvc.org/doc/dvclive/ml-frameworks/pytorch]]
 * Recurrence
 ** Only pass the odor information at the port, not at each time step

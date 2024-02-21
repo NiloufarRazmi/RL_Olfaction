@@ -26,6 +26,13 @@
 :END:
 #+ATTR_LaTeX: :width \textwidth
 [[file:img/brain.png]]
+** Why modeling?
+:PROPERTIES:
+:BEAMER_act: [<+->]
+:END:
+- Having a reliable model to make predictions
+- Simulation may uncover insight's from the real data
+- Derive principles from the simulation which can be checked in the experiment
 ** The half-triangle task
 [[file:img/RL_env-triangle-task.drawio.pdf]]
 ** Mapping states to action
@@ -206,3 +213,9 @@ With memorization needed
 :END:
 Questions ?
 * Feedback :noexport:
+** TODO Try to see initialization for runs that work if they are higher on the odor
+** What does it tell you about the brain?
+*** What does learning look like?
+*** Distribution of activities
+*** Sparseness of LEC
+** TODO Try non one hot encoded version

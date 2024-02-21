@@ -17,9 +17,13 @@
 # # DQN
 
 # %% [markdown]
-# ## Dependencies
+# ## Setup
+
+# %% [markdown]
+# ### Initialization
 
 import os
+from collections import deque, namedtuple
 
 # %%
 from pathlib import Path
@@ -48,6 +52,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 device
 
 import plotting
+from agent_tensor import EpsilonGreedy
 from environment_tensor import CONTEXTS_LABELS, Actions, Cues, WrappedEnvironment
 
 # %%
@@ -86,17 +91,25 @@ def check_plots():
 
 
 # %% [markdown]
-# ## Parameters
+# ### Parameters
 
 # %%
 p = Params(
     seed=42,
     n_runs=1,
-    total_episodes=1000,
-    epsilon=0.2,
-    alpha=0.0001,
+    total_episodes=200,
+    epsilon=0.5,
+    alpha=0.005,
     gamma=0.9,
-    nHiddenUnits=(5 * 5 + 2) * 2,
+    # nHiddenUnits=(5 * 5 + 3) * 5,
+    nHiddenUnits=128,
+    replay_buffer_max_size=10000,
+    epsilon_min=0.1,
+    epsilon_max=1.0,
+    decay_rate=0.03,
+    epsilon_warmup=50,
+    batch_size=32,
+    target_net_update=50,
 )
 p
 
@@ -105,7 +118,7 @@ p
 # p.rng = np.random.default_rng(p.seed)
 
 # %% [markdown]
-# ## The environment
+# ### Environment definition
 
 # %%
 # Load the environment
@@ -126,7 +139,7 @@ print(f"Number of observations: {p.n_observations}")
 
 
 # %% [markdown]
-# ## Running the environment
+# ### Network definition
 
 
 # %%
@@ -149,19 +162,41 @@ class DQN(nn.Module):
 
 
 # %%
-if env.one_hot_state:
-    net = DQN(
-        n_observations=p.n_observations,
-        n_actions=p.n_actions,
-        n_units=3 * p.n_observations,
-    ).to(device)
-else:
+def neural_network():
+    # if env.one_hot_state:
+    #     net = DQN(
+    #         n_observations=p.n_observations,
+    #         n_actions=p.n_actions,
+    #         n_units=4 * p.n_observations,
+    #     ).to(device)
+    # else:
+    #     net = DQN(
+    #         n_observations=p.n_observations,
+    #         n_actions=p.n_actions,
+    #         n_units=p.nHiddenUnits,
+    #     ).to(device)
+    # net
+
     net = DQN(
         n_observations=p.n_observations,
         n_actions=p.n_actions,
         n_units=p.nHiddenUnits,
     ).to(device)
-net
+
+    target_net = DQN(
+        n_observations=p.n_observations,
+        n_actions=p.n_actions,
+        n_units=p.nHiddenUnits,
+    ).to(device)
+
+    target_net.load_state_dict(net.state_dict())
+
+    return net, target_net
+
+
+# %%
+net, target_net = neural_network()
+net, target_net
 
 # %%
 # print("Model parameters:")
@@ -172,54 +207,40 @@ print([item.shape for item in net.parameters()])
 # %%
 # summary(net, input_size=[state.shape], verbose=0)
 
+# %% [markdown]
+# ### Optimizer
+
 # %%
 optimizer = optim.AdamW(net.parameters(), lr=p.alpha, amsgrad=True)
 optimizer
 
+# %% [markdown]
+# ### Explorer
 
 # %%
-class EpsilonGreedy:
-    def __init__(
-        self,
-        epsilon,
-        rng=None,
-    ):
-        self.epsilon = epsilon
-        # if rng:
-        #     self.rng = rng
+explorer = EpsilonGreedy(
+    epsilon=p.epsilon_max,
+    epsilon_min=p.epsilon_min,
+    epsilon_max=p.epsilon_max,
+    decay_rate=p.decay_rate,
+    epsilon_warmup=p.epsilon_warmup,
+)
+episodes = torch.arange(p.total_episodes, device=device)
+epsilons = torch.empty_like(episodes) * torch.nan
+for eps_i, epsi in enumerate(epsilons):
+    epsilons[eps_i] = explorer.epsilon
+    explorer.epsilon = explorer.update_epsilon(episodes[eps_i])
 
-    def choose_action(self, action_space, state, state_action_values):
-        """Choose an action a in the current world state (s)"""
-
-        def sample(action_space):
-            return random_choice(action_space)
-
-        # # First we randomize a number
-        # if hasattr(self, "rng"):
-        #     explor_exploit_tradeoff = self.rng.uniform(0, 1)
-        # else:
-        #     explor_exploit_tradeoff = np.random.uniform(0, 1)
-        explor_exploit_tradeoff = torch.rand(1)
-
-        # Exploration
-        if explor_exploit_tradeoff.item() < self.epsilon:
-            # action = action_space.sample()
-            action = sample(action_space)
-
-        # Exploitation (taking the biggest Q-value for this state)
-        else:
-            # Break ties randomly
-            # If all actions are the same for this state we choose a random one
-            # (otherwise `argmax()` would always take the first one)
-            if torch.all(state_action_values == state_action_values[0]):
-                action = sample(action_space)
-            else:
-                action = torch.argmax(state_action_values)
-        return action
+# %%
+fig, ax = plt.subplots()
+sns.lineplot(epsilons.cpu())
+ax.set(ylabel="Epsilon")
+ax.set(xlabel="Episodes")
+fig.tight_layout()
+plt.show()
 
 
 # %%
-explorer = EpsilonGreedy(epsilon=p.epsilon, rng=p.rng)
 
 
 # %%
@@ -273,7 +294,12 @@ def params_df_stats(weights, key, current_df=None):
 
 
 # %% [markdown]
-# ### Main loop
+# ## Training loop
+
+# %%
+Transition = namedtuple(
+    "Transition", ("state", "action", "reward", "next_state", "done")
+)
 
 # %%
 rewards = torch.zeros((p.total_episodes, p.n_runs), device=device)
@@ -284,15 +310,23 @@ all_actions = []
 losses = [[] for _ in range(p.n_runs)]
 
 for run in range(p.n_runs):  # Run several times to account for stochasticity
-    # # Reset model
-    # net = DQN(
-    #     n_observations=p.n_observations, n_actions=p.n_actions, n_units=p.nHiddenUnits
-    # ).to(device)
-    # optimizer = optim.AdamW(net.parameters(), lr=p.alpha, amsgrad=True)
+
+    # Reset everything
+    net, target_net = neural_network()  # eset weights
+    optimizer = optim.AdamW(net.parameters(), lr=p.alpha, amsgrad=True)
+    explorer = EpsilonGreedy(
+        epsilon=p.epsilon_max,
+        epsilon_min=p.epsilon_min,
+        epsilon_max=p.epsilon_max,
+        decay_rate=p.decay_rate,
+        epsilon_warmup=p.epsilon_warmup,
+    )
     weights_val_stats = None
     biases_val_stats = None
     weights_grad_stats = None
     biases_grad_stats = None
+    replay_buffer = deque([], maxlen=p.replay_buffer_max_size)
+    epsilons = []
 
     for episode in tqdm(
         episodes, desc=f"Run {run+1}/{p.n_runs} - Episodes", leave=False
@@ -309,162 +343,179 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
                 action_space=env.action_space,
                 state=state,
                 state_action_values=state_action_values,
-            )
+            ).item()
 
             # Record states and actions
             all_states.append(state)
-            all_actions.append(Actions(action.item()).name)
+            # all_actions.append(Actions(action.item()).name)
+            all_actions.append(Actions(action).name)
 
-            next_state, reward, done = env.step(
-                action=action.item(), current_state=state
+            next_state, reward, done = env.step(action=action, current_state=state)
+
+            # Store transition in replay buffer
+            # if len(replay_buffer) >= p.replay_buffer_max_size:
+            #     replay_buffer = replay_buffer[1:]
+            # [current_state (2 or 28 x1), action (1x1), next_state (2 or 28 x1), reward (1x1), done (1x1 bool)]
+            done = torch.tensor(done, device=device).unsqueeze(-1)
+            replay_buffer.append(
+                Transition(
+                    state,
+                    action,
+                    reward,
+                    next_state,
+                    done,
+                )
             )
+            if len(replay_buffer) >= p.batch_size:
+                transitions = random_choice(
+                    replay_buffer,
+                    length=len(replay_buffer),
+                    num_samples=p.batch_size,
+                )
+                if p.batch_size > 1:
+                    batch = Transition(*zip(*transitions, strict=True))
+                else:
+                    batch = Transition(*transitions)
+                if p.batch_size > 1:
+                    state_batch = torch.stack(batch.state)
+                    # action_batch = torch.cat(batch.action)
+                    action_batch = torch.tensor(batch.action, device=device)
+                    reward_batch = torch.cat(batch.reward)
+                    next_state_batch = torch.stack(batch.next_state)
+                    done_batch = torch.cat(batch.done)
+                else:
+                    state_batch = batch.state
+                    action_batch = batch.action
+                    reward_batch = batch.reward
+                    next_state_batch = batch.next_state
+                    done_batch = batch.done
+                # (
+                #     state_sampled,
+                #     action_sampled,
+                #     reward_batch,
+                #     next_state_batch,
+                #     done_sampled,
+                # ) = random_choice(replay_buffer, length=len(replay_buffer), num_samples=p.batch_size)
 
-            # See DQN paper for equations: https://arxiv.org/abs/1312.5602
-            state_action_value = state_action_values[action].unsqueeze(-1)  # Q(s_t, a)
-            if done:
-                expected_state_action_value = reward
-            else:
+                # See DQN paper for equations: https://doi.org/10.1038/nature14236
+                state_action_values_sampled = net(state_batch).to(device)  # Q(s_t)
+                if p.batch_size > 1:
+                    state_action_value = torch.gather(
+                        input=state_action_values_sampled,
+                        dim=1,
+                        index=action_batch.unsqueeze(-1),
+                    ).squeeze()  # Q(s_t, a)
+                else:
+                    state_action_value = state_action_values_sampled[
+                        action_batch
+                    ].unsqueeze(
+                        -1
+                    )  # Q(s_t, a)
+
+                # if done_batch:
+                #     expected_state_action_value = reward_batch
+                # else:
+                #     with torch.no_grad():
+                #         next_state_values = (
+                #             net(next_state_batch).to(device).max().unsqueeze(-1)
+                #         )  # Q(s_t+1, a)
+                #     expected_state_action_value = (
+                #         reward_batch + p.gamma * next_state_values
+                #     )  # y_j (Bellman optimality equation)
+
+                done_false = torch.argwhere(done_batch == False).squeeze()
+                done_true = torch.argwhere(done_batch == True).squeeze()
+                expected_state_action_value = torch.empty_like(done_batch) * torch.nan
                 with torch.no_grad():
-                    next_state_values = (
-                        net(next_state).to(device).max().unsqueeze(-1)
-                    )  # Q(s_t+1, a)
-                expected_state_action_value = (
-                    reward + p.gamma * next_state_values
-                )  # y_j (Bellman optimality equation)
+                    if done_true.numel() > 0:
+                        expected_state_action_value[done_true] = reward_batch[done_true]
+                    if done_false.numel() > 0:
+                        if len(next_state_batch.shape) > 1:
+                            next_state_values = (
+                                target_net(next_state_batch[done_false])
+                                .to(device)
+                                .max(1)
+                            )  # Q(s_t+1, a)
+                            expected_state_action_value[done_false] = (
+                                reward_batch[done_false]
+                                + p.gamma * next_state_values.values
+                            )  # y_j (Bellman optimality equation)
+                        else:
+                            next_state_values = (
+                                target_net(next_state_batch).to(device).max()
+                            )  # Q(s_t+1, a)
+                            expected_state_action_value[done_false] = (
+                                reward_batch[done_false] + p.gamma * next_state_values
+                            )  # y_j (Bellman optimality equation)
 
-            # Compute loss
-            criterion = nn.MSELoss()
-            loss = criterion(
-                input=state_action_value, target=expected_state_action_value
-            )  # TD update
+                # Compute loss
+                criterion = nn.MSELoss()
+                loss = criterion(
+                    input=state_action_value,  # prediction
+                    target=expected_state_action_value,  # target/"truth" value
+                )  # TD update
 
-            # # See DQN paper for equations: https://arxiv.org/abs/1312.5602
-            # expected_state_action_values = torch.zeros_like(
-            #     state_action_values, device=device
-            # )
-            # if done:
-            #     expected_state_action_values[action] = reward
-            # else:
-            #     with torch.no_grad():
-            #         next_state_value = (
-            #             net(next_state).to(device).max()  # .unsqueeze(-1)
-            #         )  # Q(s_t+1, a)
-            #     expected_state_action_values[action] = (
-            #         reward + p.gamma * next_state_value
-            #     )  # y_j (Bellman optimality equation)
+                # Optimize the model
+                optimizer.zero_grad()
+                loss.backward()
+                torch.nn.utils.clip_grad_value_(
+                    net.parameters(), 100
+                )  # In-place gradient clipping
+                optimizer.step()
 
-            # # Compute loss
-            # criterion = nn.MSELoss()
-            # loss = criterion(
-            #     input=state_action_values, target=expected_state_action_values
-            # )  # TD update
+                losses[run].append(loss.item())
 
-            # Optimize the model
-            optimizer.zero_grad()
-            loss.backward()
+                weights, biases = collect_weights_biases(net=net)
+                weights_val_stats = params_df_stats(
+                    weights, key="val", current_df=weights_grad_stats
+                )
+                biases_val_stats = params_df_stats(
+                    biases, key="val", current_df=biases_val_stats
+                )
+                biases_grad_stats = params_df_stats(
+                    biases, key="grad", current_df=biases_grad_stats
+                )
+                weights_grad_stats = params_df_stats(
+                    weights, key="grad", current_df=weights_val_stats
+                )
 
-            # In-place gradient clipping
-            torch.nn.utils.clip_grad_value_(net.parameters(), 100)
-            optimizer.step()
+            total_rewards += reward
+            step_count += 1
+
+            # Reset the target network
+            if step_count % p.target_net_update == 0:
+                target_net.load_state_dict(net.state_dict())
 
             # Move to the next state
             state = next_state
 
-            total_rewards += reward
-            step_count += 1
-            losses[run].append(loss.item())
+            explorer.epsilon = explorer.update_epsilon(episode)
+            epsilons.append(explorer.epsilon)
 
         rewards[episode, run] = total_rewards
         steps[episode, run] = step_count
-        weights, biases = collect_weights_biases(net=net)
-        weights_val_stats = params_df_stats(
-            weights, key="val", current_df=weights_grad_stats
-        )
-        biases_val_stats = params_df_stats(
-            biases, key="val", current_df=biases_val_stats
-        )
-        biases_grad_stats = params_df_stats(
-            biases, key="grad", current_df=biases_grad_stats
-        )
-        weights_grad_stats = params_df_stats(
-            weights, key="grad", current_df=weights_val_stats
-        )
     weights_val_stats.set_index("Index", inplace=True)
     biases_val_stats.set_index("Index", inplace=True)
     biases_grad_stats.set_index("Index", inplace=True)
     weights_grad_stats.set_index("Index", inplace=True)
 
-
-# %%
-# grads_metrics["avg_rolling"] = np.nan
-# grads_metrics["std_rolling"] = np.nan
-# for id in grads_metrics.id.unique():
-#     grads_metrics.loc[grads_metrics[grads_metrics["id"] == id].index, "avg_rolling"] = (
-#         grads_metrics.loc[grads_metrics[grads_metrics["id"] == id].index, "avg"]
-#         .rolling(20)
-#         .mean()
-#     )
-#     grads_metrics.loc[grads_metrics[grads_metrics["id"] == id].index, "std_rolling"] = (
-#         grads_metrics.loc[grads_metrics[grads_metrics["id"] == id].index, "std"]
-#         .rolling(20)
-#         .mean()
-#     )
-# grads_metrics
-
 # %% [markdown]
 # ## Visualization
 
-# %%
-# def plot_weights(weights_metrics):
-#     """Plot the weights."""
-#     fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(15, 5))
-
-#     sns.lineplot(x="steps_global", y="avg", hue="id", data=weights_metrics, ax=ax[0])
-#     ax[0].set(ylabel="Weights (avg)")
-#     ax[0].set(xlabel="Steps")
-
-#     sns.lineplot(x="steps_global", y="std", hue="id", data=weights_metrics, ax=ax[1])
-#     ax[1].set(ylabel="Weights (std)")
-#     ax[1].set(xlabel="Steps")
-
-#     fig.tight_layout()
-#     plt.show()
+# %% [markdown]
+# ### Exploration rate
 
 # %%
-# plot_weights(weights_metrics)
+fig, ax = plt.subplots()
+sns.lineplot(epsilons)
+ax.set(ylabel="Epsilon")
+ax.set(xlabel="Steps")
+fig.tight_layout()
+plt.show()
 
-# %%
-# def plot_gradients(grads_metrics):
-#     """Plot the gradienta."""
-#     fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(15, 5))
 
-#     sns.lineplot(
-#         x="steps_global",
-#         y="avg_rolling",
-#         hue="id",
-#         data=grads_metrics,
-#         ax=ax[0],
-#         palette=sns.color_palette()[0 : len(grads_metrics.id.unique())],
-#     )
-#     ax[0].set(ylabel="Gradients (avg)")
-#     ax[0].set(xlabel="Steps")
-
-#     sns.lineplot(
-#         x="steps_global",
-#         y="std_rolling",
-#         hue="id",
-#         data=grads_metrics,
-#         ax=ax[1],
-#         palette=sns.color_palette()[0 : len(grads_metrics.id.unique())],
-#     )
-#     ax[1].set(ylabel="Gradients (std)")
-#     ax[1].set(xlabel="Steps")
-
-#     fig.tight_layout()
-#     plt.show()
-
-# %%
-# plot_gradients(grads_metrics)
+# %% [markdown]
+# ### States & actions distributions
 
 
 # %%
@@ -510,6 +561,10 @@ def plot_states_actions_distribution(states, actions):
 plot_states_actions_distribution(all_states, all_actions)
 
 
+# %% [markdown]
+# ### Steps & rewards
+
+
 # %%
 def plot_steps_and_rewards(df):
     """Plot the steps and rewards from dataframes."""
@@ -534,6 +589,23 @@ def plot_steps_and_rewards(df):
 
 # %%
 plot_steps_and_rewards(res)
+
+
+# %%
+def plot_steps_and_rewards_dist(df):
+    """Plot the steps and rewards distributions from dataframes."""
+    fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(15, 5))
+    sns.histplot(data=df, x="Rewards", ax=ax[0])
+    sns.histplot(data=df, x="Steps", ax=ax[1])
+    fig.tight_layout()
+    plt.show()
+
+
+# %%
+plot_steps_and_rewards_dist(res)
+
+# %% [markdown]
+# ### Loss
 
 # %%
 window_size = 10
@@ -570,8 +642,8 @@ ax.set(yscale="log")
 fig.tight_layout()
 plt.show()
 
-# %%
-loss_df.iloc[-1].Loss
+# %% [markdown]
+# ### Policy learned
 
 # %%
 with torch.no_grad():
@@ -685,6 +757,9 @@ def plot_policies(q_values, labels):
 # %%
 plot_policies(q_values=q_values, labels=CONTEXTS_LABELS)
 
+# %% [markdown]
+# ### Weights & gradients metrics
+
 # %%
 weights, biases = collect_weights_biases(net=net)
 
@@ -710,21 +785,57 @@ weights_val_df = params_df_flat(weights["val"])
 weights_val_df
 
 # %%
+weights_val_df.describe()
+
+# %%
 biases_val_df = params_df_flat(biases["val"])
 biases_val_df
+
+# %%
+biases_val_df.describe()
 
 # %%
 weights_grad_df = params_df_flat(weights["grad"])
 weights_grad_df
 
 # %%
+weights_grad_df.describe()
+
+# %%
 biases_grad_df = params_df_flat(biases["grad"])
 biases_grad_df
+
+# %%
+biases_grad_df.describe()
+
+
+# %%
+def check_grad_stats(grad_df):
+    grad_stats = torch.tensor(
+        [
+            grad_df.Val.mean(),
+            grad_df.Val.std(),
+            grad_df.Val.min(),
+            grad_df.Val.max(),
+        ],
+        device=device,
+    )
+    assert not torch.equal(
+        torch.zeros_like(grad_stats),
+        grad_stats,
+    ), "Gradients are zero"
+
 
 # %%
 plotting.plot_weights_biases_distributions(
     weights_val_df, biases_val_df, label="Values"
 )
+
+# %%
+check_grad_stats(weights_grad_df)
+
+# %%
+check_grad_stats(biases_grad_df)
 
 # %%
 plotting.plot_weights_biases_distributions(
@@ -762,7 +873,7 @@ def plot_weights_biases_stats(weights_stats, biases_stats, label=None):
         palette=palette,
         ax=ax[0, 0],
     )
-    # ax[0, 0].set(yscale="log")
+    ax[0, 0].set(yscale="log")
 
     if label:
         ax[0, 1].set_title("Weights " + label)
@@ -778,7 +889,7 @@ def plot_weights_biases_stats(weights_stats, biases_stats, label=None):
         palette=palette,
         ax=ax[0, 1],
     )
-    # ax[0, 1].set(yscale="log")
+    ax[0, 1].set(yscale="log")
 
     if label:
         ax[1, 0].set_title("Biases " + label)
@@ -794,7 +905,7 @@ def plot_weights_biases_stats(weights_stats, biases_stats, label=None):
         palette=palette,
         ax=ax[1, 0],
     )
-    # ax[1, 0].set(yscale="log")
+    ax[1, 0].set(yscale="log")
 
     if label:
         ax[1, 1].set_title("Biases " + label)
@@ -810,7 +921,7 @@ def plot_weights_biases_stats(weights_stats, biases_stats, label=None):
         palette=palette,
         ax=ax[1, 1],
     )
-    # ax[1, 1].set(yscale="log")
+    ax[1, 1].set(yscale="log")
 
     fig.tight_layout()
     plt.show()
@@ -821,5 +932,3 @@ plot_weights_biases_stats(weights_val_stats, biases_val_stats, label="values")
 
 # %%
 plot_weights_biases_stats(weights_grad_stats, biases_grad_stats, label="gradients")
-
-# %%

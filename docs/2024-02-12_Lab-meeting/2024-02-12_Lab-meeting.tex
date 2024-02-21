@@ -1,4 +1,4 @@
-% Created 2024-02-12 Mon 08:27
+% Created 2024-02-12 Mon 09:03
 % Intended LaTeX compiler: lualatex
 \documentclass[bigger]{beamer}
 \usepackage{amsmath}
@@ -78,8 +78,8 @@ tabsize=2
 \end{frame}
 
 \section{Context}
-\label{sec:orga237198}
-\begin{frame}[label={sec:orgd34f01e}]{How do neurons in the LEC integrate sensory and spatial information?}
+\label{sec:org8f1ca38}
+\begin{frame}[label={sec:orgb18719c}]{How do neurons in the LEC integrate sensory and spatial information?}
 \begin{columns}
 \begin{column}{0.45\columnwidth}
 %\pause
@@ -99,12 +99,19 @@ tabsize=2
 \end{column}
 \end{columns}
 \end{frame}
-\begin{frame}[label={sec:org46cf4c0}]{The half-triangle task}
+\begin{frame}[<+->][label={sec:org3dea03e}]{Why modeling?}
+\begin{itemize}
+\item Having a reliable model to make predictions
+\item Simulation may uncover insight's from the real data
+\item Derive principles from the simulation which can be checked in the experiment
+\end{itemize}
+\end{frame}
+\begin{frame}[label={sec:org784f6d6}]{The half-triangle task}
 \begin{center}
 \includegraphics[width=.9\linewidth]{img/RL_env-triangle-task.drawio.pdf}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org8096796}]{Mapping states to action}
+\begin{frame}[label={sec:orgc61aff3}]{Mapping states to action}
 \centering
 \vspace{2em}
 %\fbox{%
@@ -112,8 +119,8 @@ tabsize=2
 %}
 \end{frame}
 \section{Deep RL algorithm \& building blocs}
-\label{sec:org6bf6b07}
-\begin{frame}[<+->][label={sec:org0e4c681}]{Deep RL lessons learned}
+\label{sec:org120265d}
+\begin{frame}[<+->][label={sec:orgde018e6}]{Deep RL lessons learned}
 \small
 \begin{columns}
 \begin{column}{0.9\columnwidth}
@@ -135,7 +142,7 @@ tabsize=2
 \end{column}
 \end{columns}
 \end{frame}
-\begin{frame}[label={sec:org02d3416}]{Deep RL implementation}
+\begin{frame}[label={sec:orge815aca}]{Deep RL implementation}
 \SetKwComment{Comment}{/* }{ */}
 \DontPrintSemicolon
 
@@ -181,20 +188,20 @@ Inspired from (Mnih et al., 2015)
 \end{textblock}
 \end{frame}
 \section{Results}
-\label{sec:orgfe5e503}
-\begin{frame}[label={sec:orgbb5897d},standout]{How deep RL feels like}
+\label{sec:orge269ff2}
+\begin{frame}[label={sec:org4367cdd},standout]{How deep RL feels like}
 \begin{center}
 \includegraphics[width=.9\linewidth]{img/blog-main-img_pen-balance-with-energel-pens.jpg}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:orge9a721e}]{Networks architectures}
+\begin{frame}[label={sec:org611daeb}]{Networks architectures}
 \centering
 28 \(\to\) 54 \(\to\) 54 \(\to\) 54 \(\to\) 4
 \begin{center}
 \includegraphics[height=0.8\textheight]{img/nn-archi.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org696cf89}]{Rewards \& steps}
+\begin{frame}[label={sec:org4a19398}]{Rewards \& steps}
 \begin{center}
 \includegraphics[height=0.29\textheight]{img/rewards-steps-1-run-working.png}
 \end{center}
@@ -205,7 +212,7 @@ Inspired from (Mnih et al., 2015)
 \includegraphics[height=0.29\textheight]{img/rewards-steps-avg-10-runs.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org041ea2d}]{Loss, rewards \& steps distributions}
+\begin{frame}[label={sec:orgcdab250}]{Loss, rewards \& steps distributions}
 \begin{columns}
 \begin{column}{0.3\columnwidth}
 \begin{center}
@@ -231,14 +238,14 @@ Inspired from (Mnih et al., 2015)
 \end{column}
 \end{columns}
 \end{frame}
-\begin{frame}[label={sec:orgd0b01db}]{Policy learned (when it works)}
+\begin{frame}[label={sec:orga7b45f4}]{Policy learned (when it works)}
 \begin{center}
 \includegraphics[width=.9\linewidth]{img/policy-learned.png}
 \end{center}
 \end{frame}
 \section{Future directions}
-\label{sec:orgcf9d9b4}
-\begin{frame}[label={sec:org1916ef7}]{Adding memory into the task}
+\label{sec:org0970093}
+\begin{frame}[label={sec:org749c655}]{Adding memory into the task}
 \begin{columns}
 \begin{column}{0.5\columnwidth}
 Current environment
@@ -280,17 +287,17 @@ step & location & cue & reward\\
 \end{column}
 \end{columns}
 \end{frame}
-\begin{frame}[label={sec:org5335db3}]{RNN for memorization and sequence modeling}
+\begin{frame}[label={sec:orgc40dd8c}]{RNN for memorization and sequence modeling}
 \begin{center}
 \includegraphics[width=0.7\textwidth]{img/RNN-transparent.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:orga34efdc}]{Feedback connectivity}
+\begin{frame}[label={sec:org93dd61d}]{Feedback connectivity}
 \begin{center}
 \includegraphics[width=0.6\textwidth]{img/Network types - The Computational Brain - transparent.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org16f1398}]{Network of networks}
+\begin{frame}[label={sec:org5e69371}]{Network of networks}
 \begin{center}
 \includegraphics[width=.9\linewidth]{img/mRNN-transparent.png}
 \end{center}
@@ -300,7 +307,7 @@ step & location & cue & reward\\
 (Perich and Rajan, 2020)
 \end{textblock}
 \end{frame}
-\begin{frame}[label={sec:org4c6d6a1},standout]{~}
+\begin{frame}[label={sec:orgc2f3ed3},standout]{~}
 Questions ?
 \end{frame}
 \end{document}
