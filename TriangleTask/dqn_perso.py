@@ -226,7 +226,7 @@ explorer = EpsilonGreedy(
     epsilon_warmup=p.epsilon_warmup,
 )
 episodes = torch.arange(p.total_episodes, device=device)
-epsilons = torch.empty_like(episodes) * torch.nan
+epsilons = torch.empty_like(episodes, device=device) * torch.nan
 for eps_i, epsi in enumerate(epsilons):
     epsilons[eps_i] = explorer.epsilon
     explorer.epsilon = explorer.update_epsilon(episodes[eps_i])
@@ -353,8 +353,6 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
             next_state, reward, done = env.step(action=action, current_state=state)
 
             # Store transition in replay buffer
-            # if len(replay_buffer) >= p.replay_buffer_max_size:
-            #     replay_buffer = replay_buffer[1:]
             # [current_state (2 or 28 x1), action (1x1), next_state (2 or 28 x1), reward (1x1), done (1x1 bool)]
             done = torch.tensor(done, device=device).unsqueeze(-1)
             replay_buffer.append(
@@ -372,45 +370,38 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
                     length=len(replay_buffer),
                     num_samples=p.batch_size,
                 )
-                if p.batch_size > 1:
-                    batch = Transition(*zip(*transitions, strict=True))
-                else:
-                    batch = Transition(*transitions)
-                if p.batch_size > 1:
-                    state_batch = torch.stack(batch.state)
-                    # action_batch = torch.cat(batch.action)
-                    action_batch = torch.tensor(batch.action, device=device)
-                    reward_batch = torch.cat(batch.reward)
-                    next_state_batch = torch.stack(batch.next_state)
-                    done_batch = torch.cat(batch.done)
-                else:
-                    state_batch = batch.state
-                    action_batch = batch.action
-                    reward_batch = batch.reward
-                    next_state_batch = batch.next_state
-                    done_batch = batch.done
-                # (
-                #     state_sampled,
-                #     action_sampled,
-                #     reward_batch,
-                #     next_state_batch,
-                #     done_sampled,
-                # ) = random_choice(replay_buffer, length=len(replay_buffer), num_samples=p.batch_size)
+                # if p.batch_size > 1:
+                batch = Transition(*zip(*transitions, strict=True))
+                # else:
+                #     batch = Transition(*transitions)
+                # if p.batch_size > 1:
+                state_batch = torch.stack(batch.state)
+                # action_batch = torch.cat(batch.action)
+                action_batch = torch.tensor(batch.action, device=device)
+                reward_batch = torch.cat(batch.reward)
+                next_state_batch = torch.stack(batch.next_state)
+                done_batch = torch.cat(batch.done)
+                # else:
+                #     state_batch = batch.state
+                #     action_batch = batch.action
+                #     reward_batch = batch.reward
+                #     next_state_batch = batch.next_state
+                #     done_batch = batch.done
 
                 # See DQN paper for equations: https://doi.org/10.1038/nature14236
                 state_action_values_sampled = net(state_batch).to(device)  # Q(s_t)
-                if p.batch_size > 1:
-                    state_action_value = torch.gather(
-                        input=state_action_values_sampled,
-                        dim=1,
-                        index=action_batch.unsqueeze(-1),
-                    ).squeeze()  # Q(s_t, a)
-                else:
-                    state_action_value = state_action_values_sampled[
-                        action_batch
-                    ].unsqueeze(
-                        -1
-                    )  # Q(s_t, a)
+                # if p.batch_size > 1:
+                state_action_value = torch.gather(
+                    input=state_action_values_sampled,
+                    dim=1,
+                    index=action_batch.unsqueeze(-1),
+                ).squeeze()  # Q(s_t, a)
+                # else:
+                #     state_action_value = state_action_values_sampled[
+                #         action_batch
+                #     ].unsqueeze(
+                #         -1
+                #     )  # Q(s_t, a)
 
                 # if done_batch:
                 #     expected_state_action_value = reward_batch
@@ -425,28 +416,31 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
 
                 done_false = torch.argwhere(done_batch == False).squeeze()
                 done_true = torch.argwhere(done_batch == True).squeeze()
-                expected_state_action_value = torch.empty_like(done_batch) * torch.nan
+                # expected_state_action_value = (
+                #     torch.empty_like(done_batch, device=device) * torch.nan
+                # )
+                expected_state_action_value = (
+                    torch.zeros_like(done_batch, device=device)
+                ).float()
                 with torch.no_grad():
                     if done_true.numel() > 0:
                         expected_state_action_value[done_true] = reward_batch[done_true]
                     if done_false.numel() > 0:
-                        if len(next_state_batch.shape) > 1:
-                            next_state_values = (
-                                target_net(next_state_batch[done_false])
-                                .to(device)
-                                .max(1)
-                            )  # Q(s_t+1, a)
-                            expected_state_action_value[done_false] = (
-                                reward_batch[done_false]
-                                + p.gamma * next_state_values.values
-                            )  # y_j (Bellman optimality equation)
-                        else:
-                            next_state_values = (
-                                target_net(next_state_batch).to(device).max()
-                            )  # Q(s_t+1, a)
-                            expected_state_action_value[done_false] = (
-                                reward_batch[done_false] + p.gamma * next_state_values
-                            )  # y_j (Bellman optimality equation)
+                        # if len(next_state_batch.shape) > 1:
+                        next_state_values = (
+                            target_net(next_state_batch[done_false]).to(device).max(1)
+                        )  # Q(s_t+1, a)
+                        expected_state_action_value[done_false] = (
+                            reward_batch[done_false]
+                            + p.gamma * next_state_values.values
+                        )  # y_j (Bellman optimality equation)
+                        # else:
+                        #     next_state_values = (
+                        #         target_net(next_state_batch).to(device).max()
+                        #     )  # Q(s_t+1, a)
+                        #     expected_state_action_value[done_false] = (
+                        #         reward_batch[done_false] + p.gamma * next_state_values
+                        #     )  # y_j (Bellman optimality equation)
 
                 # Compute loss
                 criterion = nn.MSELoss()
@@ -821,7 +815,7 @@ def check_grad_stats(grad_df):
         device=device,
     )
     assert not torch.equal(
-        torch.zeros_like(grad_stats),
+        torch.zeros_like(grad_stats, device=device),
         grad_stats,
     ), "Gradients are zero"
 

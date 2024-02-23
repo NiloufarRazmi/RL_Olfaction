@@ -187,11 +187,17 @@ def visualize_activations(model, color="C0", print_variance=False):
 ** DONE Add \epsilon-greedy starting from ~\epsilon=1~ + add test
 ** Modify warm up episodes to warm up steps
 ** TODO Soft update of the target network's weights
-** KILL Huber loss
+** Huber loss
 ** [?] Adaptive \epsilon-greedy
 [[https://doi.org/10.1016/j.procs.2017.05.431]]
 ** TODO Seed everything to be able to test runs that don't work
+*** [[https://docs.python.org/3/using/cmdline.html#envvar-PYTHONHASHSEED][PYTHONHASHSEED]]
 ** [?] Unit test DQN algo??
+[[https://krokotsch.eu/posts/deep-learning-unit-tests/]]
+*** Test that the loss decreases
+*** Test that the weights are updated
+*** Test the shapes of the data, input/output to the network, and of all tensors
+*** Check gradients are not zero after one step of backprop
 * TODO Metrics
 ** DONE Reward histogram
 ** average entropy of action distribution
