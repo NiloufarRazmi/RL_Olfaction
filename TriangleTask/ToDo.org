@@ -192,12 +192,15 @@ def visualize_activations(model, color="C0", print_variance=False):
 [[https://doi.org/10.1016/j.procs.2017.05.431]]
 ** TODO Seed everything to be able to test runs that don't work
 *** [[https://docs.python.org/3/using/cmdline.html#envvar-PYTHONHASHSEED][PYTHONHASHSEED]]
-** [?] Unit test DQN algo??
+** TODO Unit test DQN algo
 [[https://krokotsch.eu/posts/deep-learning-unit-tests/]]
 *** Test that the loss decreases
 *** Test that the weights are updated
 *** Test the shapes of the data, input/output to the network, and of all tensors
 *** Check gradients are not zero after one step of backprop
+*** Check replay buffer is being sampled from correctly
+*** Make target network update frequency infinite to see whether Q-network converges
+** DONE Add light cue to the state?
 * TODO Metrics
 ** DONE Reward histogram
 ** average entropy of action distribution

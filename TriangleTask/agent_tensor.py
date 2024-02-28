@@ -10,15 +10,15 @@ class EpsilonGreedy:
         epsilon_max=1.0,
         decay_rate=0.05,
         epsilon_warmup=25,
-        rng=None,
+        seed=None,
     ):
         self.epsilon = epsilon
         self.epsilon_min = epsilon_min
         self.epsilon_max = epsilon_max
         self.decay_rate = decay_rate
         self.epsilon_warmup = epsilon_warmup
-        if rng:
-            self.rng = rng
+        if seed:
+            self.seed = seed
 
     def choose_action(self, action_space, state, state_action_values):
         """Choose an action a in the current world state (s)"""

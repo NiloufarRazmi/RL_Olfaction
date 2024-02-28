@@ -99,23 +99,27 @@ p = Params(
     n_runs=1,
     total_episodes=200,
     epsilon=0.5,
-    alpha=0.005,
-    gamma=0.9,
+    alpha=1e-4,
+    gamma=0.99,
     # nHiddenUnits=(5 * 5 + 3) * 5,
     nHiddenUnits=128,
-    replay_buffer_max_size=10000,
-    epsilon_min=0.1,
+    replay_buffer_max_size=5000,
+    epsilon_min=0.2,
     epsilon_max=1.0,
     decay_rate=0.03,
     epsilon_warmup=50,
     batch_size=32,
-    target_net_update=50,
+    target_net_update=200,
 )
 p
 
 # %%
+if p.batch_size < 2:
+    raise ValueError("The batch size needs to be more that one data point")
+
+# %%
 # # Set the seed
-# p.rng = np.random.default_rng(p.seed)
+# make_deterministic(seed=p.seed)
 
 # %% [markdown]
 # ### Environment definition
@@ -241,9 +245,6 @@ plt.show()
 
 
 # %%
-
-
-# %%
 def collect_weights_biases(net):
     biases = {"val": [], "grad": []}
     weights = {"val": [], "grad": []}
@@ -305,7 +306,7 @@ Transition = namedtuple(
 rewards = torch.zeros((p.total_episodes, p.n_runs), device=device)
 steps = torch.zeros((p.total_episodes, p.n_runs), device=device)
 episodes = torch.arange(p.total_episodes, device=device)
-all_states = []
+# all_states = []
 all_actions = []
 losses = [[] for _ in range(p.n_runs)]
 
@@ -346,7 +347,7 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
             ).item()
 
             # Record states and actions
-            all_states.append(state)
+            # all_states.append(state)
             # all_actions.append(Actions(action.item()).name)
             all_actions.append(Actions(action).name)
 
@@ -370,83 +371,72 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
                     length=len(replay_buffer),
                     num_samples=p.batch_size,
                 )
-                # if p.batch_size > 1:
                 batch = Transition(*zip(*transitions, strict=True))
-                # else:
-                #     batch = Transition(*transitions)
-                # if p.batch_size > 1:
                 state_batch = torch.stack(batch.state)
-                # action_batch = torch.cat(batch.action)
                 action_batch = torch.tensor(batch.action, device=device)
                 reward_batch = torch.cat(batch.reward)
                 next_state_batch = torch.stack(batch.next_state)
                 done_batch = torch.cat(batch.done)
-                # else:
-                #     state_batch = batch.state
-                #     action_batch = batch.action
-                #     reward_batch = batch.reward
-                #     next_state_batch = batch.next_state
-                #     done_batch = batch.done
 
                 # See DQN paper for equations: https://doi.org/10.1038/nature14236
                 state_action_values_sampled = net(state_batch).to(device)  # Q(s_t)
-                # if p.batch_size > 1:
-                state_action_value = torch.gather(
+                state_action_values = torch.gather(
                     input=state_action_values_sampled,
                     dim=1,
                     index=action_batch.unsqueeze(-1),
                 ).squeeze()  # Q(s_t, a)
-                # else:
-                #     state_action_value = state_action_values_sampled[
-                #         action_batch
-                #     ].unsqueeze(
-                #         -1
-                #     )  # Q(s_t, a)
-
-                # if done_batch:
-                #     expected_state_action_value = reward_batch
-                # else:
-                #     with torch.no_grad():
-                #         next_state_values = (
-                #             net(next_state_batch).to(device).max().unsqueeze(-1)
-                #         )  # Q(s_t+1, a)
-                #     expected_state_action_value = (
-                #         reward_batch + p.gamma * next_state_values
-                #     )  # y_j (Bellman optimality equation)
 
                 done_false = torch.argwhere(done_batch == False).squeeze()
                 done_true = torch.argwhere(done_batch == True).squeeze()
-                # expected_state_action_value = (
-                #     torch.empty_like(done_batch, device=device) * torch.nan
-                # )
-                expected_state_action_value = (
+                expected_state_action_values = (
                     torch.zeros_like(done_batch, device=device)
                 ).float()
                 with torch.no_grad():
                     if done_true.numel() > 0:
-                        expected_state_action_value[done_true] = reward_batch[done_true]
+                        expected_state_action_values[done_true] = reward_batch[
+                            done_true
+                        ]
                     if done_false.numel() > 0:
-                        # if len(next_state_batch.shape) > 1:
                         next_state_values = (
                             target_net(next_state_batch[done_false]).to(device).max(1)
                         )  # Q(s_t+1, a)
-                        expected_state_action_value[done_false] = (
+                        expected_state_action_values[done_false] = (
                             reward_batch[done_false]
                             + p.gamma * next_state_values.values
                         )  # y_j (Bellman optimality equation)
-                        # else:
-                        #     next_state_values = (
-                        #         target_net(next_state_batch).to(device).max()
-                        #     )  # Q(s_t+1, a)
-                        #     expected_state_action_value[done_false] = (
-                        #         reward_batch[done_false] + p.gamma * next_state_values
-                        #     )  # y_j (Bellman optimality equation)
+
+                # # Compute a mask of non-final states and concatenate the batch elements
+                # # (a final state would've been the one after which simulation ended)
+                # non_final_mask = torch.tensor(
+                #     tuple(map(lambda s: s == False, batch.done)),
+                #     device=device,
+                #     dtype=torch.bool,
+                # )
+                # non_final_next_states = torch.stack(
+                #     [s[1] for s in zip(batch.done, batch.next_state) if s[0] == False]
+                # )
+
+                # # Compute V(s_{t+1}) for all next states.
+                # # Expected values of actions for non_final_next_states are computed based
+                # # on the "older" target_net; selecting their best reward with max(1).values
+                # # This is merged based on the mask, such that we'll have either the expected
+                # # state value or 0 in case the state was final.
+                # next_state_values = torch.zeros(p.batch_size, device=device)
+                # if non_final_next_states.numel() > 0 and non_final_mask.numel() > 0:
+                #     with torch.no_grad():
+                #         next_state_values[non_final_mask] = (
+                #             target_net(non_final_next_states).max(1).values
+                #         )
+                # # Compute the expected Q values
+                # expected_state_action_values = reward_batch + (
+                #     next_state_values * p.gamma
+                # )
 
                 # Compute loss
                 criterion = nn.MSELoss()
                 loss = criterion(
-                    input=state_action_value,  # prediction
-                    target=expected_state_action_value,  # target/"truth" value
+                    input=state_action_values,  # prediction
+                    target=expected_state_action_values,  # target/"truth" value
                 )  # TD update
 
                 # Optimize the model
@@ -493,19 +483,26 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
     biases_grad_stats.set_index("Index", inplace=True)
     weights_grad_stats.set_index("Index", inplace=True)
 
+
 # %% [markdown]
 # ## Visualization
 
 # %% [markdown]
 # ### Exploration rate
 
+
 # %%
-fig, ax = plt.subplots()
-sns.lineplot(epsilons)
-ax.set(ylabel="Epsilon")
-ax.set(xlabel="Steps")
-fig.tight_layout()
-plt.show()
+def plot_exploration_rate(epsilons):
+    fig, ax = plt.subplots()
+    sns.lineplot(epsilons)
+    ax.set(ylabel="Epsilon")
+    ax.set(xlabel="Steps")
+    fig.tight_layout()
+    plt.show()
+
+
+# %%
+plot_exploration_rate(epsilons)
 
 
 # %% [markdown]
@@ -537,22 +534,20 @@ res
 
 
 # %%
-def plot_states_actions_distribution(states, actions):
+def plot_states_actions_distribution(actions):
     """Plot the distributions of states and actions."""
-    fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(13, 5))
-    # sns.histplot(data=states, ax=ax[0])
-    ax[0].set_title("States")
-    sns.histplot(data=actions, ax=ax[1])
-    ax[1].set_xticks(
+    fig, ax = plt.subplots()
+    sns.histplot(data=actions, ax=ax)
+    ax.set_xticks(
         [item.value for item in Actions], labels=[item.name for item in Actions]
     )
-    ax[1].set_title("Actions")
+    ax.set_title("Actions")
     fig.tight_layout()
     plt.show()
 
 
 # %%
-plot_states_actions_distribution(all_states, all_actions)
+plot_states_actions_distribution(all_actions)
 
 
 # %% [markdown]
@@ -889,7 +884,7 @@ def plot_weights_biases_stats(weights_stats, biases_stats, label=None):
         ax[1, 0].set_title("Biases " + label)
     else:
         ax[1, 0].set_title("Biases")
-    ax[1, 0].set_xlabel("Episodes")
+    ax[1, 0].set_xlabel("Steps")
     palette = sns.color_palette()[0 : len(biases_stats.Layer.unique())]
     sns.lineplot(
         data=biases_stats,
@@ -905,7 +900,7 @@ def plot_weights_biases_stats(weights_stats, biases_stats, label=None):
         ax[1, 1].set_title("Biases " + label)
     else:
         ax[1, 1].set_title("Biases")
-    ax[1, 1].set_xlabel("Episodes")
+    ax[1, 1].set_xlabel("Steps")
     palette = sns.color_palette()[0 : len(biases_stats.Layer.unique())]
     sns.lineplot(
         data=biases_stats,

@@ -16,7 +16,7 @@ class OdorCondition(Enum):
 #     B = 2
 
 
-class Cues(Enum):
+class OdorCues(Enum):
     NoOdor = 0
     OdorA = 1
     OdorB = 2
@@ -32,6 +32,10 @@ class Ports(Enum):
 # class LightCues(Enum):
 #     North = Ports.North.value
 #     South = Ports.South.value
+class LightCues(Enum):
+    NoLight = 0
+    North = 1
+    South = 2
 
 
 class OdorPorts(Enum):
@@ -57,9 +61,9 @@ CONTEXTS_LABELS = OrderedDict(
         # (LightCues.South, "Pre odor - South light"),
         # (OdorID.A, "Post odor - Odor A"),
         # (OdorID.B, "Post odor - Odor B"),
-        (Cues.NoOdor, "Pre odor"),
-        (Cues.OdorA, "Odor A"),
-        (Cues.OdorB, "Odor B"),
+        (OdorCues.NoOdor, "Pre odor"),
+        (OdorCues.OdorA, "Odor A"),
+        (OdorCues.OdorB, "Odor B"),
     ]
 )
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
@@ -97,7 +101,8 @@ class Environment:
         self.state_space = {
             "location": self.tiles_locations,
             # "cue": set(OdorID).union(LightCues),
-            "cue": set(Cues),
+            "odor_cue": set(OdorCues),
+            "light_cue": set(LightCues),
         }
         self.numStates = tuple(len(item) for item in self.state_space.values())
         self.reset()
@@ -111,13 +116,18 @@ class Environment:
         )
         start_state = {
             "location": random_choice(self.get_allowed_tiles()),
-            "cue": Cues.NoOdor,
+            "odor_cue": OdorCues.NoOdor,
+            "light_cue": (
+                LightCues.North
+                if self.TriangleState == TriangleState.upper
+                else LightCues.South
+            ),
         }
         self.odor_condition = OdorCondition.pre
-        self.odor_ID = Cues(
+        self.odor_ID = OdorCues(
             random_choice(
                 torch.tensor(
-                    [item.value for item in Cues if item.name != "NoOdor"],
+                    [item.value for item in OdorCues if item.name != "NoOdor"],
                     device=DEVICE,
                 )
             ).item()
@@ -150,16 +160,23 @@ class Environment:
         """Observe the reward."""
         reward = 0
         if self.odor_condition == OdorCondition.post:
-            if state["cue"] == Cues.OdorA and state["location"] == Ports.West.value:
+            if (
+                state["odor_cue"] == OdorCues.OdorA
+                and state["location"] == Ports.West.value
+            ):
                 reward = 10
-            elif state["cue"] == Cues.OdorB and state["location"] == Ports.East.value:
+            elif (
+                state["odor_cue"] == OdorCues.OdorB
+                and state["location"] == Ports.East.value
+            ):
                 reward = 10
         return reward
 
     def step(self, action, current_state):
         """Take an action, observe reward and the next state."""
         new_state = {}
-        new_state["cue"] = current_state["cue"]
+        new_state["odor_cue"] = current_state["odor_cue"]
+        new_state["light_cue"] = current_state["light_cue"]
         row, col = self.to_row_col(current_state)
         newrow, newcol = self.move(row, col, action)
         new_state["location"] = self.to_state_location(newrow, newcol)
@@ -167,7 +184,8 @@ class Environment:
         # Update internal states
         if new_state["location"].item() in {item.value for item in OdorPorts}:
             self.odor_condition = OdorCondition.post
-            new_state["cue"] = self.odor_ID
+            new_state["odor_cue"] = self.odor_ID
+            new_state["light_cue"] = LightCues.NoLight
 
         reward = self.reward(new_state)
         done = self.is_terminated(new_state)
@@ -233,7 +251,7 @@ class WrappedEnvironment(Environment):
         self.one_hot_state = one_hot_state
         super().__init__(rng=rng)
 
-        # self.state_space = torch.arange(self.rows * self.cols * len(Cues))
+        # self.state_space = torch.arange(self.rows * self.cols * len(OdorCues))
         # self.numStates = len(self.state_space)
         self.reset()
 
@@ -241,7 +259,8 @@ class WrappedEnvironment(Environment):
         """Convert composite state dictionary to a tensor."""
 
         conv_state = torch.tensor(
-            [state["location"], state["cue"].value], device=DEVICE
+            [state["location"], state["odor_cue"].value, state["light_cue"].value],
+            device=DEVICE,
         )
         if self.one_hot_state:
             state_one_hot = self.to_one_hot(conv_state)
@@ -255,7 +274,8 @@ class WrappedEnvironment(Environment):
             state = self.from_one_hot(state)
         conv_state = {
             "location": state[0],
-            "cue": Cues(state[1].item()),
+            "odor_cue": OdorCues(state[1].item()),
+            "light_cue": LightCues(state[2].item()),
         }
         return conv_state
 
@@ -281,13 +301,19 @@ class WrappedEnvironment(Environment):
     def to_one_hot(self, state):
         """Convert state to one-hot vector."""
         loc_one_hot = F.one_hot(state[0].long(), num_classes=len(self.tiles_locations))
-        cue_one_hot = F.one_hot(state[1].long(), num_classes=len(Cues))
-        state_one_hot = torch.cat((loc_one_hot, cue_one_hot))
+        odor_cue_one_hot = F.one_hot(state[1].long(), num_classes=len(OdorCues))
+        light_cue_one_hot = F.one_hot(state[2].long(), num_classes=len(LightCues))
+        state_one_hot = torch.cat((loc_one_hot, odor_cue_one_hot, light_cue_one_hot))
         return state_one_hot
 
     def from_one_hot(self, state):
         """Convert state from one-hot vector to regular tensor."""
         loc = state[0 : len(self.tiles_locations)].argwhere().item()
-        cue = state[-len(Cues) :].argwhere().item()
-        conv_state = torch.tensor([loc, cue], device=DEVICE)
+        odor_cue = (
+            state[len(self.tiles_locations) : len(self.tiles_locations) + len(OdorCues)]
+            .argwhere()
+            .item()
+        )
+        light_cue = state[-len(LightCues) :].argwhere().item()
+        conv_state = torch.tensor([loc, odor_cue, light_cue], device=DEVICE)
         return conv_state
