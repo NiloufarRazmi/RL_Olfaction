@@ -1,5 +1,5 @@
 import torch
-from utils import random_choice
+from utils import make_deterministic, random_choice
 
 
 class EpsilonGreedy:
@@ -18,20 +18,18 @@ class EpsilonGreedy:
         self.decay_rate = decay_rate
         self.epsilon_warmup = epsilon_warmup
         if seed:
-            self.seed = seed
+            self.generator = make_deterministic(seed=seed)
+        else:
+            self.generator = None
 
     def choose_action(self, action_space, state, state_action_values):
         """Choose an action a in the current world state (s)"""
 
-        def sample(action_space):
-            return random_choice(action_space)
+        def sample(action_space, generator=None):
+            return random_choice(action_space, generator=self.generator)
 
         # # First we randomize a number
-        # if hasattr(self, "rng"):
-        #     explor_exploit_tradeoff = self.rng.uniform(0, 1)
-        # else:
-        #     explor_exploit_tradeoff = np.random.uniform(0, 1)
-        explor_exploit_tradeoff = torch.rand(1)
+        explor_exploit_tradeoff = torch.rand(1, generator=self.generator)
 
         # Exploration
         if explor_exploit_tradeoff.item() < self.epsilon:

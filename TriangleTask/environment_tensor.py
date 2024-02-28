@@ -3,7 +3,7 @@ from enum import Enum
 
 import torch
 import torch.nn.functional as F
-from utils import random_choice
+from utils import make_deterministic, random_choice
 
 
 class OdorCondition(Enum):
@@ -79,9 +79,11 @@ DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 class Environment:
     """Environment logic."""
 
-    def __init__(self, rng=None):
-        if rng:
-            self.rng = rng
+    def __init__(self, seed=None):
+        if seed:
+            self.generator = make_deterministic(seed=seed)
+        else:
+            self.generator = None
         self.rows = 5
         self.cols = 5
         self.tiles_locations = torch.arange(self.rows * self.cols, device=DEVICE)
@@ -106,11 +108,14 @@ class Environment:
         """Reset the environment."""
         self.TriangleState = TriangleState(
             random_choice(
-                torch.tensor([item.value for item in TriangleState], device=DEVICE)
+                torch.tensor([item.value for item in TriangleState], device=DEVICE),
+                generator=self.generator,
             ).item()
         )
         start_state = {
-            "location": random_choice(self.get_allowed_tiles()),
+            "location": random_choice(
+                self.get_allowed_tiles(), generator=self.generator
+            ),
             "cue": Cues.NoOdor,
         }
         self.odor_condition = OdorCondition.pre
@@ -119,7 +124,8 @@ class Environment:
                 torch.tensor(
                     [item.value for item in Cues if item.name != "NoOdor"],
                     device=DEVICE,
-                )
+                ),
+                generator=self.generator,
             ).item()
         )
         return start_state
@@ -228,10 +234,10 @@ class WrappedEnvironment(Environment):
 
     Results in numerical only state space"""
 
-    def __init__(self, rng=None, one_hot_state=False):
+    def __init__(self, seed=None, one_hot_state=False):
         # Initialize the base class to get the base properties
         self.one_hot_state = one_hot_state
-        super().__init__(rng=rng)
+        super().__init__(seed=seed)
 
         # self.state_space = torch.arange(self.rows * self.cols * len(Cues))
         # self.numStates = len(self.state_space)

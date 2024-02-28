@@ -190,7 +190,7 @@ def visualize_activations(model, color="C0", print_variance=False):
 ** Huber loss
 ** [?] Adaptive \epsilon-greedy
 [[https://doi.org/10.1016/j.procs.2017.05.431]]
-** TODO Seed everything to be able to test runs that don't work
+** DONE Seed everything to be able to test runs that don't work
 *** [[https://docs.python.org/3/using/cmdline.html#envvar-PYTHONHASHSEED][PYTHONHASHSEED]]
 ** TODO Unit test DQN algo
 [[https://krokotsch.eu/posts/deep-learning-unit-tests/]]

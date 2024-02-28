@@ -58,7 +58,7 @@ from agent_tensor import EpsilonGreedy
 from environment_tensor import CONTEXTS_LABELS, Actions, Cues, WrappedEnvironment
 
 # %%
-from utils import Params, random_choice
+from utils import Params, make_deterministic, random_choice
 
 # %%
 # Formatting & autoreload stuff
@@ -121,15 +121,15 @@ if p.batch_size < 2:
     raise ValueError("The batch size needs to be more that one data point")
 
 # %%
-# # Set the seed
-# make_deterministic(seed=p.seed)
+# Set the seed
+GENERATOR = make_deterministic(seed=p.seed)
 
 # %% [markdown]
 # ### Environment definition
 
 # %%
 # Load the environment
-env = WrappedEnvironment(one_hot_state=True)
+env = WrappedEnvironment(one_hot_state=True, seed=p.seed)
 
 # %%
 # Get number of actions
@@ -231,6 +231,7 @@ explorer = EpsilonGreedy(
     epsilon_max=p.epsilon_max,
     decay_rate=p.decay_rate,
     epsilon_warmup=p.epsilon_warmup,
+    seed=p.seed,
 )
 episodes = torch.arange(p.total_episodes, device=device)
 epsilons = torch.empty_like(episodes, device=device) * torch.nan
@@ -373,6 +374,7 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
                     replay_buffer,
                     length=len(replay_buffer),
                     num_samples=p.batch_size,
+                    generator=GENERATOR,
                 )
                 batch = Transition(*zip(*transitions, strict=True))
                 state_batch = torch.stack(batch.state)
@@ -389,51 +391,51 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
                     index=action_batch.unsqueeze(-1),
                 ).squeeze()  # Q(s_t, a)
 
-                done_false = torch.argwhere(done_batch == False).squeeze()
-                done_true = torch.argwhere(done_batch == True).squeeze()
-                expected_state_action_values = (
-                    torch.zeros_like(done_batch, device=device)
-                ).float()
-                with torch.no_grad():
-                    if done_true.numel() > 0:
-                        expected_state_action_values[done_true] = reward_batch[
-                            done_true
-                        ]
-                    if done_false.numel() > 0:
-                        next_state_values = (
-                            target_net(next_state_batch[done_false]).to(device).max(1)
-                        )  # Q(s_t+1, a)
-                        expected_state_action_values[done_false] = (
-                            reward_batch[done_false]
-                            + p.gamma * next_state_values.values
-                        )  # y_j (Bellman optimality equation)
+                # done_false = torch.argwhere(done_batch == False).squeeze()
+                # done_true = torch.argwhere(done_batch == True).squeeze()
+                # expected_state_action_values = (
+                #     torch.zeros_like(done_batch, device=device)
+                # ).float()
+                # with torch.no_grad():
+                #     if done_true.numel() > 0:
+                #         expected_state_action_values[done_true] = reward_batch[
+                #             done_true
+                #         ]
+                #     if done_false.numel() > 0:
+                #         next_state_values = (
+                #             target_net(next_state_batch[done_false]).to(device).max(1)
+                #         )  # Q(s_t+1, a)
+                #         expected_state_action_values[done_false] = (
+                #             reward_batch[done_false]
+                #             + p.gamma * next_state_values.values
+                #         )  # y_j (Bellman optimality equation)
 
-                # # Compute a mask of non-final states and concatenate the batch elements
-                # # (a final state would've been the one after which simulation ended)
-                # non_final_mask = torch.tensor(
-                #     tuple(map(lambda s: s == False, batch.done)),
-                #     device=device,
-                #     dtype=torch.bool,
-                # )
-                # non_final_next_states = torch.stack(
-                #     [s[1] for s in zip(batch.done, batch.next_state) if s[0] == False]
-                # )
+                # Compute a mask of non-final states and concatenate the batch elements
+                # (a final state would've been the one after which simulation ended)
+                non_final_mask = torch.tensor(
+                    tuple(map(lambda s: s == False, batch.done)),
+                    device=device,
+                    dtype=torch.bool,
+                )
+                non_final_next_states = torch.stack(
+                    [s[1] for s in zip(batch.done, batch.next_state) if s[0] == False]
+                )
 
-                # # Compute V(s_{t+1}) for all next states.
-                # # Expected values of actions for non_final_next_states are computed based
-                # # on the "older" target_net; selecting their best reward with max(1).values
-                # # This is merged based on the mask, such that we'll have either the expected
-                # # state value or 0 in case the state was final.
-                # next_state_values = torch.zeros(p.batch_size, device=device)
-                # if non_final_next_states.numel() > 0 and non_final_mask.numel() > 0:
-                #     with torch.no_grad():
-                #         next_state_values[non_final_mask] = (
-                #             target_net(non_final_next_states).max(1).values
-                #         )
-                # # Compute the expected Q values
-                # expected_state_action_values = reward_batch + (
-                #     next_state_values * p.gamma
-                # )
+                # Compute V(s_{t+1}) for all next states.
+                # Expected values of actions for non_final_next_states are computed based
+                # on the "older" target_net; selecting their best reward with max(1).values
+                # This is merged based on the mask, such that we'll have either the expected
+                # state value or 0 in case the state was final.
+                next_state_values = torch.zeros(p.batch_size, device=device)
+                if non_final_next_states.numel() > 0 and non_final_mask.numel() > 0:
+                    with torch.no_grad():
+                        next_state_values[non_final_mask] = (
+                            target_net(non_final_next_states).max(1).values
+                        )
+                # Compute the expected Q values
+                expected_state_action_values = reward_batch + (
+                    next_state_values * p.gamma
+                )
 
                 # Compute loss
                 criterion = nn.MSELoss()

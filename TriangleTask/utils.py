@@ -1,6 +1,8 @@
+import os
 from dataclasses import dataclass
 from typing import Optional
 
+import numpy as np
 import torch
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
@@ -12,7 +14,6 @@ class Params:
 
     # General
     seed: Optional[int] = None
-    rng: Optional[int] = None
 
     # Experiment
     n_runs: int = 10
@@ -45,7 +46,7 @@ class Params:
     tau: float = 0.005
 
 
-def random_choice(choices_array, length=None, num_samples=1):
+def random_choice(choices_array, length=None, num_samples=1, generator=None):
     """
     PyTorch version of `numpy.random.choice`.
 
@@ -55,7 +56,9 @@ def random_choice(choices_array, length=None, num_samples=1):
         weights = torch.ones(length, device=DEVICE)
     else:
         weights = torch.ones_like(choices_array, dtype=float, device=DEVICE)
-    idx = torch.multinomial(input=weights, num_samples=num_samples, replacement=False)
+    idx = torch.multinomial(
+        input=weights, num_samples=num_samples, replacement=False, generator=generator
+    )
     # idx = torch.distributions.categorical.Categorical(logits=logits).sample()
     if num_samples == 1:
         random_res = choices_array[idx]
@@ -66,3 +69,26 @@ def random_choice(choices_array, length=None, num_samples=1):
             "The number of samples has to be positive and greater than zero"
         )
     return random_res
+
+
+def make_deterministic(seed=None):
+    """Make everything deterministic in a single call."""
+
+    generator = None
+
+    if seed:
+        # PyTorch
+        generator = torch.manual_seed(seed)
+        if torch.cuda.is_available():
+            torch.backends.cudnn.deterministic = True
+            torch.backends.cudnn.benchmark = False
+
+        # Numpy
+        np.random.seed(seed)
+
+        # Built-in Python
+        # random.seed(seed)
+        # https://docs.python.org/3/using/cmdline.html#envvar-PYTHONHASHSEED
+        os.environ["PYTHONHASHSEED"] = str(seed)
+
+    return generator
