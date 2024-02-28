@@ -52,6 +52,8 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 device
 
 import plotting
+
+# from environment_lights_tensor import WrappedEnvironment, Actions, CONTEXTS_LABELS
 from agent_tensor import EpsilonGreedy
 from environment_tensor import CONTEXTS_LABELS, Actions, Cues, WrappedEnvironment
 
@@ -110,6 +112,7 @@ p = Params(
     epsilon_warmup=50,
     batch_size=32,
     target_net_update=200,
+    tau=0.005,
 )
 p
 
@@ -447,6 +450,20 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
                 )  # In-place gradient clipping
                 optimizer.step()
 
+                # # Reset the target network
+                # if step_count % p.target_net_update == 0:
+                #     target_net.load_state_dict(net.state_dict())
+
+                # Soft update of the target network's weights
+                # θ′ ← τ θ + (1 −τ )θ′
+                target_net_state_dict = target_net.state_dict()
+                net_state_dict = net.state_dict()
+                for key in net_state_dict:
+                    target_net_state_dict[key] = net_state_dict[
+                        key
+                    ] * p.tau + target_net_state_dict[key] * (1 - p.tau)
+                target_net.load_state_dict(target_net_state_dict)
+
                 losses[run].append(loss.item())
 
                 weights, biases = collect_weights_biases(net=net)
@@ -465,10 +482,6 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
 
             total_rewards += reward
             step_count += 1
-
-            # Reset the target network
-            if step_count % p.target_net_update == 0:
-                target_net.load_state_dict(net.state_dict())
 
             # Move to the next state
             state = next_state

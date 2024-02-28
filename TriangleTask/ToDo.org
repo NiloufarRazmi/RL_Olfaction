@@ -186,7 +186,7 @@ def visualize_activations(model, color="C0", print_variance=False):
 ** DONE Replace list type for replay buffer by ~dequeu()~ or ~NamedTuple~?
 ** DONE Add \epsilon-greedy starting from ~\epsilon=1~ + add test
 ** Modify warm up episodes to warm up steps
-** TODO Soft update of the target network's weights
+** DONE Soft update of the target network's weights
 ** Huber loss
 ** [?] Adaptive \epsilon-greedy
 [[https://doi.org/10.1016/j.procs.2017.05.431]]

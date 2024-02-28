@@ -42,6 +42,7 @@ class Params:
     replay_buffer_max_size: int = 1000
     batch_size: int = 32
     target_net_update: int = 100
+    tau: float = 0.005
 
 
 def random_choice(choices_array, length=None, num_samples=1):
