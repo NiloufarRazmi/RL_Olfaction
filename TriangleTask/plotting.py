@@ -432,7 +432,7 @@ def plot_location_count(
     plt.show()
 
 
-def plot_weights_biases_distributions(weights_df, biases_df, label=None):
+def plot_weights_biases_distributions(weights_df, biases_df, label=None, figpath=None):
     fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(13, 5))
 
     ax[0].set_title("Weights")
@@ -471,4 +471,10 @@ def plot_weights_biases_distributions(weights_df, biases_df, label=None):
     )
 
     fig.tight_layout()
+    if figpath:
+        fig.savefig(
+            figpath / f"weights-biases-distrib-{label}.png",
+            bbox_inches="tight",
+            transparent=True,
+        )
     plt.show()

@@ -22,6 +22,8 @@
 # %% [markdown]
 # ### Initialization
 
+import datetime
+import logging
 import os
 from collections import deque, namedtuple
 
@@ -81,37 +83,49 @@ mpl.rcParams["font.sans-serif"] = [
 # plt.style.use("ggplot")
 
 # %%
-ROOT_PATH = Path("env").parent
-PLOTS_PATH = ROOT_PATH / "plots"
-print(f"Plots path: `{PLOTS_PATH.absolute()}`")
-
+now = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+now
 
 # %%
-def check_plots():
-    if not PLOTS_PATH.exists():
-        os.mkdir(PLOTS_PATH)
+ROOT_PATH = Path("env").parent
+SAVE_PATH = ROOT_PATH / "save"
+CURRENT_PATH = SAVE_PATH / now
+CURRENT_PATH.mkdir(parents=True, exist_ok=True)  # Create the tree of directories
+print(f"Save path: `{CURRENT_PATH.absolute()}`")
 
+# %%
+# Configure logging
+logfile = CURRENT_PATH / "training.log"
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+handler = logging.FileHandler(logfile)
+formatter = logging.Formatter(
+    "%(asctime)s : %(name)s  : %(funcName)s : %(levelname)s : %(message)s"
+)
+handler.setFormatter(formatter)
+logger.addHandler(handler)
 
 # %% [markdown]
 # ### Parameters
 
 # %%
 p = Params(
-    seed=42,
+    # seed=42,
+    seed=123,
     n_runs=1,
-    total_episodes=200,
+    total_episodes=500,
     epsilon=0.5,
     alpha=1e-4,
     gamma=0.99,
     # nHiddenUnits=(5 * 5 + 3) * 5,
     nHiddenUnits=128,
-    replay_buffer_max_size=5000,
+    replay_buffer_max_size=10000,
     epsilon_min=0.2,
     epsilon_max=1.0,
-    decay_rate=0.03,
+    decay_rate=0.005,
     epsilon_warmup=50,
     batch_size=32,
-    target_net_update=200,
+    # target_net_update=200,
     tau=0.005,
 )
 p
@@ -299,12 +313,15 @@ def params_df_stats(weights, key, current_df=None):
 
 
 # %% [markdown]
-# ## Training loop
+# ## Training
 
 # %%
 Transition = namedtuple(
     "Transition", ("state", "action", "reward", "next_state", "done")
 )
+
+# %% [markdown]
+# ### Main loop
 
 # %%
 rewards = torch.zeros((p.total_episodes, p.n_runs), device=device)
@@ -438,7 +455,8 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
                 )
 
                 # Compute loss
-                criterion = nn.MSELoss()
+                # criterion = nn.MSELoss()
+                criterion = nn.SmoothL1Loss()
                 loss = criterion(
                     input=state_action_values,  # prediction
                     target=expected_state_action_values,  # target/"truth" value
@@ -493,31 +511,70 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
 
         rewards[episode, run] = total_rewards
         steps[episode, run] = step_count
+        logger.info(
+            f"Run: {run} - Episode: {episode} - Step: {step_count} - Loss: {loss.item()}"
+        )
     weights_val_stats.set_index("Index", inplace=True)
     biases_val_stats.set_index("Index", inplace=True)
     biases_grad_stats.set_index("Index", inplace=True)
     weights_grad_stats.set_index("Index", inplace=True)
+
+# %% [markdown]
+# ### Save data to disk
+
+# %%
+data_path = CURRENT_PATH / "data.npz"
+with open(data_path, "wb") as f:
+    np.savez(
+        f,
+        rewards=rewards,
+        steps=steps,
+        episodes=episodes,
+        all_actions=all_actions,
+        losses=losses,
+        p=p,
+    )
 
 
 # %% [markdown]
 # ## Visualization
 
 # %% [markdown]
+# ### Load data from disk
+
+# %%
+# with open(data_path, "rb") as f:
+#     # Load the arrays from the .npz file
+#     data = np.load(f, allow_pickle=True)
+
+#     # Access individual arrays by their names
+#     rewards = data["rewards"]
+#     steps = data["steps"]
+#     episodes = data["episodes"]
+#     all_actions = data["all_actions"]
+#     losses = data["losses"]
+#     p = data["p"][()]
+
+# %% [markdown]
 # ### Exploration rate
 
 
 # %%
-def plot_exploration_rate(epsilons):
+def plot_exploration_rate(epsilons, figpath=None):
     fig, ax = plt.subplots()
     sns.lineplot(epsilons)
     ax.set(ylabel="Epsilon")
     ax.set(xlabel="Steps")
     fig.tight_layout()
+    if figpath:
+        fig.savefig(
+            figpath / "exploration-rate.png", bbox_inches="tight", transparent=True
+        )
     plt.show()
 
 
 # %%
-plot_exploration_rate(epsilons)
+plot_exploration_rate(epsilons, figpath=CURRENT_PATH)
 
 
 # %% [markdown]
@@ -549,7 +606,7 @@ res
 
 
 # %%
-def plot_states_actions_distribution(actions):
+def plot_actions_distribution(actions, figpath=None):
     """Plot the distributions of states and actions."""
     fig, ax = plt.subplots()
     sns.histplot(data=actions, ax=ax)
@@ -558,11 +615,15 @@ def plot_states_actions_distribution(actions):
     )
     ax.set_title("Actions")
     fig.tight_layout()
+    if figpath:
+        fig.savefig(
+            figpath / "actions-distribution.png", bbox_inches="tight", transparent=True
+        )
     plt.show()
 
 
 # %%
-plot_states_actions_distribution(all_actions)
+plot_actions_distribution(all_actions, figpath=CURRENT_PATH)
 
 
 # %% [markdown]
@@ -570,7 +631,7 @@ plot_states_actions_distribution(all_actions)
 
 
 # %%
-def plot_steps_and_rewards(df):
+def plot_steps_and_rewards(df, figpath=None):
     """Plot the steps and rewards from dataframes."""
     fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(15, 5))
     sns.lineplot(data=df, x="Episodes", y="Rewards", ax=ax[0])
@@ -588,25 +649,35 @@ def plot_steps_and_rewards(df):
     )
 
     fig.tight_layout()
+    if figpath:
+        fig.savefig(
+            figpath / "steps-and-rewards.png", bbox_inches="tight", transparent=True
+        )
     plt.show()
 
 
 # %%
-plot_steps_and_rewards(res)
+plot_steps_and_rewards(res, figpath=CURRENT_PATH)
 
 
 # %%
-def plot_steps_and_rewards_dist(df):
+def plot_steps_and_rewards_dist(df, figpath=None):
     """Plot the steps and rewards distributions from dataframes."""
     fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(15, 5))
     sns.histplot(data=df, x="Rewards", ax=ax[0])
     sns.histplot(data=df, x="Steps", ax=ax[1])
     fig.tight_layout()
+    if figpath:
+        fig.savefig(
+            figpath / "steps-and-rewards-distrib.png",
+            bbox_inches="tight",
+            transparent=True,
+        )
     plt.show()
 
 
 # %%
-plot_steps_and_rewards_dist(res)
+plot_steps_and_rewards_dist(res, figpath=CURRENT_PATH)
 
 # %% [markdown]
 # ### Loss
@@ -644,6 +715,7 @@ ax.set(
 ax.set(xlabel="Steps")
 ax.set(yscale="log")
 fig.tight_layout()
+fig.savefig(CURRENT_PATH / "loss.png", bbox_inches="tight", transparent=True)
 plt.show()
 
 # %% [markdown]
@@ -687,7 +759,7 @@ def qtable_directions_map(qtable, rows, cols):
 
 
 # %%
-def plot_policies(q_values, labels):
+def plot_policies(q_values, labels, figpath=None):
     """Plot the heatmap of the Q-values.
 
     Also plot the best action's direction with arrows."""
@@ -755,11 +827,13 @@ def plot_policies(q_values, labels):
     fig.patch.set_alpha(0)
     fig.patch.set_facecolor("white")
     fig.tight_layout()
+    if figpath:
+        fig.savefig(figpath / "policy.png", bbox_inches="tight", transparent=True)
     plt.show()
 
 
 # %%
-plot_policies(q_values=q_values, labels=CONTEXTS_LABELS)
+plot_policies(q_values=q_values, labels=CONTEXTS_LABELS, figpath=CURRENT_PATH)
 
 # %% [markdown]
 # ### Weights & gradients metrics
@@ -832,7 +906,7 @@ def check_grad_stats(grad_df):
 
 # %%
 plotting.plot_weights_biases_distributions(
-    weights_val_df, biases_val_df, label="Values"
+    weights_val_df, biases_val_df, label="Values", figpath=CURRENT_PATH
 )
 
 # %%
@@ -843,7 +917,7 @@ check_grad_stats(biases_grad_df)
 
 # %%
 plotting.plot_weights_biases_distributions(
-    weights_grad_df, biases_grad_df, label="Gradients"
+    weights_grad_df, biases_grad_df, label="Gradients", figpath=CURRENT_PATH
 )
 
 # %%
@@ -860,7 +934,7 @@ biases_grad_stats
 
 
 # %%
-def plot_weights_biases_stats(weights_stats, biases_stats, label=None):
+def plot_weights_biases_stats(weights_stats, biases_stats, label=None, figpath=None):
     fig, ax = plt.subplots(nrows=2, ncols=2, figsize=(13, 8))
 
     if label:
@@ -928,11 +1002,40 @@ def plot_weights_biases_stats(weights_stats, biases_stats, label=None):
     ax[1, 1].set(yscale="log")
 
     fig.tight_layout()
+    if figpath:
+        fig.savefig(
+            figpath / f"weights-biases-stats-{label}.png",
+            bbox_inches="tight",
+            transparent=True,
+        )
     plt.show()
 
 
 # %%
-plot_weights_biases_stats(weights_val_stats, biases_val_stats, label="values")
+plot_weights_biases_stats(
+    weights_val_stats, biases_val_stats, label="values", figpath=CURRENT_PATH
+)
 
 # %%
-plot_weights_biases_stats(weights_grad_stats, biases_grad_stats, label="gradients")
+plot_weights_biases_stats(
+    weights_grad_stats, biases_grad_stats, label="gradients", figpath=CURRENT_PATH
+)
+
+# %%
+# weights_val_stats.rolling(10, center=True).mean().dropna()
+
+# %%
+# rolling_win = 100
+# plot_weights_biases_stats(
+#     weights_val_stats.rolling(rolling_win, center=True).mean().dropna(),
+#     biases_val_stats.rolling(rolling_win, center=True).mean().dropna(),
+#     label="values",
+# )
+
+# %%
+# rolling_win = 100
+# plot_weights_biases_stats(
+#     weights_grad_stats.rolling(rolling_win, center=True).mean().dropna(),
+#     biases_grad_stats.rolling(rolling_win, center=True).mean().dropna(),
+#     label="values",
+# )

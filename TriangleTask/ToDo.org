@@ -19,6 +19,11 @@
 - https://pytorch.org/tutorials/recipes/recipes/tensorboard_with_pytorch.html
 - https://pytorch.org/tutorials/intermediate/tensorboard_tutorial.html
 *** KILL + Make tutorial for Oscar?
+** TODO Save everything to disk
+*** TODO Save all the data in file
+*** TODO Plot from file
+*** DONE Save plot in files
+*** DONE Save progressbar log in file
 * TODO Viz
 ** DONE Improve loss plot?
 Make number of bins not relative to the numer of episodes?
@@ -185,10 +190,12 @@ def visualize_activations(model, color="C0", print_variance=False):
 ** DONE Target network
 ** DONE Replace list type for replay buffer by ~dequeu()~ or ~NamedTuple~?
 ** DONE Add \epsilon-greedy starting from ~\epsilon=1~ + add test
-** Modify warm up episodes to warm up steps
+** KILL Modify warm up episodes to warm up steps
 ** DONE Soft update of the target network's weights
-** Huber loss
-** [?] Adaptive \epsilon-greedy
+** DONE Huber loss
+** \epsilon-greedy
+*** Linear decrease with slope aiming at number of episodes max
+*** Adaptive \epsilon-greedy
 [[https://doi.org/10.1016/j.procs.2017.05.431]]
 ** DONE Seed everything to be able to test runs that don't work
 *** [[https://docs.python.org/3/using/cmdline.html#envvar-PYTHONHASHSEED][PYTHONHASHSEED]]
