@@ -2,7 +2,6 @@ wtMatrix.json
 X.csv
 .DS_Store
 .idea
-*.log
 tmp/
 **/.ipynb_checkpoints/
 *.eps
