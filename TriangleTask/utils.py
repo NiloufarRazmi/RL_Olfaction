@@ -78,7 +78,8 @@ def make_deterministic(seed=None):
 
     if seed:
         # PyTorch
-        generator = torch.manual_seed(seed)
+        generator = torch.Generator(device=DEVICE)
+        generator.manual_seed(seed)
         if torch.cuda.is_available():
             torch.backends.cudnn.deterministic = True
             torch.backends.cudnn.benchmark = False
