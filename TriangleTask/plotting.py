@@ -471,10 +471,11 @@ def plot_weights_biases_distributions(weights_df, biases_df, label=None, figpath
     )
 
     fig.tight_layout()
+    fig.patch.set_alpha(0)
+    fig.patch.set_facecolor("white")
     if figpath:
         fig.savefig(
             figpath / f"weights-biases-distrib-{label}.png",
             bbox_inches="tight",
-            transparent=True,
         )
     plt.show()

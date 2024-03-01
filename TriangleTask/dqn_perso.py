@@ -22,30 +22,30 @@
 # %% [markdown]
 # ### Initialization
 
-# %%
-from pathlib import Path
-import os
 import datetime
 import logging
+import os
+from collections import deque, namedtuple
+
+# %%
+from pathlib import Path
 
 import ipdb
-
-import numpy as np
-from tqdm import tqdm
-import matplotlib.pyplot as plt
 import matplotlib as mpl
 import matplotlib.patches as mpatches
-from matplotlib.offsetbox import AnnotationBbox, OffsetImage
+import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 import seaborn as sns
-from imojify import imojify
-from collections import namedtuple, deque
 
 # %%
 import torch
 import torch.nn as nn
-import torch.optim as optim
 import torch.nn.functional as F
+import torch.optim as optim
+from imojify import imojify
+from matplotlib.offsetbox import AnnotationBbox, OffsetImage
+from tqdm import tqdm
 
 # from torchinfo import summary
 
@@ -53,12 +53,14 @@ import torch.nn.functional as F
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 device
 
-# %%
-from utils import Params, random_choice, make_deterministic
-from environment_tensor import WrappedEnvironment, Actions, CONTEXTS_LABELS, Cues
+import plotting
+
 # from environment_lights_tensor import WrappedEnvironment, Actions, CONTEXTS_LABELS
 from agent_tensor import EpsilonGreedy
-import plotting
+from environment_tensor import CONTEXTS_LABELS, Actions, Cues, WrappedEnvironment
+
+# %%
+from utils import Params, make_deterministic, random_choice
 
 # %%
 # Formatting & autoreload stuff
@@ -159,6 +161,7 @@ print(f"Number of observations: {p.n_observations}")
 
 # %% [markdown]
 # ### Network definition
+
 
 # %%
 class DQN(nn.Module):
@@ -555,6 +558,7 @@ with open(data_path, "wb") as f:
 # %% [markdown]
 # ### Exploration rate
 
+
 # %%
 def plot_exploration_rate(epsilons, figpath=None):
     fig, ax = plt.subplots()
@@ -562,10 +566,10 @@ def plot_exploration_rate(epsilons, figpath=None):
     ax.set(ylabel="Epsilon")
     ax.set(xlabel="Steps")
     fig.tight_layout()
+    fig.patch.set_alpha(0)
+    fig.patch.set_facecolor("white")
     if figpath:
-        fig.savefig(
-            figpath / "exploration-rate.png", bbox_inches="tight", transparent=True
-        )
+        fig.savefig(figpath / "exploration-rate.png", bbox_inches="tight")
     plt.show()
 
 
@@ -575,6 +579,7 @@ plot_exploration_rate(epsilons, figpath=CURRENT_PATH)
 
 # %% [markdown]
 # ### States & actions distributions
+
 
 # %%
 def postprocess(episodes, p, rewards, steps):
@@ -599,6 +604,7 @@ res
 # As a sanity check, we will plot the distributions of states and actions
 # with the following function:
 
+
 # %%
 def plot_actions_distribution(actions, figpath=None):
     """Plot the distributions of states and actions."""
@@ -609,10 +615,10 @@ def plot_actions_distribution(actions, figpath=None):
     )
     ax.set_title("Actions")
     fig.tight_layout()
+    fig.patch.set_alpha(0)
+    fig.patch.set_facecolor("white")
     if figpath:
-        fig.savefig(
-            figpath / "actions-distribution.png", bbox_inches="tight", transparent=True
-        )
+        fig.savefig(figpath / "actions-distribution.png", bbox_inches="tight")
     plt.show()
 
 
@@ -622,6 +628,7 @@ plot_actions_distribution(all_actions, figpath=CURRENT_PATH)
 
 # %% [markdown]
 # ### Steps & rewards
+
 
 # %%
 def plot_steps_and_rewards(df, figpath=None):
@@ -642,10 +649,10 @@ def plot_steps_and_rewards(df, figpath=None):
     )
 
     fig.tight_layout()
+    fig.patch.set_alpha(0)
+    fig.patch.set_facecolor("white")
     if figpath:
-        fig.savefig(
-            figpath / "steps-and-rewards.png", bbox_inches="tight", transparent=True
-        )
+        fig.savefig(figpath / "steps-and-rewards.png", bbox_inches="tight")
     plt.show()
 
 
@@ -660,11 +667,12 @@ def plot_steps_and_rewards_dist(df, figpath=None):
     sns.histplot(data=df, x="Rewards", ax=ax[0])
     sns.histplot(data=df, x="Steps", ax=ax[1])
     fig.tight_layout()
+    fig.patch.set_alpha(0)
+    fig.patch.set_facecolor("white")
     if figpath:
         fig.savefig(
             figpath / "steps-and-rewards-distrib.png",
             bbox_inches="tight",
-            transparent=True,
         )
     plt.show()
 
@@ -708,7 +716,9 @@ ax.set(
 ax.set(xlabel="Steps")
 ax.set(yscale="log")
 fig.tight_layout()
-fig.savefig(CURRENT_PATH / "loss.png", bbox_inches="tight", transparent=True)
+fig.patch.set_alpha(0)
+fig.patch.set_facecolor("white")
+fig.savefig(CURRENT_PATH / "loss.png", bbox_inches="tight")
 plt.show()
 
 # %% [markdown]
@@ -821,7 +831,7 @@ def plot_policies(q_values, labels, figpath=None):
     fig.patch.set_facecolor("white")
     fig.tight_layout()
     if figpath:
-        fig.savefig(figpath / "policy.png", bbox_inches="tight", transparent=True)
+        fig.savefig(figpath / "policy.png", bbox_inches="tight")
     plt.show()
 
 
@@ -995,11 +1005,12 @@ def plot_weights_biases_stats(weights_stats, biases_stats, label=None, figpath=N
     ax[1, 1].set(yscale="log")
 
     fig.tight_layout()
+    fig.patch.set_alpha(0)
+    fig.patch.set_facecolor("white")
     if figpath:
         fig.savefig(
             figpath / f"weights-biases-stats-{label}.png",
             bbox_inches="tight",
-            transparent=True,
         )
     plt.show()
 

@@ -212,6 +212,12 @@ With memorization needed
 :BEAMER_opt: standout
 :END:
 Questions ?
+
+* COMMENT Add plain option to Beamer TOC
+% Local variables:
+% org-beamer-outline-frame-options: "plain"
+% End:
+
 * Feedback :noexport:
 ** TODO Try to see initialization for runs that work if they are higher on the odor
 ** What does it tell you about the brain?
