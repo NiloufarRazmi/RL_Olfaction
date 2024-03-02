@@ -25,6 +25,7 @@
 import datetime
 import logging
 import os
+import shutil
 from collections import deque, namedtuple
 
 # %%
@@ -54,13 +55,14 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 device
 
 import plotting
-
-# from environment_lights_tensor import WrappedEnvironment, Actions, CONTEXTS_LABELS
 from agent_tensor import EpsilonGreedy
-from environment_tensor import CONTEXTS_LABELS, Actions, Cues, WrappedEnvironment
+from environment_lights_tensor import CONTEXTS_LABELS, Actions, WrappedEnvironment
 
 # %%
 from utils import Params, make_deterministic, random_choice
+
+# from environment_tensor import WrappedEnvironment, Actions, CONTEXTS_LABELS, Cues
+
 
 # %%
 # Formatting & autoreload stuff
@@ -71,16 +73,21 @@ from utils import Params, make_deterministic, random_choice
 
 # %%
 sns.set_theme(font_scale=1.5)
-mpl.rcParams["font.family"] = ["sans-serif"]
-mpl.rcParams["font.sans-serif"] = [
-    "Fira Sans",
-    "Computer Modern Sans Serif",
-    "DejaVu Sans",
-    "Verdana",
-    "Arial",
-    "Helvetica",
-]
 # plt.style.use("ggplot")
+USETEX = True if shutil.which("latex") else False
+mpl.rcParams["text.usetex"] = USETEX
+if USETEX:
+    mpl.rcParams["font.family"] = ["serif"]
+else:
+    mpl.rcParams["font.family"] = ["sans-serif"]
+    mpl.rcParams["font.sans-serif"] = [
+        "Fira Sans",
+        "Computer Modern Sans Serif",
+        "DejaVu Sans",
+        "Verdana",
+        "Arial",
+        "Helvetica",
+    ]
 
 # %%
 now = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
@@ -123,7 +130,7 @@ p = Params(
     epsilon_min=0.2,
     epsilon_max=1.0,
     decay_rate=0.005,
-    epsilon_warmup=50,
+    epsilon_warmup=100,
     batch_size=32,
     # target_net_update=200,
     tau=0.005,
@@ -512,7 +519,7 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
         rewards[episode, run] = total_rewards
         steps[episode, run] = step_count
         logger.info(
-            f"Run: {run+1} - Episode: {episode} - Steps: {step_count} - Loss: {loss.item()}"
+            f"Run: {run+1}/{p.n_runs} - Episode: {episode+1}/{p.total_episodes} - Steps: {step_count} - Loss: {loss.item()}"
         )
     weights_val_stats.set_index("Index", inplace=True)
     biases_val_stats.set_index("Index", inplace=True)
@@ -684,7 +691,7 @@ plot_steps_and_rewards_dist(res, figpath=CURRENT_PATH)
 # ### Loss
 
 # %%
-window_size = 10
+window_size = 1
 for idx, loss in enumerate(losses):
     current_loss = torch.tensor(loss, device=device)
     losses_rolling_avg = nn.functional.avg_pool1d(
@@ -706,13 +713,22 @@ loss_df
 # %%
 fig, ax = plt.subplots()
 sns.lineplot(data=loss_df, x="Steps", y="Loss", ax=ax)
-ax.set(
-    ylabel=(
-        f"$Log_{{10}}(\\text{{Loss}})$\naveraged over {p.n_runs} runs"
-        if p.n_runs > 1
-        else "$Log_{10}(\\text{Loss})$"
+if USETEX:
+    ax.set(
+        ylabel=(
+            f"$Log_{{10}}(\mathrm{{Loss}})$\naveraged over {p.n_runs} runs"
+            if p.n_runs > 1
+            else "$Log_{10}(\mathrm{Loss})$"
+        )
     )
-)
+else:
+    ax.set(
+        ylabel=(
+            f"$Log_{{10}}(\\text{{Loss}})$\naveraged over {p.n_runs} runs"
+            if p.n_runs > 1
+            else "$Log_{10}(\\text{Loss})$"
+        )
+    )
 ax.set(xlabel="Steps")
 ax.set(yscale="log")
 fig.tight_layout()

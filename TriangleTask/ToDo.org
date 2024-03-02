@@ -24,6 +24,7 @@
 *** TODO Plot from file
 *** DONE Save plot in files
 *** DONE Save progressbar log in file
+** TODO Implement resume training feature
 * TODO Viz
 ** DONE Improve loss plot?
 Make number of bins not relative to the numer of episodes?
@@ -160,7 +161,7 @@ def visualize_activations(model, color="C0", print_variance=False):
 [[https://wandb.ai/sauravmaheshkar/initialization/reports/A-Gentle-Introduction-To-Weight-Initialization-for-Neural-Networks--Vmlldzo2ODExMTg#he-initialization-]]
 * DONE Model doesn't converge
 ** DONE Try to apply on simple MDP
-* TODO Experiments
+* Experiments
 ** Representations
 *** Look at the last layer
 *** Split Hyp and olfactory cortex in 2 layers
@@ -169,8 +170,10 @@ def visualize_activations(model, color="C0", print_variance=False):
 - https://discuss.pytorch.org/t/best-way-to-split-process-merge/18702
 - https://pytorch.org/docs/stable/generated/torch.tensor_split.html
 - https://discuss.pytorch.org/t/combine-linear-layers/22337/3
-** TODO Test input fixed replay buffer with all the right transitions
+** Test input fixed replay buffer with all the right transitions
 ** DONE Check 50% chance if 100% random actions + add CI test
+** Test generalization if agent trained only in upper triangle and later trained in lower triangle
+Should learn faster than agent trained only in the lower triangle
 * DONE Debug
 ** DONE Unit test env
 ** DONE Unit test one hot case
@@ -193,7 +196,7 @@ def visualize_activations(model, color="C0", print_variance=False):
 ** KILL Modify warm up episodes to warm up steps
 ** DONE Soft update of the target network's weights
 ** DONE Huber loss
-** \epsilon-greedy
+** [?] \epsilon-greedy
 *** Linear decrease with slope aiming at number of episodes max
 *** Adaptive \epsilon-greedy
 [[https://doi.org/10.1016/j.procs.2017.05.431]]
@@ -208,10 +211,10 @@ def visualize_activations(model, color="C0", print_variance=False):
 *** Check replay buffer is being sampled from correctly
 *** Make target network update frequency infinite to see whether Q-network converges
 ** DONE Add light cue to the state?
-* TODO Metrics
+* Metrics
 ** DONE Reward histogram
 ** average entropy of action distribution
-** TODO Add logging
+** Add logging
 - [[https://mlflow.org/docs/latest/python_api/mlflow.pytorch.html]]
 - [[https://dvc.org/doc/dvclive/ml-frameworks/pytorch]]
 * Recurrence
