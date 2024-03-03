@@ -55,14 +55,19 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 device
 
 import plotting
+
+# from environment_lights_tensor import (
+#     WrappedEnvironment,
+#     Actions,
+#     CONTEXTS_LABELS,
+#     OdorCues,
+#     LightCues,
+# )
 from agent_tensor import EpsilonGreedy
-from environment_lights_tensor import CONTEXTS_LABELS, Actions, WrappedEnvironment
+from environment_tensor import CONTEXTS_LABELS, Actions, Cues, WrappedEnvironment
 
 # %%
 from utils import Params, make_deterministic, random_choice
-
-# from environment_tensor import WrappedEnvironment, Actions, CONTEXTS_LABELS, Cues
-
 
 # %%
 # Formatting & autoreload stuff
@@ -74,6 +79,7 @@ from utils import Params, make_deterministic, random_choice
 # %%
 sns.set_theme(font_scale=1.5)
 # plt.style.use("ggplot")
+print(shutil.which("latex"))
 USETEX = True if shutil.which("latex") else False
 mpl.rcParams["text.usetex"] = USETEX
 if USETEX:
@@ -88,6 +94,9 @@ else:
         "Arial",
         "Helvetica",
     ]
+
+# %% [markdown]
+# ### Save directory
 
 # %%
 now = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
@@ -117,19 +126,19 @@ logger.addHandler(handler)
 
 # %%
 p = Params(
-    # seed=42,
-    seed=123,
-    n_runs=20,
-    total_episodes=500,
+    seed=42,
+    # seed=123,
+    n_runs=10,
+    total_episodes=600,
     epsilon=0.5,
     alpha=1e-4,
     gamma=0.99,
     # nHiddenUnits=(5 * 5 + 3) * 5,
     nHiddenUnits=128,
-    replay_buffer_max_size=10000,
+    replay_buffer_max_size=5000,
     epsilon_min=0.2,
     epsilon_max=1.0,
-    decay_rate=0.005,
+    decay_rate=0.01,
     epsilon_warmup=100,
     batch_size=32,
     # target_net_update=200,
@@ -182,7 +191,7 @@ class DQN(nn.Module):
             nn.Linear(n_units, n_units),
             nn.ReLU(),
             nn.Linear(n_units, n_actions),
-            nn.ReLU(),
+            # nn.ReLU(),
         )
 
     def forward(self, x):
@@ -365,6 +374,7 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
         step_count = 0
         done = False
         total_rewards = 0
+        loss = torch.ones(1) * torch.nan
 
         while not done:
             state_action_values = net(state).to(device)  # Q(s_t)
@@ -393,7 +403,7 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
                     done,
                 )
             )
-            if len(replay_buffer) >= p.batch_size:
+            if len(replay_buffer) == p.replay_buffer_max_size:
                 transitions = random_choice(
                     replay_buffer,
                     length=len(replay_buffer),
@@ -752,6 +762,24 @@ with torch.no_grad():
                 state = env.to_one_hot(state).float()
             q_values[tile_i, cue_i, :] = net(state).to(device)
 q_values.shape
+
+
+# %%
+# with torch.no_grad():
+#     q_values = torch.nan * torch.empty(
+#         (len(env.tiles_locations), len(OdorCues), len(LightCues), p.n_actions),
+#         device=device,
+#     )
+#     for tile_i, tile_v in enumerate(env.tiles_locations):
+#         for o_cue_i, o_cue_v in enumerate(OdorCues):
+#             for l_cue_i, l_cue_v in enumerate(LightCues):
+#                 state = torch.tensor(
+#                     [tile_v, o_cue_v.value, l_cue_v.value], device=device
+#                 ).float()
+#                 if env.one_hot_state:
+#                     state = env.to_one_hot(state).float()
+#                 q_values[tile_i, cue_i, :] = net(state).to(device)
+# q_values.shape
 
 
 # %%
