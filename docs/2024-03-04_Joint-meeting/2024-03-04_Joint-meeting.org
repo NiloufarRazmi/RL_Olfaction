@@ -1,0 +1,63 @@
+#+TITLE: Joint meeting
+# #+SUBTITLE: Deep dive into deep RL
+#+author: Andrea Pierré
+#+date: March 4^{th}, 2024
+* HEADER :noexport:
+#+SETUPFILE: ./style.org
+
+* Online Deep RL training
+** Rewards & steps
+#+ATTR_LaTeX: :width \linewidth
+[[file:img/steps-and-rewards.png]]
+** Loss, rewards & steps distributions, exploration/exploitation rate
+[[file:img/steps-and-rewards-distrib.png]]
+*** Left :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.4
+:END:
+[[file:img/loss.png]]
+*** Right :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.4
+:END:
+[[file:img/exploration-rate.png]]
+** Policy learned
+#+ATTR_LaTeX: :width \linewidth
+[[file:img/policy.png]]
+* Generalization experiment
+** Rewards & steps
+#+ATTR_LaTeX: :width \linewidth
+** Loss, rewards & steps distributions, exploration/exploitation rate
+*** Left :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.4
+:END:
+*** Right :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.4
+:END:
+** Policy learned
+#+ATTR_LaTeX: :width \linewidth
+* Discussion
+** Points of discussion
+:PROPERTIES:
+:BEAMER_act: [<+->]
+:END:
+- Lights cues in the state?
+- Debrief from the meeting with Thomas
+- Topics of discussion for future meetings?
+  - How to compare neural data with simulation data?
+  - Journal club (e.g. MINDS paper, etc.)
+  - Any other topics to add?
+** \nbsp{}
+:PROPERTIES:
+:BEAMER_opt: standout
+:END:
+Thanks!
+
+* COMMENT Add plain option to Beamer TOC
+% Local variables:
+% org-beamer-outline-frame-options: "plain"
+% End:
+
+* Feedback :noexport:

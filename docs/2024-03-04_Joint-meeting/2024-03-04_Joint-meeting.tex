@@ -1,0 +1,139 @@
+% Created 2024-03-03 Sun 23:38
+% Intended LaTeX compiler: lualatex
+\documentclass[bigger]{beamer}
+\usepackage{amsmath}
+\usepackage{fontspec}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{wrapfig}
+\usepackage{rotating}
+\usepackage[normalem]{ulem}
+\usepackage{capt-of}
+\usepackage{hyperref}
+\usetheme[progressbar=foot, sectionpage=none, numbering=fraction]{metropolis}
+\usepackage{tikz}
+\usepackage{booktabs}
+\usepackage{adjustbox}
+\usepackage{diagbox}
+\usepackage{latexcolors}
+\usetikzlibrary{automata, positioning, arrows, arrows.meta}
+\usepackage{diagbox}
+\usepackage{dsfont}
+\usepackage{amsmath}
+\usepackage{fontawesome5}
+\usepackage[ruled]{algorithm2e}
+\usepackage[absolute, overlay]{textpos}
+\definecolor{RedBrown}{RGB}{192, 4, 4} \setbeamercolor{progress bar}{fg=RedBrown} \setbeamercolor{title separator}{fg=RedBrown}
+\setbeamercolor{progress bar in head/foot}{fg=RedBrown} \setbeamercolor{progress bar in section page}{fg=RedBrown} \setbeamercolor{alerted text}{fg=RedBrown}
+\pretocmd{\tableofcontents}{\thispagestyle{empty}}{}{}
+\addtocounter{framenumber}{-1}
+\usepackage{listings}
+\usepackage{xcolor}
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{HTML}{f0f0f0}
+\lstdefinestyle{mystyle}{
+backgroundcolor=\color{backcolour},
+commentstyle=\color{codegreen},
+keywordstyle=\color{magenta},
+numberstyle=\tiny\color{codegray},
+stringstyle=\color{codepurple},
+basicstyle=\ttfamily,
+breakatwhitespace=false,
+breaklines=true,
+captionpos=b,
+keepspaces=true,
+numbers=none,
+numbersep=5pt,
+showspaces=false,
+showstringspaces=false,
+showtabs=false,
+tabsize=2
+}
+\lstset{style=mystyle}
+\usetheme{default}
+\author{Andrea Pierré}
+\date{March 4\textsuperscript{th}, 2024}
+\title{Joint meeting}
+\institute{Brown University}
+\titlegraphic{\hfill\includegraphics[height=1.5cm]{img/Brown Logo_2016_2 Color Process ST_1300.png}}
+\setbeamercovered{transparent=10}
+\setbeamertemplate{section in toc}[sections numbered]
+\AtBeginSection[]{\begin{frame}[plain, noframenumbering]{Outline}    \setbeamertemplate{section in toc}[sections numbered]\setbeamertemplate{subsection in toc}[subsections numbered]\vspace{-0.8em}\tableofcontents[currentsection, currentsubsection]\end{frame}}
+\AtBeginSubsection[]{\begin{frame}[plain, noframenumbering]{Outline}\setbeamertemplate{section in toc}[sections numbered]\setbeamertemplate{subsection in toc}[subsections numbered]\tableofcontents[currentsection,currentsubsection]\end{frame}}
+\hypersetup{
+ pdfauthor={Andrea Pierré},
+ pdftitle={Joint meeting},
+ pdfkeywords={},
+ pdfsubject={},
+ pdfcreator={Emacs 29.2 (Org mode 9.7)}, 
+ pdflang={English}}
+\begin{document}
+
+\maketitle
+\begin{frame}[plain]{Outline}
+\tableofcontents
+\end{frame}
+
+\section{Online Deep RL training}
+\label{sec:orgbb39dbe}
+\begin{frame}[label={sec:org2ae60de}]{Rewards \& steps}
+\begin{center}
+\includegraphics[width=\linewidth]{img/steps-and-rewards.png}
+\end{center}
+\end{frame}
+\begin{frame}[label={sec:orgade08e4}]{Loss, rewards \& steps distributions, exploration/exploitation rate}
+\begin{center}
+\includegraphics[width=.9\linewidth]{img/steps-and-rewards-distrib.png}
+\end{center}
+\begin{columns}
+\begin{column}{0.4\columnwidth}
+\begin{center}
+\includegraphics[width=.9\linewidth]{img/loss.png}
+\end{center}
+\end{column}
+\begin{column}{0.4\columnwidth}
+\begin{center}
+\includegraphics[width=.9\linewidth]{img/exploration-rate.png}
+\end{center}
+\end{column}
+\end{columns}
+\end{frame}
+\begin{frame}[label={sec:orgded8bfd}]{Policy learned}
+\begin{center}
+\includegraphics[width=\linewidth]{img/policy.png}
+\end{center}
+\end{frame}
+\section{Generalization experiment}
+\label{sec:org8868606}
+\begin{frame}[label={sec:org7c58d85}]{Rewards \& steps}
+\end{frame}
+\begin{frame}[label={sec:org9aee9e4}]{Loss, rewards \& steps distributions, exploration/exploitation rate}
+\begin{columns}
+\begin{column}{0.4\columnwidth}
+\end{column}
+\begin{column}{0.4\columnwidth}
+\end{column}
+\end{columns}
+\end{frame}
+\begin{frame}[label={sec:org4580b81}]{Policy learned}
+\end{frame}
+\section{Discussion}
+\label{sec:org10c2e2d}
+\begin{frame}[<+->][label={sec:org1ba1da4}]{Points of discussion}
+\begin{itemize}
+\item Lights cues in the state?
+\item Debrief from the meeting with Thomas
+\item Topics of discussion for future meetings?
+\begin{itemize}
+\item How to compare neural data with simulation data?
+\item Journal club (e.g. MINDS paper, etc.)
+\item Any other topics to add?
+\end{itemize}
+\end{itemize}
+\end{frame}
+\begin{frame}[label={sec:orgfe893dd},standout]{~}
+Thanks!
+\end{frame}
+\end{document}
