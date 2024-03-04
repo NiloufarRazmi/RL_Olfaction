@@ -22,31 +22,31 @@
 # %% [markdown]
 # ### Initialization
 
-import datetime
-import logging
-import os
-import shutil
-from collections import deque, namedtuple
-
 # %%
 from pathlib import Path
+import os
+import datetime
+import logging
+import shutil
 
 import ipdb
+
+import numpy as np
+from tqdm import tqdm
+import matplotlib.pyplot as plt
 import matplotlib as mpl
 import matplotlib.patches as mpatches
-import matplotlib.pyplot as plt
-import numpy as np
+from matplotlib.offsetbox import AnnotationBbox, OffsetImage
 import pandas as pd
 import seaborn as sns
+from imojify import imojify
+from collections import namedtuple, deque
 
 # %%
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 import torch.optim as optim
-from imojify import imojify
-from matplotlib.offsetbox import AnnotationBbox, OffsetImage
-from tqdm import tqdm
+import torch.nn.functional as F
 
 # from torchinfo import summary
 
@@ -54,22 +54,22 @@ from tqdm import tqdm
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 DEVICE
 
-import plotting
-from agent_tensor import EpsilonGreedy
-from env_tensor_exp_train_upper_only_then_lower import (
-    CONTEXTS_LABELS,
-    Actions,
-    Cues,
-    TriangleState,
-    WrappedEnvironment,
-)
-
 # %%
-from utils import Params, make_deterministic, random_choice
+from utils import Params, random_choice, make_deterministic
+
+from env_tensor_exp_train_upper_only_then_lower import (
+    WrappedEnvironment,
+    Actions,
+    CONTEXTS_LABELS,
+    Cues,
+    TriangleState
+)
+from agent_tensor import EpsilonGreedy
+import plotting
 
 # %%
 # Formatting & autoreload stuff
-# %load_ext lab_black
+# # %load_ext lab_black
 # %load_ext autoreload
 # %autoreload 2
 # # %matplotlib ipympl
@@ -126,7 +126,7 @@ logger.addHandler(handler)
 p = Params(
     seed=42,
     # seed=123,
-    n_runs=1,
+    n_runs=20,
     total_episodes=600,
     epsilon=0.5,
     alpha=1e-4,
@@ -175,7 +175,6 @@ print(f"Number of observations: {p.n_observations}")
 
 # %% [markdown]
 # ### Network definition
-
 
 # %%
 class DQN(nn.Module):
@@ -590,7 +589,6 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
 # %% [markdown]
 # ### Exploration rate
 
-
 # %%
 def plot_exploration_rate(epsilons, figpath=None):
     fig, ax = plt.subplots()
@@ -611,7 +609,6 @@ plot_exploration_rate(epsilons, figpath=CURRENT_PATH)
 
 # %% [markdown]
 # ### States & actions distributions
-
 
 # %%
 def postprocess(episodes, p, rewards, steps):
@@ -636,7 +633,6 @@ res
 # As a sanity check, we will plot the distributions of states and actions
 # with the following function:
 
-
 # %%
 def plot_actions_distribution(actions, figpath=None):
     """Plot the distributions of states and actions."""
@@ -660,7 +656,6 @@ plot_actions_distribution(all_actions, figpath=CURRENT_PATH)
 
 # %% [markdown]
 # ### Steps & rewards
-
 
 # %%
 def plot_steps_and_rewards(df, figpath=None):
@@ -795,7 +790,6 @@ q_values.shape
 #                     state = env.to_one_hot(state).float()
 #                 q_values[tile_i, cue_i, :] = net(state).to(device)
 # q_values.shape
-
 
 # %%
 def qtable_directions_map(qtable, rows, cols):
