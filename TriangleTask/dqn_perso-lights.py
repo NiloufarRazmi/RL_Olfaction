@@ -51,27 +51,22 @@ from tqdm import tqdm
 # from torchinfo import summary
 
 # if GPU is to be used
-DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-DEVICE
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device
 
 import plotting
-
-# from environment_lights_tensor import (
-#     WrappedEnvironment,
-#     Actions,
-#     CONTEXTS_LABELS,
-#     OdorCues,
-#     LightCues,
-# )
 from agent_tensor import EpsilonGreedy
-from environment_tensor import CONTEXTS_LABELS, Actions, Cues, WrappedEnvironment
+from environment_lights_tensor import CONTEXTS_LABELS, Actions, WrappedEnvironment
 
 # %%
 from utils import Params, make_deterministic, random_choice
 
+# from environment_tensor import WrappedEnvironment, Actions, CONTEXTS_LABELS, Cues
+
+
 # %%
 # Formatting & autoreload stuff
-# %load_ext lab_black
+# # %load_ext lab_black
 # %load_ext autoreload
 # %autoreload 2
 # # %matplotlib ipympl
@@ -79,8 +74,8 @@ from utils import Params, make_deterministic, random_choice
 # %%
 sns.set_theme(font_scale=1.5)
 # plt.style.use("ggplot")
-print(shutil.which("latex"))
 USETEX = True if shutil.which("latex") else False
+print(shutil.which("latex"))
 mpl.rcParams["text.usetex"] = USETEX
 if USETEX:
     mpl.rcParams["font.family"] = ["serif"]
@@ -94,9 +89,6 @@ else:
         "Arial",
         "Helvetica",
     ]
-
-# %% [markdown]
-# ### Save directory
 
 # %%
 now = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
@@ -126,16 +118,16 @@ logger.addHandler(handler)
 
 # %%
 p = Params(
-    seed=42,
-    # seed=123,
-    n_runs=10,
+    # seed=42,
+    seed=123,
+    n_runs=20,
     total_episodes=600,
     epsilon=0.5,
     alpha=1e-4,
     gamma=0.99,
     # nHiddenUnits=(5 * 5 + 3) * 5,
     nHiddenUnits=128,
-    replay_buffer_max_size=5000,
+    replay_buffer_max_size=10000,
     epsilon_min=0.2,
     epsilon_max=1.0,
     decay_rate=0.01,
@@ -205,26 +197,26 @@ def neural_network():
     #         n_observations=p.n_observations,
     #         n_actions=p.n_actions,
     #         n_units=4 * p.n_observations,
-    #     ).to(DEVICE)
+    #     ).to(device)
     # else:
     #     net = DQN(
     #         n_observations=p.n_observations,
     #         n_actions=p.n_actions,
     #         n_units=p.nHiddenUnits,
-    #     ).to(DEVICE)
+    #     ).to(device)
     # net
 
     net = DQN(
         n_observations=p.n_observations,
         n_actions=p.n_actions,
         n_units=p.nHiddenUnits,
-    ).to(DEVICE)
+    ).to(device)
 
     target_net = DQN(
         n_observations=p.n_observations,
         n_actions=p.n_actions,
         n_units=p.nHiddenUnits,
-    ).to(DEVICE)
+    ).to(device)
 
     target_net.load_state_dict(net.state_dict())
 
@@ -263,8 +255,8 @@ explorer = EpsilonGreedy(
     epsilon_warmup=p.epsilon_warmup,
     seed=p.seed,
 )
-episodes = torch.arange(p.total_episodes, device=DEVICE)
-epsilons = torch.empty_like(episodes, device=DEVICE) * torch.nan
+episodes = torch.arange(p.total_episodes, device=device)
+epsilons = torch.empty_like(episodes, device=device) * torch.nan
 for eps_i, epsi in enumerate(epsilons):
     epsilons[eps_i] = explorer.epsilon
     explorer.epsilon = explorer.update_epsilon(episodes[eps_i])
@@ -340,9 +332,9 @@ Transition = namedtuple(
 # ### Main loop
 
 # %%
-rewards = torch.zeros((p.total_episodes, p.n_runs), device=DEVICE)
-steps = torch.zeros((p.total_episodes, p.n_runs), device=DEVICE)
-episodes = torch.arange(p.total_episodes, device=DEVICE)
+rewards = torch.zeros((p.total_episodes, p.n_runs), device=device)
+steps = torch.zeros((p.total_episodes, p.n_runs), device=device)
+episodes = torch.arange(p.total_episodes, device=device)
 # all_states = []
 all_actions = []
 losses = [[] for _ in range(p.n_runs)]
@@ -350,7 +342,7 @@ losses = [[] for _ in range(p.n_runs)]
 for run in range(p.n_runs):  # Run several times to account for stochasticity
 
     # Reset everything
-    net, target_net = neural_network()  # Reset weights
+    net, target_net = neural_network()  # eset weights
     optimizer = optim.AdamW(net.parameters(), lr=p.alpha, amsgrad=True)
     explorer = EpsilonGreedy(
         epsilon=p.epsilon_max,
@@ -370,14 +362,13 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
         episodes, desc=f"Run {run+1}/{p.n_runs} - Episodes", leave=False
     ):
         state = env.reset()  # Reset the environment
-        state = state.clone().float().detach().to(DEVICE)
+        state = state.clone().float().detach().to(device)
         step_count = 0
         done = False
         total_rewards = 0
-        loss = torch.ones(1, device=DEVICE) * torch.nan
 
         while not done:
-            state_action_values = net(state).to(DEVICE)  # Q(s_t)
+            state_action_values = net(state).to(device)  # Q(s_t)
             action = explorer.choose_action(
                 action_space=env.action_space,
                 state=state,
@@ -393,7 +384,7 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
 
             # Store transition in replay buffer
             # [current_state (2 or 28 x1), action (1x1), next_state (2 or 28 x1), reward (1x1), done (1x1 bool)]
-            done = torch.tensor(done, device=DEVICE).unsqueeze(-1)
+            done = torch.tensor(done, device=device).unsqueeze(-1)
             replay_buffer.append(
                 Transition(
                     state,
@@ -403,9 +394,7 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
                     done,
                 )
             )
-
-            # Start training when `replay_buffer` is full
-            if len(replay_buffer) == p.replay_buffer_max_size:
+            if len(replay_buffer) >= p.batch_size:
                 transitions = random_choice(
                     replay_buffer,
                     length=len(replay_buffer),
@@ -414,13 +403,13 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
                 )
                 batch = Transition(*zip(*transitions, strict=True))
                 state_batch = torch.stack(batch.state)
-                action_batch = torch.tensor(batch.action, device=DEVICE)
+                action_batch = torch.tensor(batch.action, device=device)
                 reward_batch = torch.cat(batch.reward)
                 next_state_batch = torch.stack(batch.next_state)
                 done_batch = torch.cat(batch.done)
 
                 # See DQN paper for equations: https://doi.org/10.1038/nature14236
-                state_action_values_sampled = net(state_batch).to(DEVICE)  # Q(s_t)
+                state_action_values_sampled = net(state_batch).to(device)  # Q(s_t)
                 state_action_values = torch.gather(
                     input=state_action_values_sampled,
                     dim=1,
@@ -430,7 +419,7 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
                 # done_false = torch.argwhere(done_batch == False).squeeze()
                 # done_true = torch.argwhere(done_batch == True).squeeze()
                 # expected_state_action_values = (
-                #     torch.zeros_like(done_batch, device=DEVICE)
+                #     torch.zeros_like(done_batch, device=device)
                 # ).float()
                 # with torch.no_grad():
                 #     if done_true.numel() > 0:
@@ -439,7 +428,7 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
                 #         ]
                 #     if done_false.numel() > 0:
                 #         next_state_values = (
-                #             target_net(next_state_batch[done_false]).to(DEVICE).max(1)
+                #             target_net(next_state_batch[done_false]).to(device).max(1)
                 #         )  # Q(s_t+1, a)
                 #         expected_state_action_values[done_false] = (
                 #             reward_batch[done_false]
@@ -450,7 +439,7 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
                 # (a final state would've been the one after which simulation ended)
                 non_final_mask = torch.tensor(
                     tuple(map(lambda s: s == False, batch.done)),
-                    device=DEVICE,
+                    device=device,
                     dtype=torch.bool,
                 )
                 non_final_next_states = torch.stack(
@@ -462,7 +451,7 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
                 # on the "older" target_net; selecting their best reward with max(1).values
                 # This is merged based on the mask, such that we'll have either the expected
                 # state value or 0 in case the state was final.
-                next_state_values = torch.zeros(p.batch_size, device=DEVICE)
+                next_state_values = torch.zeros(p.batch_size, device=device)
                 if non_final_next_states.numel() > 0 and non_final_mask.numel() > 0:
                     with torch.no_grad():
                         next_state_values[non_final_mask] = (
@@ -705,14 +694,14 @@ plot_steps_and_rewards_dist(res, figpath=CURRENT_PATH)
 # %%
 window_size = 1
 for idx, loss in enumerate(losses):
-    current_loss = torch.tensor(loss, device=DEVICE)
+    current_loss = torch.tensor(loss, device=device)
     losses_rolling_avg = nn.functional.avg_pool1d(
         current_loss.view(1, 1, -1), kernel_size=window_size
     ).squeeze()
     tmp_df = pd.DataFrame(
         data={
-            "Run": idx * torch.ones(len(losses_rolling_avg), device=DEVICE).int().cpu(),
-            "Steps": torch.arange(0, len(losses_rolling_avg), device=DEVICE).cpu(),
+            "Run": idx * torch.ones(len(losses_rolling_avg), device=device).int().cpu(),
+            "Steps": torch.arange(0, len(losses_rolling_avg), device=device).cpu(),
             "Loss": losses_rolling_avg.cpu(),
         }
     )
@@ -755,33 +744,15 @@ plt.show()
 # %%
 with torch.no_grad():
     q_values = torch.nan * torch.empty(
-        (len(env.tiles_locations), len(Cues), p.n_actions), device=DEVICE
+        (len(env.tiles_locations), len(Cues), p.n_actions), device=device
     )
     for tile_i, tile_v in enumerate(env.tiles_locations):
         for cue_i, cue_v in enumerate(Cues):
-            state = torch.tensor([tile_v, cue_v.value], device=DEVICE).float()
+            state = torch.tensor([tile_v, cue_v.value], device=device).float()
             if env.one_hot_state:
                 state = env.to_one_hot(state).float()
-            q_values[tile_i, cue_i, :] = net(state).to(DEVICE)
+            q_values[tile_i, cue_i, :] = net(state).to(device)
 q_values.shape
-
-
-# %%
-# with torch.no_grad():
-#     q_values = torch.nan * torch.empty(
-#         (len(env.tiles_locations), len(OdorCues), len(LightCues), p.n_actions),
-#         device=DEVICE,
-#     )
-#     for tile_i, tile_v in enumerate(env.tiles_locations):
-#         for o_cue_i, o_cue_v in enumerate(OdorCues):
-#             for l_cue_i, l_cue_v in enumerate(LightCues):
-#                 state = torch.tensor(
-#                     [tile_v, o_cue_v.value, l_cue_v.value], device=DEVICE
-#                 ).float()
-#                 if env.one_hot_state:
-#                     state = env.to_one_hot(state).float()
-#                 q_values[tile_i, cue_i, :] = net(state).to(DEVICE)
-# q_values.shape
 
 
 # %%
@@ -945,10 +916,10 @@ def check_grad_stats(grad_df):
             grad_df.Val.min(),
             grad_df.Val.max(),
         ],
-        device=DEVICE,
+        device=device,
     )
     assert not torch.equal(
-        torch.zeros_like(grad_stats, device=DEVICE),
+        torch.zeros_like(grad_stats, device=device),
         grad_stats,
     ), "Gradients are zero"
 

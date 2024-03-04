@@ -55,16 +55,14 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 DEVICE
 
 import plotting
-
-# from environment_lights_tensor import (
-#     WrappedEnvironment,
-#     Actions,
-#     CONTEXTS_LABELS,
-#     OdorCues,
-#     LightCues,
-# )
 from agent_tensor import EpsilonGreedy
-from environment_tensor import CONTEXTS_LABELS, Actions, Cues, WrappedEnvironment
+from env_tensor_exp_train_upper_only_then_lower import (
+    CONTEXTS_LABELS,
+    Actions,
+    Cues,
+    TriangleState,
+    WrappedEnvironment,
+)
 
 # %%
 from utils import Params, make_deterministic, random_choice
@@ -128,7 +126,7 @@ logger.addHandler(handler)
 p = Params(
     seed=42,
     # seed=123,
-    n_runs=10,
+    n_runs=1,
     total_episodes=600,
     epsilon=0.5,
     alpha=1e-4,
@@ -168,7 +166,7 @@ p.n_actions = env.numActions
 
 # Get the number of state observations
 # state, info = env.reset()
-state = env.reset()
+state = env.reset(triangle_state=TriangleState.lower)
 p.n_observations = len(state)
 
 print(f"Number of actions: {p.n_actions}")
@@ -336,6 +334,163 @@ Transition = namedtuple(
     "Transition", ("state", "action", "reward", "next_state", "done")
 )
 
+
+# %%
+def train(
+    weights_val_stats,
+    biases_val_stats,
+    biases_grad_stats,
+    weights_grad_stats,
+    triangle_state,
+):
+
+    state = env.reset(triangle_state=triangle_state)  # Reset the environment
+    state = state.clone().float().detach().to(DEVICE)
+    step_count = 0
+    done = False
+    total_rewards = 0
+    loss = torch.ones(1, device=DEVICE) * torch.nan
+
+    while not done:
+        state_action_values = net(state).to(DEVICE)  # Q(s_t)
+        action = explorer.choose_action(
+            action_space=env.action_space,
+            state=state,
+            state_action_values=state_action_values,
+        ).item()
+
+        # Record states and actions
+        # all_states.append(state)
+        # all_actions.append(Actions(action.item()).name)
+        all_actions.append(Actions(action).name)
+
+        next_state, reward, done = env.step(action=action, current_state=state)
+
+        # Store transition in replay buffer
+        # [current_state (2 or 28 x1), action (1x1), next_state (2 or 28 x1), reward (1x1), done (1x1 bool)]
+        done = torch.tensor(done, device=DEVICE).unsqueeze(-1)
+        replay_buffer.append(
+            Transition(
+                state,
+                action,
+                reward,
+                next_state,
+                done,
+            )
+        )
+        if len(replay_buffer) == p.replay_buffer_max_size:
+            transitions = random_choice(
+                replay_buffer,
+                length=len(replay_buffer),
+                num_samples=p.batch_size,
+                generator=GENERATOR,
+            )
+            batch = Transition(*zip(*transitions, strict=True))
+            state_batch = torch.stack(batch.state)
+            action_batch = torch.tensor(batch.action, device=DEVICE)
+            reward_batch = torch.cat(batch.reward)
+            next_state_batch = torch.stack(batch.next_state)
+            done_batch = torch.cat(batch.done)
+
+            # See DQN paper for equations: https://doi.org/10.1038/nature14236
+            state_action_values_sampled = net(state_batch).to(DEVICE)  # Q(s_t)
+            state_action_values = torch.gather(
+                input=state_action_values_sampled,
+                dim=1,
+                index=action_batch.unsqueeze(-1),
+            ).squeeze()  # Q(s_t, a)
+
+            # Compute a mask of non-final states and concatenate the batch elements
+            # (a final state would've been the one after which simulation ended)
+            non_final_mask = torch.tensor(
+                tuple(map(lambda s: s == False, batch.done)),
+                device=DEVICE,
+                dtype=torch.bool,
+            )
+            non_final_next_states = torch.stack(
+                [s[1] for s in zip(batch.done, batch.next_state) if s[0] == False]
+            )
+
+            # Compute V(s_{t+1}) for all next states.
+            # Expected values of actions for non_final_next_states are computed based
+            # on the "older" target_net; selecting their best reward with max(1).values
+            # This is merged based on the mask, such that we'll have either the expected
+            # state value or 0 in case the state was final.
+            next_state_values = torch.zeros(p.batch_size, device=DEVICE)
+            if non_final_next_states.numel() > 0 and non_final_mask.numel() > 0:
+                with torch.no_grad():
+                    next_state_values[non_final_mask] = (
+                        target_net(non_final_next_states).max(1).values
+                    )
+            # Compute the expected Q values
+            expected_state_action_values = reward_batch + (next_state_values * p.gamma)
+
+            # Compute loss
+            # criterion = nn.MSELoss()
+            criterion = nn.SmoothL1Loss()
+            loss = criterion(
+                input=state_action_values,  # prediction
+                target=expected_state_action_values,  # target/"truth" value
+            )  # TD update
+
+            # Optimize the model
+            optimizer.zero_grad()
+            loss.backward()
+            torch.nn.utils.clip_grad_value_(
+                net.parameters(), 100
+            )  # In-place gradient clipping
+            optimizer.step()
+
+            # # Reset the target network
+            # if step_count % p.target_net_update == 0:
+            #     target_net.load_state_dict(net.state_dict())
+
+            # Soft update of the target network's weights
+            # θ′ ← τ θ + (1 −τ )θ′
+            target_net_state_dict = target_net.state_dict()
+            net_state_dict = net.state_dict()
+            for key in net_state_dict:
+                target_net_state_dict[key] = net_state_dict[
+                    key
+                ] * p.tau + target_net_state_dict[key] * (1 - p.tau)
+            target_net.load_state_dict(target_net_state_dict)
+
+            losses[run].append(loss.item())
+
+            weights, biases = collect_weights_biases(net=net)
+            weights_val_stats = params_df_stats(
+                weights, key="val", current_df=weights_grad_stats
+            )
+            biases_val_stats = params_df_stats(
+                biases, key="val", current_df=biases_val_stats
+            )
+            biases_grad_stats = params_df_stats(
+                biases, key="grad", current_df=biases_grad_stats
+            )
+            weights_grad_stats = params_df_stats(
+                weights, key="grad", current_df=weights_val_stats
+            )
+
+        total_rewards += reward
+        step_count += 1
+
+        # Move to the next state
+        state = next_state
+
+        explorer.epsilon = explorer.update_epsilon(episode)
+        epsilons.append(explorer.epsilon)
+
+    return (
+        total_rewards,
+        step_count,
+        loss,
+        weights_val_stats,
+        biases_val_stats,
+        biases_grad_stats,
+        weights_grad_stats,
+    )
+
+
 # %% [markdown]
 # ### Main loop
 
@@ -350,7 +505,7 @@ losses = [[] for _ in range(p.n_runs)]
 for run in range(p.n_runs):  # Run several times to account for stochasticity
 
     # Reset everything
-    net, target_net = neural_network()  # Reset weights
+    net, target_net = neural_network()  # reset weights
     optimizer = optim.AdamW(net.parameters(), lr=p.alpha, amsgrad=True)
     explorer = EpsilonGreedy(
         epsilon=p.epsilon_max,
@@ -369,164 +524,22 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
     for episode in tqdm(
         episodes, desc=f"Run {run+1}/{p.n_runs} - Episodes", leave=False
     ):
-        state = env.reset()  # Reset the environment
-        state = state.clone().float().detach().to(DEVICE)
-        step_count = 0
-        done = False
-        total_rewards = 0
-        loss = torch.ones(1, device=DEVICE) * torch.nan
 
-        while not done:
-            state_action_values = net(state).to(DEVICE)  # Q(s_t)
-            action = explorer.choose_action(
-                action_space=env.action_space,
-                state=state,
-                state_action_values=state_action_values,
-            ).item()
-
-            # Record states and actions
-            # all_states.append(state)
-            # all_actions.append(Actions(action.item()).name)
-            all_actions.append(Actions(action).name)
-
-            next_state, reward, done = env.step(action=action, current_state=state)
-
-            # Store transition in replay buffer
-            # [current_state (2 or 28 x1), action (1x1), next_state (2 or 28 x1), reward (1x1), done (1x1 bool)]
-            done = torch.tensor(done, device=DEVICE).unsqueeze(-1)
-            replay_buffer.append(
-                Transition(
-                    state,
-                    action,
-                    reward,
-                    next_state,
-                    done,
-                )
-            )
-
-            # Start training when `replay_buffer` is full
-            if len(replay_buffer) == p.replay_buffer_max_size:
-                transitions = random_choice(
-                    replay_buffer,
-                    length=len(replay_buffer),
-                    num_samples=p.batch_size,
-                    generator=GENERATOR,
-                )
-                batch = Transition(*zip(*transitions, strict=True))
-                state_batch = torch.stack(batch.state)
-                action_batch = torch.tensor(batch.action, device=DEVICE)
-                reward_batch = torch.cat(batch.reward)
-                next_state_batch = torch.stack(batch.next_state)
-                done_batch = torch.cat(batch.done)
-
-                # See DQN paper for equations: https://doi.org/10.1038/nature14236
-                state_action_values_sampled = net(state_batch).to(DEVICE)  # Q(s_t)
-                state_action_values = torch.gather(
-                    input=state_action_values_sampled,
-                    dim=1,
-                    index=action_batch.unsqueeze(-1),
-                ).squeeze()  # Q(s_t, a)
-
-                # done_false = torch.argwhere(done_batch == False).squeeze()
-                # done_true = torch.argwhere(done_batch == True).squeeze()
-                # expected_state_action_values = (
-                #     torch.zeros_like(done_batch, device=DEVICE)
-                # ).float()
-                # with torch.no_grad():
-                #     if done_true.numel() > 0:
-                #         expected_state_action_values[done_true] = reward_batch[
-                #             done_true
-                #         ]
-                #     if done_false.numel() > 0:
-                #         next_state_values = (
-                #             target_net(next_state_batch[done_false]).to(DEVICE).max(1)
-                #         )  # Q(s_t+1, a)
-                #         expected_state_action_values[done_false] = (
-                #             reward_batch[done_false]
-                #             + p.gamma * next_state_values.values
-                #         )  # y_j (Bellman optimality equation)
-
-                # Compute a mask of non-final states and concatenate the batch elements
-                # (a final state would've been the one after which simulation ended)
-                non_final_mask = torch.tensor(
-                    tuple(map(lambda s: s == False, batch.done)),
-                    device=DEVICE,
-                    dtype=torch.bool,
-                )
-                non_final_next_states = torch.stack(
-                    [s[1] for s in zip(batch.done, batch.next_state) if s[0] == False]
-                )
-
-                # Compute V(s_{t+1}) for all next states.
-                # Expected values of actions for non_final_next_states are computed based
-                # on the "older" target_net; selecting their best reward with max(1).values
-                # This is merged based on the mask, such that we'll have either the expected
-                # state value or 0 in case the state was final.
-                next_state_values = torch.zeros(p.batch_size, device=DEVICE)
-                if non_final_next_states.numel() > 0 and non_final_mask.numel() > 0:
-                    with torch.no_grad():
-                        next_state_values[non_final_mask] = (
-                            target_net(non_final_next_states).max(1).values
-                        )
-                # Compute the expected Q values
-                expected_state_action_values = reward_batch + (
-                    next_state_values * p.gamma
-                )
-
-                # Compute loss
-                # criterion = nn.MSELoss()
-                criterion = nn.SmoothL1Loss()
-                loss = criterion(
-                    input=state_action_values,  # prediction
-                    target=expected_state_action_values,  # target/"truth" value
-                )  # TD update
-
-                # Optimize the model
-                optimizer.zero_grad()
-                loss.backward()
-                torch.nn.utils.clip_grad_value_(
-                    net.parameters(), 100
-                )  # In-place gradient clipping
-                optimizer.step()
-
-                # # Reset the target network
-                # if step_count % p.target_net_update == 0:
-                #     target_net.load_state_dict(net.state_dict())
-
-                # Soft update of the target network's weights
-                # θ′ ← τ θ + (1 −τ )θ′
-                target_net_state_dict = target_net.state_dict()
-                net_state_dict = net.state_dict()
-                for key in net_state_dict:
-                    target_net_state_dict[key] = net_state_dict[
-                        key
-                    ] * p.tau + target_net_state_dict[key] * (1 - p.tau)
-                target_net.load_state_dict(target_net_state_dict)
-
-                losses[run].append(loss.item())
-
-                weights, biases = collect_weights_biases(net=net)
-                weights_val_stats = params_df_stats(
-                    weights, key="val", current_df=weights_grad_stats
-                )
-                biases_val_stats = params_df_stats(
-                    biases, key="val", current_df=biases_val_stats
-                )
-                biases_grad_stats = params_df_stats(
-                    biases, key="grad", current_df=biases_grad_stats
-                )
-                weights_grad_stats = params_df_stats(
-                    weights, key="grad", current_df=weights_val_stats
-                )
-
-            total_rewards += reward
-            step_count += 1
-
-            # Move to the next state
-            state = next_state
-
-            explorer.epsilon = explorer.update_epsilon(episode)
-            epsilons.append(explorer.epsilon)
+        (
+            total_rewards,
+            step_count,
+            loss,
+            weights_val_stats,
+            biases_val_stats,
+            biases_grad_stats,
+            weights_grad_stats,
+        ) = train(
+            weights_val_stats,
+            biases_val_stats,
+            biases_grad_stats,
+            weights_grad_stats,
+            triangle_state=TriangleState.lower,
+        )
 
         rewards[episode, run] = total_rewards
         steps[episode, run] = step_count
@@ -538,22 +551,22 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
     biases_grad_stats.set_index("Index", inplace=True)
     weights_grad_stats.set_index("Index", inplace=True)
 
+
 # %% [markdown]
 # ### Save data to disk
 
 # %%
-data_path = CURRENT_PATH / "data.npz"
-with open(data_path, "wb") as f:
-    np.savez(
-        f,
-        rewards=rewards.cpu(),
-        steps=steps.cpu(),
-        episodes=episodes.cpu(),
-        all_actions=all_actions,
-        # losses=losses,
-        p=p,
-    )
-
+# data_path = CURRENT_PATH / "data.npz"
+# with open(data_path, "wb") as f:
+#     np.savez(
+#         f,
+#         rewards=rewards.cpu(),
+#         steps=steps.cpu(),
+#         episodes=episodes.cpu(),
+#         all_actions=all_actions,
+#         # losses=losses,
+#         p=p,
+#     )
 
 # %% [markdown]
 # ## Visualization
@@ -770,17 +783,17 @@ q_values.shape
 # with torch.no_grad():
 #     q_values = torch.nan * torch.empty(
 #         (len(env.tiles_locations), len(OdorCues), len(LightCues), p.n_actions),
-#         device=DEVICE,
+#         device=device,
 #     )
 #     for tile_i, tile_v in enumerate(env.tiles_locations):
 #         for o_cue_i, o_cue_v in enumerate(OdorCues):
 #             for l_cue_i, l_cue_v in enumerate(LightCues):
 #                 state = torch.tensor(
-#                     [tile_v, o_cue_v.value, l_cue_v.value], device=DEVICE
+#                     [tile_v, o_cue_v.value, l_cue_v.value], device=device
 #                 ).float()
 #                 if env.one_hot_state:
 #                     state = env.to_one_hot(state).float()
-#                 q_values[tile_i, cue_i, :] = net(state).to(DEVICE)
+#                 q_values[tile_i, cue_i, :] = net(state).to(device)
 # q_values.shape
 
 

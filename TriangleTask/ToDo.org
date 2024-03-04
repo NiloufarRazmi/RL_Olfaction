@@ -172,13 +172,13 @@ def visualize_activations(model, color="C0", print_variance=False):
 - https://discuss.pytorch.org/t/combine-linear-layers/22337/3
 ** Test input fixed replay buffer with all the right transitions
 ** DONE Check 50% chance if 100% random actions + add CI test
-** Test generalization if agent trained only in upper triangle and later trained in lower triangle
+** DONE Test generalization if agent trained only in upper triangle and later trained in lower triangle
 Should learn faster than agent trained only in the lower triangle
-** Light cue in the state?
-** No ReLU at the last layer?
+** DONE Light cue in the state?
+** DONE No ReLU at the last layer?
 ** Normalizing states/actions?
 ** Reward at 1 instead of 10?
-** TODO Start training when replay buffer is full?
+** DONE Start training when replay buffer is full?
 * DONE Debug
 ** DONE Unit test env
 ** DONE Unit test one hot case
