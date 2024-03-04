@@ -1,4 +1,4 @@
-% Created 2024-03-03 Sun 23:38
+% Created 2024-03-04 Mon 08:28
 % Intended LaTeX compiler: lualatex
 \documentclass[bigger]{beamer}
 \usepackage{amsmath}
@@ -77,13 +77,22 @@ tabsize=2
 \end{frame}
 
 \section{Online Deep RL training}
-\label{sec:orgbb39dbe}
-\begin{frame}[label={sec:org2ae60de}]{Rewards \& steps}
+\label{sec:org99fed52}
+\begin{frame}[label={sec:org692078c}]{Rewards \& steps}
 \begin{center}
 \includegraphics[width=\linewidth]{img/steps-and-rewards.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:orgade08e4}]{Loss, rewards \& steps distributions, exploration/exploitation rate}
+\begin{frame}[<+->][label={sec:org86bc518}]{Why is it converging now?}
+\begin{itemize}
+\item Lights cues in the state?
+\item Start training once replay buffer is full (5000 transitions) instead of when there are enough transitions for a batch (32 transitions)
+\item Soft update of the networks weights (instead of sharp transition)
+\item Huber loss instead of mean squared error \(\to\) should be less sensible to outliers
+\item \alert{Remove ReLU on output layer!}
+\end{itemize}
+\end{frame}
+\begin{frame}[label={sec:orgcf6bc7d}]{Loss, rewards \& steps distributions, exploration/exploitation rate}
 \begin{center}
 \includegraphics[width=.9\linewidth]{img/steps-and-rewards-distrib.png}
 \end{center}
@@ -100,30 +109,50 @@ tabsize=2
 \end{column}
 \end{columns}
 \end{frame}
-\begin{frame}[label={sec:orgded8bfd}]{Policy learned}
+\begin{frame}[label={sec:org94fa2b4}]{Policy learned}
 \begin{center}
 \includegraphics[width=\linewidth]{img/policy.png}
 \end{center}
 \end{frame}
 \section{Generalization experiment}
-\label{sec:org8868606}
-\begin{frame}[label={sec:org7c58d85}]{Rewards \& steps}
+\label{sec:orga723019}
+\begin{frame}[label={sec:org237acba}]{Training only on the lower triangle}
+\begin{center}
+\includegraphics[width=\linewidth]{img/steps-and-rewards-lower-only.png}
+\end{center}
 \end{frame}
-\begin{frame}[label={sec:org9aee9e4}]{Loss, rewards \& steps distributions, exploration/exploitation rate}
+\begin{frame}[label={sec:org07aaa32}]{Generalization test: training only on the lower triangle then switch to upper triangle}
+\begin{center}
+\includegraphics[width=.9\linewidth]{img/steps-and-rewards_upper-then-lower1.png}
+\end{center}
+\begin{center}
+\includegraphics[width=.9\linewidth]{img/steps-and-rewards_upper-then-lower2.png}
+\end{center}
+\end{frame}
+\begin{frame}[label={sec:org23cd4ca}]{Loss, exploration/exploitation rate}
 \begin{columns}
-\begin{column}{0.4\columnwidth}
+\begin{column}{0.5\columnwidth}
+\begin{center}
+\includegraphics[width=.9\linewidth]{img/exploration-rate_upper-then-lower1.png}
+\end{center}
+\begin{center}
+\includegraphics[width=.9\linewidth]{img/exploration-rate_upper-then-lower2.png}
+\end{center}
 \end{column}
-\begin{column}{0.4\columnwidth}
+\begin{column}{0.5\columnwidth}
+\begin{center}
+\includegraphics[width=.9\linewidth]{img/loss_upper-then-lower1.png}
+\end{center}
+\begin{center}
+\includegraphics[width=.9\linewidth]{img/loss_upper-then-lower2.png}
+\end{center}
 \end{column}
 \end{columns}
 \end{frame}
-\begin{frame}[label={sec:org4580b81}]{Policy learned}
-\end{frame}
 \section{Discussion}
-\label{sec:org10c2e2d}
-\begin{frame}[<+->][label={sec:org1ba1da4}]{Points of discussion}
+\label{sec:orgf6c4291}
+\begin{frame}[<+->][label={sec:org2549330}]{Points of discussion}
 \begin{itemize}
-\item Lights cues in the state?
 \item Debrief from the meeting with Thomas
 \item Topics of discussion for future meetings?
 \begin{itemize}
@@ -133,7 +162,7 @@ tabsize=2
 \end{itemize}
 \end{itemize}
 \end{frame}
-\begin{frame}[label={sec:orgfe893dd},standout]{~}
+\begin{frame}[label={sec:org7cf9124},standout]{~}
 Thanks!
 \end{frame}
 \end{document}

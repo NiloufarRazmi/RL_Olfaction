@@ -9,6 +9,15 @@
 ** Rewards & steps
 #+ATTR_LaTeX: :width \linewidth
 [[file:img/steps-and-rewards.png]]
+** Why is it converging now?
+:PROPERTIES:
+:BEAMER_act: [<+->]
+:END:
+- Lights cues in the state?
+- Start training once replay buffer is full (5000 transitions) instead of when there are enough transitions for a batch (32 transitions)
+- Soft update of the networks weights (instead of sharp transition)
+- Huber loss instead of mean squared error \to should be less sensible to outliers
+- *Remove ReLU on output layer!*
 ** Loss, rewards & steps distributions, exploration/exploitation rate
 [[file:img/steps-and-rewards-distrib.png]]
 *** Left :BMCOL:
@@ -25,25 +34,30 @@
 #+ATTR_LaTeX: :width \linewidth
 [[file:img/policy.png]]
 * Generalization experiment
-** Rewards & steps
+** Training only on the lower triangle
 #+ATTR_LaTeX: :width \linewidth
-** Loss, rewards & steps distributions, exploration/exploitation rate
+[[file:img/steps-and-rewards-lower-only.png]]
+** Generalization test: training only on the lower triangle then switch to upper triangle
+[[file:img/steps-and-rewards_upper-then-lower1.png]]
+[[file:img/steps-and-rewards_upper-then-lower2.png]]
+** Loss, exploration/exploitation rate
 *** Left :BMCOL:
 :PROPERTIES:
-:BEAMER_col: 0.4
+:BEAMER_col: 0.5
 :END:
+[[file:img/exploration-rate_upper-then-lower1.png]]
+[[file:img/exploration-rate_upper-then-lower2.png]]
 *** Right :BMCOL:
 :PROPERTIES:
-:BEAMER_col: 0.4
+:BEAMER_col: 0.5
 :END:
-** Policy learned
-#+ATTR_LaTeX: :width \linewidth
+[[file:img/loss_upper-then-lower1.png]]
+[[file:img/loss_upper-then-lower2.png]]
 * Discussion
 ** Points of discussion
 :PROPERTIES:
 :BEAMER_act: [<+->]
 :END:
-- Lights cues in the state?
 - Debrief from the meeting with Thomas
 - Topics of discussion for future meetings?
   - How to compare neural data with simulation data?
