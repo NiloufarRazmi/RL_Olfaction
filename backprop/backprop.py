@@ -53,21 +53,19 @@
 # plt.show()
 # ```
 
-import ipywidgets as widgets
-
-# Replace `%matplotlib ipympl` by `%matplotlib inline` in case you get javascript issues
-# %matplotlib ipympl
-import matplotlib.pyplot as plt
-
 # %%
 # Import packages
 import numpy as np
-from IPython.display import display
 from tqdm import tqdm
 
 # import pandas as pd
 # import json
 
+# Replace `%matplotlib ipympl` by `%matplotlib inline` in case you get javascript issues
+# %matplotlib ipympl
+import ipywidgets as widgets
+import matplotlib.pyplot as plt
+from IPython.display import display
 
 # %load_ext lab_black
 
@@ -173,7 +171,6 @@ allError = np.nan * np.ones(nTot)
 catPredict = np.nan * np.ones(nTot)
 
 for i in tqdm(range(nTrain)):
-
     # Generate model prediction (forward pass of activity through units):
     activity = [np.array([]) for _ in range(nLayers)]
     for j in range(nLayers):

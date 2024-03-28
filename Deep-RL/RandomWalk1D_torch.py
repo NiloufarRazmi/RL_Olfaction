@@ -19,23 +19,19 @@
 # %% [markdown]
 # ## Dependencies
 
-import os
-
 # %%
+import os
 from pathlib import Path
 
-import ipdb
 import matplotlib as mpl
 import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 import seaborn as sns
 
 # %%
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 import torch.optim as optim
 from imojify import imojify
 from matplotlib.offsetbox import AnnotationBbox, OffsetImage
@@ -46,9 +42,8 @@ from tqdm import tqdm
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 device
 
-from env.RandomWalk1D_tensor import Actions, RandomWalk1D
-
 # %%
+from env.RandomWalk1D_tensor import Actions, RandomWalk1D
 from utils import Params
 
 # from agent import EpsilonGreedy

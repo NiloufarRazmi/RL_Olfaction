@@ -34,25 +34,29 @@
 #+ATTR_LaTeX: :width \linewidth
 [[file:img/policy.png]]
 * Generalization experiment
-** Training only on the lower triangle
+** Training only in the lower triangle
 #+ATTR_LaTeX: :width \linewidth
 [[file:img/steps-and-rewards-lower-only.png]]
-** Generalization test: training only on the lower triangle then switch to upper triangle
-[[file:img/steps-and-rewards_upper-then-lower1.png]]
-[[file:img/steps-and-rewards_upper-then-lower2.png]]
-** Loss, exploration/exploitation rate
+** Training only in the lower triangle then switch to the upper triangle
 *** Left :BMCOL:
 :PROPERTIES:
 :BEAMER_col: 0.5
 :END:
+#+ATTR_LaTeX: :height 0.4\textheight
 [[file:img/exploration-rate_upper-then-lower1.png]]
+#+ATTR_LaTeX: :height 0.4\textheight
 [[file:img/exploration-rate_upper-then-lower2.png]]
 *** Right :BMCOL:
 :PROPERTIES:
 :BEAMER_col: 0.5
 :END:
+#+ATTR_LaTeX: :height 0.4\textheight
 [[file:img/loss_upper-then-lower1.png]]
+#+ATTR_LaTeX: :height 0.4\textheight
 [[file:img/loss_upper-then-lower2.png]]
+** Training only in the lower triangle then switch to the upper triangle
+[[file:img/steps-and-rewards_upper-then-lower1.png]]
+[[file:img/steps-and-rewards_upper-then-lower2.png]]
 * Discussion
 ** Points of discussion
 :PROPERTIES:
@@ -75,3 +79,14 @@ Thanks!
 % End:
 
 * Feedback :noexport:
+** TODO Policy learned over time
+** See where are major weights changing
+** TODO Check allo/ego experiment
+*** Check if the network prefer ego or allo
+*** How to computationally represent ego/allo?
+*** How does the weights compare to full arena/lower/flipped
+**** Could use ego or allo depending of the conditions?
+** What are the factors that influence generalization?
+** Plans
+*** Niloufar next
+*** Topics on email

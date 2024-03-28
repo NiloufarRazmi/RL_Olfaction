@@ -62,7 +62,7 @@ from env_tensor_exp_train_upper_only_then_lower import (
     Actions,
     CONTEXTS_LABELS,
     Cues,
-    TriangleState
+    TriangleState,
 )
 from agent_tensor import EpsilonGreedy
 import plotting
@@ -126,7 +126,7 @@ logger.addHandler(handler)
 p = Params(
     seed=42,
     # seed=123,
-    n_runs=20,
+    n_runs=1,
     total_episodes=600,
     epsilon=0.5,
     alpha=1e-4,
@@ -175,6 +175,7 @@ print(f"Number of observations: {p.n_observations}")
 
 # %% [markdown]
 # ### Network definition
+
 
 # %%
 class DQN(nn.Module):
@@ -338,7 +339,6 @@ Transition = namedtuple(
 def train(
     triangle_state,
 ):
-
     state = env.reset(triangle_state=triangle_state)  # Reset the environment
     state = state.clone().float().detach().to(DEVICE)
     step_count = 0
@@ -479,7 +479,6 @@ all_actions = []
 losses = [[] for _ in range(p.n_runs)]
 
 for run in range(p.n_runs):  # Run several times to account for stochasticity
-
     # Reset everything
     net, target_net = neural_network()  # reset weights
     optimizer = optim.AdamW(net.parameters(), lr=p.alpha, amsgrad=True)
@@ -499,7 +498,6 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
         desc=f"Run {run+1}/{p.n_runs} - Episodes",
         leave=False,
     ):
-
         (
             total_rewards,
             step_count,
@@ -514,14 +512,12 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
             f"Run: {run+1}/{p.n_runs} - Episode: {episode+1}/{p.total_episodes} - Steps: {step_count} - Loss: {loss.item()}"
         )
 
-
     # Then switch to lower triangle
     for episode in tqdm(
         episodes[p.total_episodes :],
         desc=f"Run {run+1}/{p.n_runs} - Episodes",
         leave=False,
     ):
-
         (
             total_rewards,
             step_count,
@@ -575,6 +571,7 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
 # %% [markdown]
 # ### Exploration rate
 
+
 # %%
 def plot_exploration_rate(epsilons, figpath=None):
     fig, ax = plt.subplots()
@@ -595,6 +592,7 @@ plot_exploration_rate(epsilons, figpath=CURRENT_PATH)
 
 # %% [markdown]
 # ### States & actions distributions
+
 
 # %%
 def postprocess(episodes, p, rewards, steps):
@@ -619,6 +617,7 @@ res
 # As a sanity check, we will plot the distributions of states and actions
 # with the following function:
 
+
 # %%
 def plot_actions_distribution(actions, figpath=None):
     """Plot the distributions of states and actions."""
@@ -642,6 +641,7 @@ plot_actions_distribution(all_actions, figpath=CURRENT_PATH)
 
 # %% [markdown]
 # ### Steps & rewards
+
 
 # %%
 def plot_steps_and_rewards(df, figpath=None):
@@ -776,6 +776,7 @@ q_values.shape
 #                     state = env.to_one_hot(state).float()
 #                 q_values[tile_i, cue_i, :] = net(state).to(device)
 # q_values.shape
+
 
 # %%
 def qtable_directions_map(qtable, rows, cols):

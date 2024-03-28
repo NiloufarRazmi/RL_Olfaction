@@ -73,7 +73,6 @@ def random_choice(choices_array, length=None, num_samples=1, generator=None):
 
 def make_deterministic(seed=None):
     """Make everything deterministic in a single call."""
-
     generator = None
 
     if seed:

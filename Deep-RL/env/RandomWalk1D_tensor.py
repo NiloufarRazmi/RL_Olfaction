@@ -11,7 +11,8 @@ class Actions(Enum):
 
 
 class RandomWalk1D:
-    """`RandomWalk1D` to test the Q-learning algorithm.
+    """
+    `RandomWalk1D` to test the Q-learning algorithm.
 
     The agent (A) starts in state 3.
     The actions it can take are going left or right.

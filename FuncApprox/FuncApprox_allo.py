@@ -28,6 +28,8 @@
 # %% [markdown]
 # ## Initialization
 
+# %%
+# Import packages
 import re
 
 # %%
@@ -35,11 +37,11 @@ import re
 from collections import OrderedDict
 
 import matplotlib.pyplot as plt
-
-# %%
-# Import packages
 import numpy as np
 import pandas as pd
+
+# %%
+# Load custom functions
 import plotting
 import seaborn as sns
 from agent import EpsilonGreedy, QLearningFuncApprox
@@ -52,9 +54,6 @@ from environment_allo import (
 )
 from plotting_ego import plot_location_count
 from tqdm import tqdm
-
-# %%
-# Load custom functions
 from utils import Params
 
 sns.set(font_scale=2)

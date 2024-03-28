@@ -25,7 +25,7 @@
 *** DONE Save plot in files
 *** DONE Save progressbar log in file
 ** TODO Implement resume training feature
-* Viz
+* TODO Viz
 ** DONE Improve loss plot?
 Make number of bins not relative to the numer of episodes?
 
@@ -33,8 +33,10 @@ Make number of bins not relative to the numer of episodes?
 *** TODO Either screen + interactive session
 *** WAIT Or batch script that writes in a file
 Using  Tensorboard ~SummaryWriter~
-** TODO Plot weights and neurons activations
+** TODO Plot neurons activations
 Get inspiration from https://pair.withgoogle.com/explorables/grokking/
+** TODO Plot weights matrices
+See Figure 1 from [[https://arxiv.org/pdf/2007.02686.pdf]]
 ** DONE Plot policy learned
 ** TODO Add loss info in progress bar
 [[https://aladdinpersson.medium.com/how-to-get-a-progress-bar-in-pytorch-72bdbf19b35c]]
@@ -159,6 +161,8 @@ def visualize_activations(model, color="C0", print_variance=False):
 [[https://lightning.ai/docs/pytorch/stable/notebooks/course_UvA-DL/03-initialization-and-optimization.html]]
 ** 2D Weights histogram?
 [[https://wandb.ai/sauravmaheshkar/initialization/reports/A-Gentle-Introduction-To-Weight-Initialization-for-Neural-Networks--Vmlldzo2ODExMTg#he-initialization-]]
+** TODO Plot policy animation
+** Divide policy plot in upper/lower triangle
 * DONE Model doesn't converge
 ** DONE Try to apply on simple MDP
 * TODO Experiments
@@ -224,3 +228,8 @@ Should learn faster than agent trained only in the lower triangle
 - [[https://dvc.org/doc/dvclive/ml-frameworks/pytorch]]
 * Recurrence
 ** Only pass the odor information at the port, not at each time step
+* Next steps
+** Look at what representations the neurons learn
+** Memory in the environment + RNN?
+** Ego/allo choice?
+** Fully connected vs. autoencoder? Check the difference in the compact representations

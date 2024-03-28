@@ -79,12 +79,12 @@
 # -  automatic differentiation (``torch.autograd``)
 #
 
+# %%
 import math
 import random
 from collections import deque, namedtuple
 from itertools import count
 
-# %%
 import gymnasium as gym
 import matplotlib
 import matplotlib.pyplot as plt
@@ -131,7 +131,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 Transition = namedtuple("Transition", ("state", "action", "next_state", "reward"))
 
 
-class ReplayMemory(object):
+class ReplayMemory:
     def __init__(self, capacity):
         self.memory = deque([], maxlen=capacity)
 

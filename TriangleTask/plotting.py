@@ -82,9 +82,11 @@ def qtable_directions_map(qtable, rows, cols):
 
 
 def plot_q_values_map(qtable, rows, cols):
-    """Plot the heatmap of the Q-values.
+    """
+    Plot the heatmap of the Q-values.
 
-    Also plot the best action's direction with arrows."""
+    Also plot the best action's direction with arrows.
+    """
     # TODO: Remove function as it doesn't seem to be used anymore?
     qtable_val_max, qtable_directions = qtable_directions_map(qtable, rows, cols)
 
@@ -174,10 +176,11 @@ def plot_tiles_locations(tiles_list, rows, cols, title=None):
 
 
 def plot_q_values_maps(qtable, rows, cols, labels):
-    """Plot the heatmap of the Q-values.
+    """
+    Plot the heatmap of the Q-values.
 
-    Also plot the best action's direction with arrows."""
-
+    Also plot the best action's direction with arrows.
+    """
     # font_name = "DejaVu Math TeX Gyre"
     # mpl.rcParams["font.family"] = font_name
 
@@ -265,9 +268,11 @@ def add_emoji(coords, emoji, ax):
 
 
 def plot_policy_emoji(qtable, rows, cols, label, emoji):
-    """Plot the heatmap of the Q-values.
+    """
+    Plot the heatmap of the Q-values.
 
-    Also plot the best action's direction with arrows."""
+    Also plot the best action's direction with arrows.
+    """
     grid_spec = {"width_ratios": (0.9, 0.05)}
     fig, (ax, cbar_ax) = plt.subplots(1, 2, gridspec_kw=grid_spec, figsize=(10, 8))
 

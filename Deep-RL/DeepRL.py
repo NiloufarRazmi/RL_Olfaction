@@ -26,14 +26,15 @@
 # %% [markdown]
 # ## Dependencies
 
+# %%
 import matplotlib as mpl
 import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
-
-# %%
 import numpy as np
 import pandas as pd
 import seaborn as sns
+
+# %%
 from agent import DQN, EpsilonGreedy
 from deep_learning import Network
 from env.RandomWalk1D import Actions, RandomWalk1D
@@ -42,8 +43,6 @@ from matplotlib.offsetbox import AnnotationBbox, OffsetImage
 
 # from numpy.random import default_rng
 from tqdm import tqdm
-
-# %%
 from utils import Params
 
 # %%

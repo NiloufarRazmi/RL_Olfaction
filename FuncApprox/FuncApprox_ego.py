@@ -36,14 +36,19 @@ import re
 
 import numpy as np
 import pandas as pd
-import plotting
-import plotting_ego
-from agent import EpsilonGreedy, QLearningFuncApprox
-from environment_ego import CONTEXTS_LABELS, Actions, LightCues, WrappedEnvironment
-from tqdm import tqdm
 
 # %%
 # Load custom functions
+import plotting
+import plotting_ego
+from agent import EpsilonGreedy, QLearningFuncApprox
+from environment_ego import (
+    CONTEXTS_LABELS,
+    Actions,
+    LightCues,
+    WrappedEnvironment,
+)
+from tqdm import tqdm
 from utils import Params
 
 # %%

@@ -23,20 +23,19 @@
 # 4. RPE requires knowing value of new state
 #    -- so this will require a forward pass using "new state" inputs.
 
+# %%
+# Import packages
 import matplotlib as mpl
 
 # # %matplotlib ipympl
 import matplotlib.pyplot as plt
-
-# %%
-# Import packages
 import numpy as np
 import pandas as pd
 import seaborn as sns
-from deep_learning import Network
 
 # %%
 # Load custom functions
+from deep_learning import Network
 from utils import Params
 
 # %%

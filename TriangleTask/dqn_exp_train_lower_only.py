@@ -23,30 +23,23 @@
 # ### Initialization
 
 # %%
-from pathlib import Path
-import os
 import datetime
 import logging
 import shutil
+from collections import deque, namedtuple
+from pathlib import Path
 
-import ipdb
-
-import numpy as np
-from tqdm import tqdm
-import matplotlib.pyplot as plt
 import matplotlib as mpl
-import matplotlib.patches as mpatches
-from matplotlib.offsetbox import AnnotationBbox, OffsetImage
+import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 import seaborn as sns
-from imojify import imojify
-from collections import namedtuple, deque
 
 # %%
 import torch
 import torch.nn as nn
 import torch.optim as optim
-import torch.nn.functional as F
+from tqdm import tqdm
 
 # from torchinfo import summary
 
@@ -55,17 +48,16 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 DEVICE
 
 # %%
-from utils import Params, random_choice, make_deterministic
-
-from env_tensor_exp_train_upper_only_then_lower import (
-    WrappedEnvironment,
-    Actions,
-    CONTEXTS_LABELS,
-    Cues,
-    TriangleState
-)
-from agent_tensor import EpsilonGreedy
 import plotting
+from agent_tensor import EpsilonGreedy
+from env_tensor_exp_train_upper_only_then_lower import (
+    CONTEXTS_LABELS,
+    Actions,
+    Cues,
+    TriangleState,
+    WrappedEnvironment,
+)
+from utils import Params, make_deterministic, random_choice
 
 # %%
 # Formatting & autoreload stuff
@@ -175,6 +167,7 @@ print(f"Number of observations: {p.n_observations}")
 
 # %% [markdown]
 # ### Network definition
+
 
 # %%
 class DQN(nn.Module):
@@ -300,7 +293,7 @@ def collect_weights_biases(net):
 
 # %%
 def params_df_stats(weights, key, current_df=None):
-    if not current_df is None:
+    if current_df is not None:
         last_idx = current_df.index[-1] + 1
         df = current_df
     else:
@@ -342,7 +335,6 @@ def train(
     weights_grad_stats,
     triangle_state,
 ):
-
     state = env.reset(triangle_state=triangle_state)  # Reset the environment
     state = state.clone().float().detach().to(DEVICE)
     step_count = 0
@@ -502,7 +494,6 @@ all_actions = []
 losses = [[] for _ in range(p.n_runs)]
 
 for run in range(p.n_runs):  # Run several times to account for stochasticity
-
     # Reset everything
     net, target_net = neural_network()  # reset weights
     optimizer = optim.AdamW(net.parameters(), lr=p.alpha, amsgrad=True)
@@ -523,7 +514,6 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
     for episode in tqdm(
         episodes, desc=f"Run {run+1}/{p.n_runs} - Episodes", leave=False
     ):
-
         (
             total_rewards,
             step_count,
@@ -589,6 +579,7 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
 # %% [markdown]
 # ### Exploration rate
 
+
 # %%
 def plot_exploration_rate(epsilons, figpath=None):
     fig, ax = plt.subplots()
@@ -609,6 +600,7 @@ plot_exploration_rate(epsilons, figpath=CURRENT_PATH)
 
 # %% [markdown]
 # ### States & actions distributions
+
 
 # %%
 def postprocess(episodes, p, rewards, steps):
@@ -633,6 +625,7 @@ res
 # As a sanity check, we will plot the distributions of states and actions
 # with the following function:
 
+
 # %%
 def plot_actions_distribution(actions, figpath=None):
     """Plot the distributions of states and actions."""
@@ -656,6 +649,7 @@ plot_actions_distribution(all_actions, figpath=CURRENT_PATH)
 
 # %% [markdown]
 # ### Steps & rewards
+
 
 # %%
 def plot_steps_and_rewards(df, figpath=None):
@@ -791,6 +785,7 @@ q_values.shape
 #                 q_values[tile_i, cue_i, :] = net(state).to(device)
 # q_values.shape
 
+
 # %%
 def qtable_directions_map(qtable, rows, cols):
     """Get the best learned action & map it to arrows."""
@@ -816,10 +811,11 @@ def qtable_directions_map(qtable, rows, cols):
 
 # %%
 def plot_policies(q_values, labels, figpath=None):
-    """Plot the heatmap of the Q-values.
+    """
+    Plot the heatmap of the Q-values.
 
-    Also plot the best action's direction with arrows."""
-
+    Also plot the best action's direction with arrows.
+    """
     fig, ax = plt.subplots(1, 3, figsize=(13, 4))
     for idx, cue in enumerate(labels):
         qtable_val_max, qtable_directions = qtable_directions_map(

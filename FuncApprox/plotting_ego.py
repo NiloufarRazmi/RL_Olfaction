@@ -79,10 +79,12 @@ def arrow_left(x, y):
 
 
 def convert_row_origin(row, rows):
-    """Convert row and column for plotting.
+    """
+    Convert row and column for plotting.
 
     In the environment, row and col starts in the top left corner,
-    but for plotting the origin is in the bottom left corner."""
+    but for plotting the origin is in the bottom left corner.
+    """
     max_row_idx = rows - 1
     conv_row = max_row_idx - row
     return conv_row
@@ -191,9 +193,11 @@ def qtable_directions_map_ego(qtable, rows, cols, states):
 
 
 def plot_ego_q_values_maps(qtable, rows, cols, labels, states):
-    """Plot the heatmap of the Q-values.
+    """
+    Plot the heatmap of the Q-values.
 
-    Also plot the best action's direction with arrows."""
+    Also plot the best action's direction with arrows.
+    """
     q_val_best = qtable_directions_map_ego(qtable, rows, cols, states)
 
     cmap = mpl.colormaps["PuRd"]

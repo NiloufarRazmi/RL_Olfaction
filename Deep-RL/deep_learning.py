@@ -34,6 +34,7 @@ class Network:
         -------
         object
             a `Network` instance
+
         """
         self.nLayers = nLayers
         self.activation_func = Sigmoid()
@@ -177,6 +178,8 @@ class Network:
         return allError, y_hat, delta, activity
 
     def cost_derivative(self, output_activations, y):
-        """Return the vector of partial derivatives $\partial C_x /
-        \partial a$ for the output activations."""
+        """
+        Return the vector of partial derivatives $\partial C_x /
+        \partial a$ for the output activations.
+        """
         return y - output_activations

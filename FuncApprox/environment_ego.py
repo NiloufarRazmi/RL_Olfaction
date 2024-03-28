@@ -93,9 +93,12 @@ class Environment:
         """Observe the reward."""
         reward = 0
         if self.odor_condition == OdorCondition.post:
-            if state["cue"] == OdorID.A and state["location"] == Ports.West.value:
-                reward = 10
-            elif state["cue"] == OdorID.B and state["location"] == Ports.East.value:
+            if (
+                state["cue"] == OdorID.A
+                and state["location"] == Ports.West.value
+                or state["cue"] == OdorID.B
+                and state["location"] == Ports.East.value
+            ):
                 reward = 10
         return reward
 
@@ -134,25 +137,25 @@ class Environment:
         """Where the agent ends up on the map."""
 
         def LEFT(col):
-            "Moving left in the allocentric sense."
+            """Moving left in the allocentric sense."""
             col = max(col - 1, 0)
             angle = 270
             return angle, col
 
         def DOWN(row):
-            "Moving down in the allocentric sense."
+            """Moving down in the allocentric sense."""
             row = min(row + 1, self.rows - 1)
             angle = 180
             return angle, row
 
         def RIGHT(col):
-            "Moving right in the allocentric sense."
+            """Moving right in the allocentric sense."""
             col = min(col + 1, self.cols - 1)
             angle = 90
             return angle, col
 
         def UP(row):
-            "Moving up in the allocentric sense."
+            """Moving up in the allocentric sense."""
             row = max(row - 1, 0)
             angle = 0
             return angle, row
@@ -201,9 +204,11 @@ class Environment:
 
 
 class WrappedEnvironment(Environment):
-    """Wrap the base Environment class.
+    """
+    Wrap the base Environment class.
 
-    Results in numerical only and flattened state space"""
+    Results in numerical only and flattened state space
+    """
 
     def __init__(self, params, rng=None):
         # Initialize the base class to get the base properties

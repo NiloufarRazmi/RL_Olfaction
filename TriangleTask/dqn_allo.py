@@ -23,7 +23,6 @@
 import math
 import random
 from collections import deque, namedtuple
-from itertools import count
 from pathlib import Path
 
 import matplotlib
@@ -31,17 +30,15 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+# %%
+# Load custom functions
 # from agent import Qlearning, EpsilonGreedy
 import plotting
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 import torch.optim as optim
-from environment_tensor import CONTEXTS_LABELS, Actions, Cues, WrappedEnvironment
+from environment_tensor import Actions, WrappedEnvironment
 from tqdm import tqdm
-
-# %%
-# Load custom functions
 from utils import Params
 
 # %%
@@ -97,7 +94,7 @@ device
 Transition = namedtuple("Transition", ("state", "action", "next_state", "reward"))
 
 
-class ReplayMemory(object):
+class ReplayMemory:
     def __init__(self, capacity):
         self.memory = deque([], maxlen=capacity)
 
@@ -326,10 +323,9 @@ losses = []
 checkpoints_path = Path("checkpoints")
 if not checkpoints_path.exists():
     checkpoints_path.mkdir(parents=True, exist_ok=True)
-checkpoint_path = checkpoints_path.joinpath(f"checkpoint.pt")
+checkpoint_path = checkpoints_path.joinpath("checkpoint.pt")
 
 for run in range(params.n_runs):  # Run several times to account for stochasticity
-
     # Load checkpoint
     if checkpoint_path.exists():
         checkpoint = torch.load(checkpoint_path)

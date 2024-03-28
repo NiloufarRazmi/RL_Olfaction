@@ -11,19 +11,17 @@ jupytext: ## Convert JSON notebook to plain text
 black-format:
 	black .
 
-isort-format:
-	isort --profile black .
+ruff-format:
+	# ruff check --fix
+	ruff format
 
 format: ## Autoformat everything
 	make jupytext
-	make isort-format
+	make ruff-format
 	make black-format
 
-flake8:
-	flake8 --max-line-length 88 --extend-ignore E203 --exclude="**/.ipynb_checkpoints/" .
-
 ruff:
-	ruff .
+	ruff check
 
 lint: ## Lint all files
 	# make flake8

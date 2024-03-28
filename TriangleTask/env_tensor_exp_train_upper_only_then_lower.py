@@ -154,9 +154,12 @@ class Environment:
         """Observe the reward."""
         reward = 0
         if self.odor_condition == OdorCondition.post:
-            if state["cue"] == Cues.OdorA and state["location"] == Ports.West.value:
-                reward = 10
-            elif state["cue"] == Cues.OdorB and state["location"] == Ports.East.value:
+            if (
+                state["cue"] == Cues.OdorA
+                and state["location"] == Ports.West.value
+                or state["cue"] == Cues.OdorB
+                and state["location"] == Ports.East.value
+            ):
                 reward = 10
         return reward
 
@@ -228,9 +231,11 @@ class Environment:
 
 
 class WrappedEnvironment(Environment):
-    """Wrap the base Environment class.
+    """
+    Wrap the base Environment class.
 
-    Results in numerical only state space"""
+    Results in numerical only state space
+    """
 
     def __init__(self, seed=None, one_hot_state=False, triangle_state=None):
         # Initialize the base class to get the base properties
@@ -246,7 +251,6 @@ class WrappedEnvironment(Environment):
 
     def convert_composite_to_tensor_state(self, state):
         """Convert composite state dictionary to a tensor."""
-
         conv_state = torch.tensor(
             [state["location"], state["cue"].value], device=DEVICE
         )

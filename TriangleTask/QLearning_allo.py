@@ -23,13 +23,13 @@
 # Import packages
 import numpy as np
 import pandas as pd
+
+# %%
+# Load custom functions
 import plotting
 from agent import EpsilonGreedy, Qlearning
 from environment import CONTEXTS_LABELS, Actions, Cues, WrappedEnvironment
 from tqdm import tqdm
-
-# %%
-# Load custom functions
 from utils import Params
 
 # %%

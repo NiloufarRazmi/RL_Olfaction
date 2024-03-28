@@ -1,4 +1,4 @@
-% Created 2024-03-04 Mon 08:28
+% Created 2024-03-04 Mon 09:47
 % Intended LaTeX compiler: lualatex
 \documentclass[bigger]{beamer}
 \usepackage{amsmath}
@@ -77,13 +77,13 @@ tabsize=2
 \end{frame}
 
 \section{Online Deep RL training}
-\label{sec:org99fed52}
-\begin{frame}[label={sec:org692078c}]{Rewards \& steps}
+\label{sec:org369ea0a}
+\begin{frame}[label={sec:org562be35}]{Rewards \& steps}
 \begin{center}
 \includegraphics[width=\linewidth]{img/steps-and-rewards.png}
 \end{center}
 \end{frame}
-\begin{frame}[<+->][label={sec:org86bc518}]{Why is it converging now?}
+\begin{frame}[<+->][label={sec:org0626cd8}]{Why is it converging now?}
 \begin{itemize}
 \item Lights cues in the state?
 \item Start training once replay buffer is full (5000 transitions) instead of when there are enough transitions for a batch (32 transitions)
@@ -92,7 +92,7 @@ tabsize=2
 \item \alert{Remove ReLU on output layer!}
 \end{itemize}
 \end{frame}
-\begin{frame}[label={sec:orgcf6bc7d}]{Loss, rewards \& steps distributions, exploration/exploitation rate}
+\begin{frame}[label={sec:org8bb4ccd}]{Loss, rewards \& steps distributions, exploration/exploitation rate}
 \begin{center}
 \includegraphics[width=.9\linewidth]{img/steps-and-rewards-distrib.png}
 \end{center}
@@ -109,19 +109,39 @@ tabsize=2
 \end{column}
 \end{columns}
 \end{frame}
-\begin{frame}[label={sec:org94fa2b4}]{Policy learned}
+\begin{frame}[label={sec:org86f830c}]{Policy learned}
 \begin{center}
 \includegraphics[width=\linewidth]{img/policy.png}
 \end{center}
 \end{frame}
 \section{Generalization experiment}
-\label{sec:orga723019}
-\begin{frame}[label={sec:org237acba}]{Training only on the lower triangle}
+\label{sec:orgb295475}
+\begin{frame}[label={sec:org0527c26}]{Training only in the lower triangle}
 \begin{center}
 \includegraphics[width=\linewidth]{img/steps-and-rewards-lower-only.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org07aaa32}]{Generalization test: training only on the lower triangle then switch to upper triangle}
+\begin{frame}[label={sec:org5306e95}]{Training only in the lower triangle then switch to the upper triangle}
+\begin{columns}
+\begin{column}{0.5\columnwidth}
+\begin{center}
+\includegraphics[height=0.4\textheight]{img/exploration-rate_upper-then-lower1.png}
+\end{center}
+\begin{center}
+\includegraphics[height=0.4\textheight]{img/exploration-rate_upper-then-lower2.png}
+\end{center}
+\end{column}
+\begin{column}{0.5\columnwidth}
+\begin{center}
+\includegraphics[height=0.4\textheight]{img/loss_upper-then-lower1.png}
+\end{center}
+\begin{center}
+\includegraphics[height=0.4\textheight]{img/loss_upper-then-lower2.png}
+\end{center}
+\end{column}
+\end{columns}
+\end{frame}
+\begin{frame}[label={sec:orgcbca335}]{Training only in the lower triangle then switch to the upper triangle}
 \begin{center}
 \includegraphics[width=.9\linewidth]{img/steps-and-rewards_upper-then-lower1.png}
 \end{center}
@@ -129,29 +149,9 @@ tabsize=2
 \includegraphics[width=.9\linewidth]{img/steps-and-rewards_upper-then-lower2.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org23cd4ca}]{Loss, exploration/exploitation rate}
-\begin{columns}
-\begin{column}{0.5\columnwidth}
-\begin{center}
-\includegraphics[width=.9\linewidth]{img/exploration-rate_upper-then-lower1.png}
-\end{center}
-\begin{center}
-\includegraphics[width=.9\linewidth]{img/exploration-rate_upper-then-lower2.png}
-\end{center}
-\end{column}
-\begin{column}{0.5\columnwidth}
-\begin{center}
-\includegraphics[width=.9\linewidth]{img/loss_upper-then-lower1.png}
-\end{center}
-\begin{center}
-\includegraphics[width=.9\linewidth]{img/loss_upper-then-lower2.png}
-\end{center}
-\end{column}
-\end{columns}
-\end{frame}
 \section{Discussion}
-\label{sec:orgf6c4291}
-\begin{frame}[<+->][label={sec:org2549330}]{Points of discussion}
+\label{sec:org2de0eb7}
+\begin{frame}[<+->][label={sec:org44f8a4d}]{Points of discussion}
 \begin{itemize}
 \item Debrief from the meeting with Thomas
 \item Topics of discussion for future meetings?
@@ -162,7 +162,7 @@ tabsize=2
 \end{itemize}
 \end{itemize}
 \end{frame}
-\begin{frame}[label={sec:org7cf9124},standout]{~}
+\begin{frame}[label={sec:org12ce93e},standout]{~}
 Thanks!
 \end{frame}
 \end{document}

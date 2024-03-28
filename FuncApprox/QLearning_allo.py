@@ -32,14 +32,14 @@
 # Import packages
 import numpy as np
 import pandas as pd
+
+# %%
+# Load custom functions
 import plotting
 from agent import EpsilonGreedy, Qlearning
 from environment_allo import CONTEXTS_LABELS, Actions, LightCues, WrappedEnvironment
 from plotting_ego import plot_location_count
 from tqdm import tqdm
-
-# %%
-# Load custom functions
 from utils import Params
 
 # %%

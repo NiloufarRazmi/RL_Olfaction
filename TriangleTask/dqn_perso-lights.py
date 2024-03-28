@@ -22,18 +22,14 @@
 # %% [markdown]
 # ### Initialization
 
+# %%
 import datetime
 import logging
-import os
 import shutil
 from collections import deque, namedtuple
-
-# %%
 from pathlib import Path
 
-import ipdb
 import matplotlib as mpl
-import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -42,10 +38,7 @@ import seaborn as sns
 # %%
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 import torch.optim as optim
-from imojify import imojify
-from matplotlib.offsetbox import AnnotationBbox, OffsetImage
 from tqdm import tqdm
 
 # from torchinfo import summary
@@ -54,15 +47,13 @@ from tqdm import tqdm
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 device
 
+# %%
 import plotting
 from agent_tensor import EpsilonGreedy
-from environment_lights_tensor import CONTEXTS_LABELS, Actions, WrappedEnvironment
-
-# %%
-from utils import Params, make_deterministic, random_choice
 
 # from environment_tensor import WrappedEnvironment, Actions, CONTEXTS_LABELS, Cues
-
+from environment_lights_tensor import CONTEXTS_LABELS, Actions, WrappedEnvironment
+from utils import Params, make_deterministic, random_choice
 
 # %%
 # Formatting & autoreload stuff
@@ -295,7 +286,7 @@ def collect_weights_biases(net):
 
 # %%
 def params_df_stats(weights, key, current_df=None):
-    if not current_df is None:
+    if current_df is not None:
         last_idx = current_df.index[-1] + 1
         df = current_df
     else:
@@ -340,7 +331,6 @@ all_actions = []
 losses = [[] for _ in range(p.n_runs)]
 
 for run in range(p.n_runs):  # Run several times to account for stochasticity
-
     # Reset everything
     net, target_net = neural_network()  # eset weights
     optimizer = optim.AdamW(net.parameters(), lr=p.alpha, amsgrad=True)
@@ -780,10 +770,11 @@ def qtable_directions_map(qtable, rows, cols):
 
 # %%
 def plot_policies(q_values, labels, figpath=None):
-    """Plot the heatmap of the Q-values.
+    """
+    Plot the heatmap of the Q-values.
 
-    Also plot the best action's direction with arrows."""
-
+    Also plot the best action's direction with arrows.
+    """
     fig, ax = plt.subplots(1, 3, figsize=(13, 4))
     for idx, cue in enumerate(labels):
         qtable_val_max, qtable_directions = qtable_directions_map(

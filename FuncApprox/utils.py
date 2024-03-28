@@ -22,9 +22,11 @@ class Params:
 def get_location_count(
     all_state_composite, tiles_locations, cols, rows, cue=None, scale=True
 ):
-    """Count the occurences for each tile location.
+    """
+    Count the occurences for each tile location.
 
-    Optionally filter by `cue`"""
+    Optionally filter by `cue`
+    """
     location_count = np.zeros(len(tiles_locations))
     for tile in tiles_locations:
         if cue:  # Select based on chosen cue

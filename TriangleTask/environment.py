@@ -138,9 +138,12 @@ class Environment:
         """Observe the reward."""
         reward = 0
         if self.odor_condition == OdorCondition.post:
-            if state["cue"] == Cues.OdorA and state["location"] == Ports.West.value:
-                reward = 10
-            elif state["cue"] == Cues.OdorB and state["location"] == Ports.East.value:
+            if (
+                state["cue"] == Cues.OdorA
+                and state["location"] == Ports.West.value
+                or state["cue"] == Cues.OdorB
+                and state["location"] == Ports.East.value
+            ):
                 reward = 10
         return reward
 
@@ -223,9 +226,11 @@ class Environment:
 
 
 class WrappedEnvironment(Environment):
-    """Wrap the base Environment class.
+    """
+    Wrap the base Environment class.
 
-    Results in numerical only and flattened state space"""
+    Results in numerical only and flattened state space
+    """
 
     def __init__(self, params, rng=None):
         # Initialize the base class to get the base properties

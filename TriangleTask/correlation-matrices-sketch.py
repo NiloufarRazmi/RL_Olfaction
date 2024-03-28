@@ -13,9 +13,8 @@
 #     name: python3
 # ---
 
-import matplotlib.pyplot as plt
-
 # %%
+import matplotlib.pyplot as plt
 import torch
 from curlyBrace import curlyBrace
 

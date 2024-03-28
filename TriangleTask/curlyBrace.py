@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 Module Name : curlyBrace
 
@@ -69,8 +67,8 @@ def getAxSize(fig, ax):
     Reference
     -----------
     https://stackoverflow.com/questions/19306510/determine-matplotlib-axis-size-in-pixels
-    """
 
+    """
     bbox = ax.get_window_extent().transformed(fig.dpi_scale_trans.inverted())
     ax_width, ax_height = bbox.width, bbox.height
     ax_width *= fig.dpi
@@ -89,7 +87,7 @@ def curlyBrace(
     str_text="",
     int_line_num=2,
     fontdict={},
-    **kwargs
+    **kwargs,
 ):
     """
     .. _curlyBrace :
@@ -190,8 +188,8 @@ def curlyBrace(
     Reference
     ----------
     https://uk.mathworks.com/matlabcentral/fileexchange/38716-curly-brace-annotation
-    """
 
+    """
     pt1 = [None, None]
     pt2 = [None, None]
 
