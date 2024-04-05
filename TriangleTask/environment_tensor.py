@@ -162,7 +162,7 @@ class Environment:
                 or state["cue"] == Cues.OdorB
                 and state["location"] == Ports.East.value
             ):
-                reward = 10
+                reward = 1
         return reward
 
     def step(self, action, current_state):

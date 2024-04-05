@@ -31,9 +31,12 @@ from pathlib import Path
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+
+# import matplotlib.ticker as ticker
 import numpy as np
 import pandas as pd
 import seaborn as sns
+import ipdb
 
 # %%
 import torch
@@ -58,7 +61,13 @@ import plotting
 #     LightCues,
 # )
 from agent_tensor import EpsilonGreedy
-from environment_tensor import CONTEXTS_LABELS, Actions, Cues, WrappedEnvironment
+from environment_tensor import (
+    CONTEXTS_LABELS,
+    Actions,
+    Cues,
+    WrappedEnvironment,
+    TriangleState,
+)
 from utils import Params, make_deterministic, random_choice
 
 # %%
@@ -118,9 +127,9 @@ logger.addHandler(handler)
 
 # %%
 p = Params(
-    seed=42,
+    # seed=42,
     # seed=123,
-    n_runs=10,
+    n_runs=1,
     total_episodes=600,
     epsilon=0.5,
     alpha=1e-4,
@@ -226,6 +235,9 @@ def neural_network():
 # %%
 net, target_net = neural_network()
 net, target_net
+
+# %%
+weights_untrained = [layer.detach() for layer in net.parameters()]
 
 # %%
 # print("Model parameters:")
@@ -805,64 +817,71 @@ def plot_policies(q_values, labels, figpath=None):
 
     Also plot the best action's direction with arrows.
     """
-    fig, ax = plt.subplots(1, 3, figsize=(13, 4))
-    for idx, cue in enumerate(labels):
-        qtable_val_max, qtable_directions = qtable_directions_map(
-            qtable=q_values[:, idx, :], rows=env.rows, cols=env.cols
-        )
-        sns.heatmap(
-            qtable_val_max.cpu(),
-            annot=qtable_directions,
-            fmt="",
-            ax=ax.flatten()[idx],
-            cmap=sns.color_palette("Blues", as_cmap=True),
-            linewidths=0.7,
-            linecolor="black",
-            xticklabels=[],
-            yticklabels=[],
-            annot_kws={"fontsize": "xx-large"},
-            cbar_kws={"label": "Q-value"},
-        ).set(title=labels[cue])
-        for _, spine in ax.flatten()[idx].spines.items():
-            spine.set_visible(True)
-            spine.set_linewidth(0.7)
-            spine.set_color("black")
+    fig, ax = plt.subplots(2, len(labels), figsize=(13, 8))
+    for tri_i, tri_v in enumerate(TriangleState):
+        for cue_i, cue_v in enumerate(labels):
+            qtable_val_max, qtable_directions = qtable_directions_map(
+                qtable=q_values[:, cue_i, :], rows=env.rows, cols=env.cols
+            )
+            if tri_v == TriangleState.upper:
+                qtable_val_max = torch.triu(qtable_val_max)
+                qtable_directions = np.triu(qtable_directions)
+            elif tri_v == TriangleState.lower:
+                qtable_val_max = torch.tril(qtable_val_max)
+                qtable_directions = np.tril(qtable_directions)
+            sns.heatmap(
+                qtable_val_max.cpu(),
+                annot=qtable_directions,
+                fmt="",
+                ax=ax[tri_i, cue_i],
+                cmap=sns.color_palette("Blues", as_cmap=True),
+                linewidths=0.7,
+                linecolor="black",
+                xticklabels=[],
+                yticklabels=[],
+                annot_kws={"fontsize": "xx-large"},
+                cbar_kws={"label": "Q-value"},
+            ).set(title=labels[cue_v])
+            for _, spine in ax[tri_i, cue_i].spines.items():
+                spine.set_visible(True)
+                spine.set_linewidth(0.7)
+                spine.set_color("black")
 
-        # Annotate the ports names
-        bbox = {
-            "facecolor": "black",
-            "edgecolor": "none",
-            "boxstyle": "round",
-            "alpha": 0.1,
-        }
-        ax.flatten()[idx].text(
-            x=4.7,
-            y=0.3,
-            s="N",
-            bbox=bbox,
-            color="white",
-        )
-        ax.flatten()[idx].text(
-            x=0.05,
-            y=4.9,
-            s="S",
-            bbox=bbox,
-            color="white",
-        )
-        ax.flatten()[idx].text(
-            x=4.7,
-            y=4.9,
-            s="E",
-            bbox=bbox,
-            color="white",
-        )
-        ax.flatten()[idx].text(
-            x=0.05,
-            y=0.3,
-            s="W",
-            bbox=bbox,
-            color="white",
-        )
+            # Annotate the ports names
+            bbox = {
+                "facecolor": "black",
+                "edgecolor": "none",
+                "boxstyle": "round",
+                "alpha": 0.1,
+            }
+            ax[tri_i, cue_i].text(
+                x=4.7,
+                y=0.3,
+                s="N",
+                bbox=bbox,
+                color="white",
+            )
+            ax[tri_i, cue_i].text(
+                x=0.05,
+                y=4.9,
+                s="S",
+                bbox=bbox,
+                color="white",
+            )
+            ax[tri_i, cue_i].text(
+                x=4.7,
+                y=4.9,
+                s="E",
+                bbox=bbox,
+                color="white",
+            )
+            ax[tri_i, cue_i].text(
+                x=0.05,
+                y=0.3,
+                s="W",
+                bbox=bbox,
+                color="white",
+            )
 
     # Make background transparent
     fig.patch.set_alpha(0)
@@ -875,6 +894,79 @@ def plot_policies(q_values, labels, figpath=None):
 
 # %%
 plot_policies(q_values=q_values, labels=CONTEXTS_LABELS, figpath=CURRENT_PATH)
+
+
+# %% [markdown]
+# ### Weights matrix
+
+
+# %%
+def plot_weights_matrices(weights_untrained, weights_trained, figpath=None):
+    fig, ax = plt.subplots(
+        nrows=round(len(weights_trained) / 2),
+        ncols=4,
+        figsize=(12, 17),
+        width_ratios=[10, 1, 10, 1],
+    )
+    for idx, (w_untrained, w_trained) in enumerate(
+        zip(weights_untrained, weights_trained)
+    ):
+        # cmap = "vlag"
+        cmap = "bwr"
+
+        plot_row = int(np.floor(idx / 2))  # Row index to lay out the plots
+
+        if len(w_trained.shape) < 2:  # Biases
+            b_untrained_current = w_untrained.unsqueeze(-1).detach().numpy()
+            b_trained_current = w_trained.unsqueeze(-1).detach().numpy()
+            sns.heatmap(b_untrained_current, ax=ax[plot_row, 1], cmap=cmap)
+            sns.heatmap(b_trained_current, ax=ax[plot_row, 3], cmap=cmap)
+            bias_idx = [1, 3]
+            for jdx in bias_idx:
+                ax[plot_row, jdx].xaxis.set_major_locator(mpl.ticker.NullLocator())
+
+        else:  # Weights
+            w_untrained_current = w_trained.detach().numpy()
+            w_trained_current = w_trained.detach().numpy()
+            sns.heatmap(w_untrained_current, ax=ax[plot_row, 0], cmap=cmap)
+            sns.heatmap(w_trained_current, ax=ax[plot_row, 2], cmap=cmap)
+            w_idx = [0, 2]
+            for jdx in w_idx:
+                ax[plot_row, jdx].tick_params(labelbottom=False, labeltop=True)
+                ax[plot_row, jdx].xaxis.set_major_locator(
+                    mpl.ticker.LinearLocator(numticks=3)
+                )
+                ax[plot_row, jdx].xaxis.set_major_formatter(
+                    mpl.ticker.FormatStrFormatter("%d")
+                )
+
+        for jdx in range(ax.shape[1]):
+            ax[plot_row, jdx].yaxis.set_major_locator(
+                mpl.ticker.LinearLocator(numticks=3)
+            )
+            ax[plot_row, jdx].yaxis.set_major_formatter(
+                mpl.ticker.FormatStrFormatter("%d")
+            )
+
+        fig.tight_layout()
+        fig.patch.set_alpha(0)
+        fig.patch.set_facecolor("white")
+    if figpath:
+        fig.savefig(figpath / "weights-matrices.png", bbox_inches="tight")
+    plt.show()
+
+
+# %%
+plot_weights_matrices(
+    weights_untrained=weights_untrained,
+    weights_trained=[layer for layer in net.parameters()],
+    figpath=CURRENT_PATH,
+)
+
+# %% [markdown]
+# ### Activations learned
+
+# %%
 
 # %% [markdown]
 # ### Weights & gradients metrics

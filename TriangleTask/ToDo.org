@@ -24,7 +24,7 @@
 *** TODO Plot from file
 *** DONE Save plot in files
 *** DONE Save progressbar log in file
-** TODO Implement resume training feature
+** Implement resume training feature
 * TODO Viz
 ** DONE Improve loss plot?
 Make number of bins not relative to the numer of episodes?
@@ -38,9 +38,9 @@ Get inspiration from https://pair.withgoogle.com/explorables/grokking/
 ** TODO Plot weights matrices
 See Figure 1 from [[https://arxiv.org/pdf/2007.02686.pdf]]
 ** DONE Plot policy learned
-** TODO Add loss info in progress bar
+** Add loss info in progress bar
 [[https://aladdinpersson.medium.com/how-to-get-a-progress-bar-in-pytorch-72bdbf19b35c]]
-** TODO Plot loss updates during training
+** Plot loss updates during training
 ** Plot distributions
 #+begin_src python
 ##############################################################
@@ -162,7 +162,7 @@ def visualize_activations(model, color="C0", print_variance=False):
 ** 2D Weights histogram?
 [[https://wandb.ai/sauravmaheshkar/initialization/reports/A-Gentle-Introduction-To-Weight-Initialization-for-Neural-Networks--Vmlldzo2ODExMTg#he-initialization-]]
 ** TODO Plot policy animation
-** Divide policy plot in upper/lower triangle
+** DONE Divide policy plot in upper/lower triangle
 * DONE Model doesn't converge
 ** DONE Try to apply on simple MDP
 * TODO Experiments
@@ -183,6 +183,10 @@ Should learn faster than agent trained only in the lower triangle
 ** Normalizing states/actions?
 ** Reward at 1 instead of 10?
 ** DONE Start training when replay buffer is full?
+** TODO Minimum representations topic
+*** Compress to a 3? neurons layer and look at the compressed representations learned
+*** Find the smallest network able to learn the task (single hidden layer, X neurons), and look at the representations learned
+*** Check the neurons activity and compare to the normal/fully connected case
 * DONE Debug
 ** DONE Unit test env
 ** DONE Unit test one hot case
@@ -196,7 +200,7 @@ Should learn faster than agent trained only in the lower triangle
 ** DONE One hot encoding of state inputs
 ** DONE Plot stats of weights and biases
 ** DONE Plot gradients
-* TODO Improvements
+* Improvements
 ** DONE Batches
 ** DONE Experience replay
 ** DONE Target network
@@ -211,7 +215,7 @@ Should learn faster than agent trained only in the lower triangle
 [[https://doi.org/10.1016/j.procs.2017.05.431]]
 ** DONE Seed everything to be able to test runs that don't work
 *** [[https://docs.python.org/3/using/cmdline.html#envvar-PYTHONHASHSEED][PYTHONHASHSEED]]
-** TODO Unit test DQN algo
+** Unit test DQN algo
 [[https://krokotsch.eu/posts/deep-learning-unit-tests/]]
 *** Test that the loss decreases
 *** Test that the weights are updated
@@ -226,10 +230,8 @@ Should learn faster than agent trained only in the lower triangle
 ** Add logging
 - [[https://mlflow.org/docs/latest/python_api/mlflow.pytorch.html]]
 - [[https://dvc.org/doc/dvclive/ml-frameworks/pytorch]]
-* Recurrence
-** Only pass the odor information at the port, not at each time step
 * Next steps
 ** Look at what representations the neurons learn
 ** Memory in the environment + RNN?
+*** Only pass the odor information at the port, not at each time step
 ** Ego/allo choice?
-** Fully connected vs. autoencoder? Check the difference in the compact representations

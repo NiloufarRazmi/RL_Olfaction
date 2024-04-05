@@ -1,0 +1,13 @@
+#+title: Motivation
+* RL
+** RL is a general framework for sequential decision making under uncertainty
+** Known RL algorithms may need lots of data to solve large MDPs, limiting practical deployment.
+* Why model
+** Posit: You understand a system if you can simulate it
+** If you have a good enough model you may uncover mechanisms that explain a phenomena
+*** Without a model \to you're limited to describe the *how*
+*** With a model \to you may be able to explain the *why*
+** Test hypothesis
+** Abstraction of the system
+Makes you think of the parameters/inputs/outputs
+** Find out what is needed to reproduce experimental results, what explains those results

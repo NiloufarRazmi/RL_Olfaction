@@ -1,0 +1,2 @@
+* How to compare neural data w/ simulation data?
+** Reduce to a comparable manifold?
