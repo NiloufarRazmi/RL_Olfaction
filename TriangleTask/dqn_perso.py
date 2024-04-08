@@ -902,12 +902,23 @@ plot_policies(q_values=q_values, labels=CONTEXTS_LABELS, figpath=CURRENT_PATH)
 
 # %%
 def plot_weights_matrices(weights_untrained, weights_trained, figpath=None):
-    fig, ax = plt.subplots(
-        nrows=round(len(weights_trained) / 2),
-        ncols=4,
-        figsize=(12, 17),
-        width_ratios=[10, 1, 10, 1],
-    )
+    fig = plt.figure(layout="constrained", figsize=(12, 17))
+    subfigs = fig.subfigures(nrows=1, ncols=2)
+    ax = []
+    for subf in subfigs:
+        ax.append(
+            subf.subplots(
+                nrows=round(len(weights_trained) / 2),
+                ncols=2,
+                width_ratios=[10, 1],
+            )
+        )
+    subfigs[0].suptitle("Before training")
+    subfigs[1].suptitle("After training")
+    # subfigs[0].colorbar(pc, shrink=0.6, ax=axsLeft, location='bottom')
+    # subfigs[1].colorbar(pc, shrink=0.6, ax=axsRight)
+    # fig.suptitle('Weights')
+
     for idx, (w_untrained, w_trained) in enumerate(
         zip(weights_untrained, weights_trained)
     ):
@@ -919,36 +930,31 @@ def plot_weights_matrices(weights_untrained, weights_trained, figpath=None):
         if len(w_trained.shape) < 2:  # Biases
             b_untrained_current = w_untrained.unsqueeze(-1).detach().numpy()
             b_trained_current = w_trained.unsqueeze(-1).detach().numpy()
-            sns.heatmap(b_untrained_current, ax=ax[plot_row, 1], cmap=cmap)
-            sns.heatmap(b_trained_current, ax=ax[plot_row, 3], cmap=cmap)
-            bias_idx = [1, 3]
-            for jdx in bias_idx:
-                ax[plot_row, jdx].xaxis.set_major_locator(mpl.ticker.NullLocator())
+            sns.heatmap(b_untrained_current, ax=ax[0][plot_row, 1], cmap=cmap)
+            sns.heatmap(b_trained_current, ax=ax[1][plot_row, 1], cmap=cmap)
+            for axi in ax:
+                axi[plot_row, 1].xaxis.set_major_locator(mpl.ticker.NullLocator())
 
         else:  # Weights
-            w_untrained_current = w_trained.detach().numpy()
+            w_untrained_current = w_untrained.detach().numpy()
             w_trained_current = w_trained.detach().numpy()
-            sns.heatmap(w_untrained_current, ax=ax[plot_row, 0], cmap=cmap)
-            sns.heatmap(w_trained_current, ax=ax[plot_row, 2], cmap=cmap)
-            w_idx = [0, 2]
-            for jdx in w_idx:
-                ax[plot_row, jdx].tick_params(labelbottom=False, labeltop=True)
-                ax[plot_row, jdx].xaxis.set_major_locator(
+            sns.heatmap(w_untrained_current, ax=ax[0][plot_row, 0], cmap=cmap)
+            sns.heatmap(w_trained_current, ax=ax[1][plot_row, 0], cmap=cmap)
+            for axi in ax:
+                axi[plot_row, 0].tick_params(labelbottom=False, labeltop=True)
+                axi[plot_row, 0].xaxis.set_major_locator(
                     mpl.ticker.LinearLocator(numticks=3)
                 )
-                ax[plot_row, jdx].xaxis.set_major_formatter(
-                    mpl.ticker.FormatStrFormatter("%d")
-                )
+                for axj in axi.flatten():
+                    axj.xaxis.set_major_formatter(mpl.ticker.FormatStrFormatter("%d"))
 
-        for jdx in range(ax.shape[1]):
-            ax[plot_row, jdx].yaxis.set_major_locator(
-                mpl.ticker.LinearLocator(numticks=3)
-            )
-            ax[plot_row, jdx].yaxis.set_major_formatter(
-                mpl.ticker.FormatStrFormatter("%d")
-            )
+    for axlr in ax:
+        for axi in axlr:
+            for axj in axi:
+                axj.yaxis.set_major_locator(mpl.ticker.LinearLocator(numticks=3))
+                axj.yaxis.set_major_formatter(mpl.ticker.FormatStrFormatter("%d"))
 
-        fig.tight_layout()
+        # fig.tight_layout()
         fig.patch.set_alpha(0)
         fig.patch.set_facecolor("white")
     if figpath:

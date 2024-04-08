@@ -35,7 +35,7 @@ Make number of bins not relative to the numer of episodes?
 Using  Tensorboard ~SummaryWriter~
 ** TODO Plot neurons activations
 Get inspiration from https://pair.withgoogle.com/explorables/grokking/
-** TODO Plot weights matrices
+** DONE Plot weights matrices
 See Figure 1 from [[https://arxiv.org/pdf/2007.02686.pdf]]
 ** DONE Plot policy learned
 ** Add loss info in progress bar
