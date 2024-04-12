@@ -26,7 +26,7 @@
 import datetime
 import logging
 import shutil
-from collections import deque, namedtuple
+from collections import deque, namedtuple, OrderedDict
 from pathlib import Path
 
 import matplotlib as mpl
@@ -175,12 +175,13 @@ p.n_observations = len(state)
 print(f"Number of actions: {p.n_actions}")
 print(f"Number of observations: {p.n_observations}")
 
-
 # %% [markdown]
 # ### Network definition
 
-
 # %%
+ENCODER_NEURONS_NUM = 5
+
+
 class DQN(nn.Module):
     def __init__(self, n_observations, n_actions, n_units=16):
         super(DQN, self).__init__()
@@ -922,8 +923,8 @@ def plot_weights_matrices(weights_untrained, weights_trained, figpath=None):
     for idx, (w_untrained, w_trained) in enumerate(
         zip(weights_untrained, weights_trained)
     ):
-        # cmap = "vlag"
-        cmap = "bwr"
+        # cmap = "bwr"
+        cmap = "coolwarm"
 
         plot_row = int(np.floor(idx / 2))  # Row index to lay out the plots
 
@@ -973,6 +974,117 @@ plot_weights_matrices(
 # ### Activations learned
 
 # %%
+[item for item in net.mlp.named_children()]
+
+# %%
+# Hook to capture the activations
+activations = {}
+
+
+def get_activation(name):
+    def hook(module, args, output):
+        activations[name] = output.detach()
+
+    return hook
+
+
+# %%
+# Register the hooks for all layers
+for name, layer in net.mlp.named_children():
+    layer.register_forward_hook(get_activation(name))
+
+# %%
+x = torch.randn(28)
+output = net(x)
+
+# %%
+[val.shape for key, val in activations.items()]
+
+# %%
+# Construct input dictionnary to be fed to the network
+input_cond = OrderedDict({})
+for cue_obj, cue_txt in CONTEXTS_LABELS.items():
+    for loc in env.state_space["location"]:
+        current_state = torch.tensor([loc, cue_obj.value], device=DEVICE)
+        if env.one_hot_state:
+            current_state = env.to_one_hot(current_state)
+        input_cond[f"{loc}-{cue_txt}"] = current_state.float()
+
+# %%
+# Get the activations from the network
+layer_inspected = 6 - 1
+activations_layer = (
+    torch.ones((len(input_cond), ENCODER_NEURONS_NUM), device=DEVICE) * torch.nan
+)
+for idx, (cond, input_val) in enumerate(input_cond.items()):
+    net(input_val)
+    activations_layer[idx, :] = activations[str(layer_inspected)]
+
+# %%
+# cols = pd.MultiIndex.from_tuples(
+#     [("neuron", str(item)) for item in range(1, ENCODER_NEURONS_NUM + 1)]
+# )
+activations_layer_df = pd.DataFrame(activations_layer)  # , columns=cols)
+activations_layer_df["Input"] = list(input_cond.keys())
+activations_layer_df.set_index("Input", inplace=True)
+activations_layer_df
+
+
+# %%
+# def plot_activations(activations_layer, figpath=None):
+#     fig, ax = plt.subplots(figsize=(10, 15))
+#     sns.heatmap(activations_layer, ax=ax)
+#     ax.set(xlabel=f"Neurons activations in layer {layer_inspected + 1}")
+#     ax.tick_params(top=True, labeltop=True, bottom=False, labelbottom=False)
+#     ax.xaxis.set_label_position("top")
+#     ax.set_yticks(np.arange(len(input_cond)) + 0.5)
+#     ax.set_yticklabels(list(input_cond.keys()), rotation=0)
+#     fig.tight_layout()
+#     fig.patch.set_alpha(0)
+#     fig.patch.set_facecolor("white")
+#     if figpath:
+#         fig.savefig(figpath / "activations-learned.png", bbox_inches="tight")
+#     plt.show()
+
+# %%
+# plot_activations(activations_layer, figpath=CURRENT_PATH)
+
+
+# %%
+def plot_activations(activations_layer, input_cond, labels, figpath=None):
+    # Create a categorical palette to identify the clusters
+    # cluster_palette = sns.color_palette("Pastel2")
+    cluster_palette = sns.color_palette("Accent")
+    cluster_colors = dict(zip(list(labels.values()), cluster_palette))
+    row_colors = [cluster_colors[cond.split("-")[1]] for cond in input_cond.keys()]
+    row_colors_serie = pd.Series(row_colors)
+    row_colors_serie = row_colors_serie.set_axis(list(input_cond.keys()))
+
+    # cmap = "mako"
+    # cmap = "rocket"
+    # cmap = "magma"
+    cmap = "viridis"
+    chart = sns.clustermap(activations_layer_df, cmap=cmap, row_colors=row_colors_serie)
+    chart.ax_heatmap.set_xlabel(f"Neurons activations in layer {layer_inspected + 1}")
+
+    for label, col_val in cluster_colors.items():
+        chart.ax_col_dendrogram.bar(0, 0, color=col_val, label=label, linewidth=0)
+    chart.ax_col_dendrogram.legend(loc="center", bbox_to_anchor=(1.1, 0.7))  # , ncol=6)
+
+    chart.fig.patch.set_alpha(0)
+    chart.fig.patch.set_facecolor("white")
+    if figpath:
+        chart.savefig(figpath / "activations-learned.png", bbox_inches="tight")
+    plt.show()
+
+
+# %%
+plot_activations(
+    activations_layer=activations_layer,
+    input_cond=input_cond,
+    labels=CONTEXTS_LABELS,
+    figpath=CURRENT_PATH,
+)
 
 # %% [markdown]
 # ### Weights & gradients metrics

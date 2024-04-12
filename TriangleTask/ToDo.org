@@ -33,10 +33,14 @@ Make number of bins not relative to the numer of episodes?
 *** TODO Either screen + interactive session
 *** WAIT Or batch script that writes in a file
 Using  Tensorboard ~SummaryWriter~
-** TODO Plot neurons activations
+** DONE Plot neurons activations
 Get inspiration from https://pair.withgoogle.com/explorables/grokking/
-** DONE Plot weights matrices
+** Plot weights matrices
 See Figure 1 from [[https://arxiv.org/pdf/2007.02686.pdf]]
+*** Put colorbar for 2 plots (weights + biases) at the bottom?
+[[https://jdhao.github.io/2017/06/11/mpl_multiplot_one_colorbar/]]
+*** Get colorbar values for 2 plots
+[[https://stackoverflow.com/a/52837393/4129062]]
 ** DONE Plot policy learned
 ** Add loss info in progress bar
 [[https://aladdinpersson.medium.com/how-to-get-a-progress-bar-in-pytorch-72bdbf19b35c]]
