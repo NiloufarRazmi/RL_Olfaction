@@ -104,9 +104,13 @@ now = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 now
 
 # %%
+EXP_TAG = "scratch"
+
+# %%
 ROOT_PATH = Path("env").parent
 SAVE_PATH = ROOT_PATH / "save"
-CURRENT_PATH = SAVE_PATH / now
+folder = f"{now}_{EXP_TAG}" if EXP_TAG else now
+CURRENT_PATH = SAVE_PATH / folder
 CURRENT_PATH.mkdir(parents=True, exist_ok=True)  # Create the tree of directories
 print(f"Save path: `{CURRENT_PATH.absolute()}`")
 
@@ -547,17 +551,31 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
 
 # %%
 data_path = CURRENT_PATH / "data.npz"
-with open(data_path, "wb") as f:
+with open(data_path, "wb") as fhd:
     np.savez(
-        f,
+        fhd,
         rewards=rewards.cpu(),
         steps=steps.cpu(),
         episodes=episodes.cpu(),
         all_actions=all_actions,
-        # losses=losses,
+        losses=losses,
         p=p,
     )
 
+# %%
+# data_path = CURRENT_PATH / "data.pkl"
+# with open(data_path, "wb") as fhd:
+#     pickle.dump(
+#         [
+#             rewards,
+#             steps,
+#             episodes,
+#             all_actions,
+#             losses,
+#             p,
+#         ],
+#         fhd,
+#     )
 
 # %% [markdown]
 # ## Visualization
@@ -566,17 +584,25 @@ with open(data_path, "wb") as f:
 # ### Load data from disk
 
 # %%
-# with open(data_path, "rb") as f:
-#     # Load the arrays from the .npz file
-#     data = np.load(f, allow_pickle=True)
+with open(data_path, "rb") as fhd:
+    # Load the arrays from the .npz file
+    data = np.load(fhd, allow_pickle=True)
 
-#     # Access individual arrays by their names
-#     rewards = data["rewards"]
-#     steps = data["steps"]
-#     episodes = data["episodes"]
-#     all_actions = data["all_actions"]
-#     losses = data["losses"]
-#     p = data["p"][()]
+    # Access individual arrays by their names
+    rewards = data["rewards"]
+    steps = data["steps"]
+    episodes = data["episodes"]
+    all_actions = data["all_actions"]
+    losses = data["losses"]
+    p = data["p"][()]
+
+
+# %%
+# with open(data_path, "rb") as fhd:
+#     obj = pickle.load(fhd)
+
+# %%
+# obj[0]
 
 # %% [markdown]
 # ### Exploration rate

@@ -1,2 +1,5 @@
 * How to compare neural data w/ simulation data?
 ** Reduce to a comparable manifold?
+** Representational (dis)similarity analysis
+*** 10.1038/srep27755
+*** 10.1038/nn.4244

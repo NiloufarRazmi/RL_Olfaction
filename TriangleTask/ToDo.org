@@ -24,8 +24,9 @@
 *** TODO Plot from file
 *** DONE Save plot in files
 *** DONE Save progressbar log in file
+*** Use an MLOps tool like MLFlow or AimStack to save everything?
 ** Implement resume training feature
-* TODO Viz
+* Viz
 ** DONE Improve loss plot?
 Make number of bins not relative to the numer of episodes?
 
