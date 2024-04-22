@@ -278,13 +278,25 @@ for eps_i, epsi in enumerate(epsilons):
     epsilons[eps_i] = explorer.epsilon
     explorer.epsilon = explorer.update_epsilon(episodes[eps_i])
 
+
 # %%
-fig, ax = plt.subplots()
-sns.lineplot(epsilons.cpu(), color="black")
-ax.set(ylabel="Epsilon")
-ax.set(xlabel="Episodes")
-fig.tight_layout()
-plt.show()
+def plot_exploration_rate(epsilons, xlabel="", figpath=None):
+    fig, ax = plt.subplots()
+    sns.lineplot(epsilons, color="black")
+    ax.set(ylabel="Epsilon")
+    if xlabel:
+        ax.set(xlabel=xlabel)
+    ax.set_facecolor("0.9")
+    fig.tight_layout()
+    fig.patch.set_alpha(0)
+    fig.patch.set_facecolor("white")
+    if figpath:
+        fig.savefig(figpath / "exploration-rate.png", bbox_inches="tight")
+    plt.show()
+
+
+# %%
+plot_exploration_rate(epsilons, xlabel="Episodes")
 
 
 # %%
@@ -596,7 +608,6 @@ with open(data_path, "rb") as fhd:
     losses = data["losses"]
     p = data["p"][()]
 
-
 # %%
 # with open(data_path, "rb") as fhd:
 #     obj = pickle.load(fhd)
@@ -607,23 +618,8 @@ with open(data_path, "rb") as fhd:
 # %% [markdown]
 # ### Exploration rate
 
-
 # %%
-def plot_exploration_rate(epsilons, figpath=None):
-    fig, ax = plt.subplots()
-    sns.lineplot(epsilons, color="black")
-    ax.set(ylabel="Epsilon")
-    ax.set(xlabel="Steps")
-    fig.tight_layout()
-    fig.patch.set_alpha(0)
-    fig.patch.set_facecolor("white")
-    if figpath:
-        fig.savefig(figpath / "exploration-rate.png", bbox_inches="tight")
-    plt.show()
-
-
-# %%
-plot_exploration_rate(epsilons, figpath=CURRENT_PATH)
+plot_exploration_rate(epsilons, xlabel="Steps", figpath=CURRENT_PATH)
 
 
 # %% [markdown]
@@ -635,7 +631,7 @@ def postprocess(episodes, p, rewards, steps):
     """Convert the results of the simulation in dataframes."""
     res = pd.DataFrame(
         data={
-            "Episodes": episodes.tile(p.n_runs).cpu(),
+            "Episodes": np.tile(episodes, p.n_runs),
             "Rewards": rewards.T.flatten(),
             "Steps": steps.T.flatten(),
         }
@@ -663,6 +659,7 @@ def plot_actions_distribution(actions, figpath=None):
         [item.value for item in Actions], labels=[item.name for item in Actions]
     )
     ax.set_title("Actions")
+    ax.set_facecolor("0.9")
     fig.tight_layout()
     fig.patch.set_alpha(0)
     fig.patch.set_facecolor("white")
@@ -697,6 +694,8 @@ def plot_steps_and_rewards(df, figpath=None):
         )
     )
 
+    for axi in ax:
+        axi.set_facecolor("0.9")
     fig.tight_layout()
     fig.patch.set_alpha(0)
     fig.patch.set_facecolor("white")
@@ -715,6 +714,8 @@ def plot_steps_and_rewards_dist(df, figpath=None):
     fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(15, 5))
     sns.histplot(data=df, x="Rewards", ax=ax[0], color="black")
     sns.histplot(data=df, x="Steps", ax=ax[1], color="black")
+    for axi in ax:
+        axi.set_facecolor("0.9")
     fig.tight_layout()
     fig.patch.set_alpha(0)
     fig.patch.set_facecolor("white")
@@ -773,6 +774,7 @@ else:
     )
 ax.set(xlabel="Steps")
 ax.set(yscale="log")
+ax.set_facecolor("0.9")
 fig.tight_layout()
 fig.patch.set_alpha(0)
 fig.patch.set_facecolor("white")

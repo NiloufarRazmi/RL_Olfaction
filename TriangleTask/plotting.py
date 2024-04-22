@@ -475,6 +475,8 @@ def plot_weights_biases_distributions(weights_df, biases_df, label=None, figpath
         ax=ax[1],
     )
 
+    for axi in ax:
+        axi.set_facecolor("0.9")
     fig.tight_layout()
     fig.patch.set_alpha(0)
     fig.patch.set_facecolor("white")
