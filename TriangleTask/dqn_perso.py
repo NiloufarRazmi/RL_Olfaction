@@ -280,7 +280,7 @@ for eps_i, epsi in enumerate(epsilons):
 
 # %%
 fig, ax = plt.subplots()
-sns.lineplot(epsilons.cpu())
+sns.lineplot(epsilons.cpu(), color="black")
 ax.set(ylabel="Epsilon")
 ax.set(xlabel="Episodes")
 fig.tight_layout()
@@ -611,7 +611,7 @@ with open(data_path, "rb") as fhd:
 # %%
 def plot_exploration_rate(epsilons, figpath=None):
     fig, ax = plt.subplots()
-    sns.lineplot(epsilons)
+    sns.lineplot(epsilons, color="black")
     ax.set(ylabel="Epsilon")
     ax.set(xlabel="Steps")
     fig.tight_layout()
@@ -636,8 +636,8 @@ def postprocess(episodes, p, rewards, steps):
     res = pd.DataFrame(
         data={
             "Episodes": episodes.tile(p.n_runs).cpu(),
-            "Rewards": rewards.T.flatten().cpu(),
-            "Steps": steps.T.flatten().cpu(),
+            "Rewards": rewards.T.flatten(),
+            "Steps": steps.T.flatten(),
         }
     )
     # res["cum_rewards"] = rewards.cumsum(axis=0).flatten(order="F")
@@ -658,7 +658,7 @@ res
 def plot_actions_distribution(actions, figpath=None):
     """Plot the distributions of states and actions."""
     fig, ax = plt.subplots()
-    sns.histplot(data=actions, ax=ax)
+    sns.histplot(data=actions, ax=ax, color="black")
     ax.set_xticks(
         [item.value for item in Actions], labels=[item.name for item in Actions]
     )
@@ -683,12 +683,12 @@ plot_actions_distribution(all_actions, figpath=CURRENT_PATH)
 def plot_steps_and_rewards(df, figpath=None):
     """Plot the steps and rewards from dataframes."""
     fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(15, 5))
-    sns.lineplot(data=df, x="Episodes", y="Rewards", ax=ax[0])
+    sns.lineplot(data=df, x="Episodes", y="Rewards", ax=ax[0], color="black")
     ax[0].set(
         ylabel=f"Rewards\naveraged over {p.n_runs} runs" if p.n_runs > 1 else "Rewards"
     )
 
-    sns.lineplot(data=df, x="Episodes", y="Steps", ax=ax[1])
+    sns.lineplot(data=df, x="Episodes", y="Steps", ax=ax[1], color="black")
     ax[1].set(
         ylabel=(
             f"Steps number\naveraged over {p.n_runs} runs"
@@ -713,8 +713,8 @@ plot_steps_and_rewards(res, figpath=CURRENT_PATH)
 def plot_steps_and_rewards_dist(df, figpath=None):
     """Plot the steps and rewards distributions from dataframes."""
     fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(15, 5))
-    sns.histplot(data=df, x="Rewards", ax=ax[0])
-    sns.histplot(data=df, x="Steps", ax=ax[1])
+    sns.histplot(data=df, x="Rewards", ax=ax[0], color="black")
+    sns.histplot(data=df, x="Steps", ax=ax[1], color="black")
     fig.tight_layout()
     fig.patch.set_alpha(0)
     fig.patch.set_facecolor("white")
@@ -754,7 +754,7 @@ loss_df
 
 # %%
 fig, ax = plt.subplots()
-sns.lineplot(data=loss_df, x="Steps", y="Loss", ax=ax)
+sns.lineplot(data=loss_df, x="Steps", y="Loss", ax=ax, color="black")
 if USETEX:
     ax.set(
         ylabel=(

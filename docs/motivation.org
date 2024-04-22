@@ -11,3 +11,7 @@
 ** Abstraction of the system
 Makes you think of the parameters/inputs/outputs
 ** Find out what is needed to reproduce experimental results, what explains those results
+* Feyman quote
+#+begin_quote
+What I cannot create, I do not understand. -- Richard Feynman
+#+end_quote
