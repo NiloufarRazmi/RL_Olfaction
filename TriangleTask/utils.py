@@ -302,7 +302,7 @@ def get_activations_learned(net, env, layer_inspected, contexts_labels):
         net(input_val)
         activations_layer[idx, :] = activations[str(layer_inspected)]
 
-    activations_layer_df = pd.DataFrame(activations_layer)  # , columns=cols)
+    activations_layer_df = pd.DataFrame(activations_layer.cpu())  # , columns=cols)
     activations_layer_df["Input"] = list(input_cond.keys())
     activations_layer_df.set_index("Input", inplace=True)
     return input_cond, activations_layer_df

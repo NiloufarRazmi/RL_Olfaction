@@ -800,16 +800,16 @@ def plot_weights_matrices(
         plot_row = int(np.floor(idx / 2))  # Row index to lay out the plots
 
         if len(w_trained.shape) < 2:  # Biases
-            b_untrained_current = w_untrained.unsqueeze(-1).detach().numpy()
-            b_trained_current = w_trained.unsqueeze(-1).detach().numpy()
+            b_untrained_current = w_untrained.unsqueeze(-1).cpu().detach().numpy()
+            b_trained_current = w_trained.unsqueeze(-1).cpu().detach().numpy()
             sns.heatmap(b_untrained_current, ax=ax[0][plot_row, 1], cmap=cmap)
             sns.heatmap(b_trained_current, ax=ax[1][plot_row, 1], cmap=cmap)
             for axi in ax:
                 axi[plot_row, 1].xaxis.set_major_locator(mpl.ticker.NullLocator())
 
         else:  # Weights
-            w_untrained_current = w_untrained.detach().numpy()
-            w_trained_current = w_trained.detach().numpy()
+            w_untrained_current = w_untrained.cpu().detach().numpy()
+            w_trained_current = w_trained.cpu().detach().numpy()
             sns.heatmap(w_untrained_current, ax=ax[0][plot_row, 0], cmap=cmap)
             sns.heatmap(w_trained_current, ax=ax[1][plot_row, 0], cmap=cmap)
             for axi in ax:
