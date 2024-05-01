@@ -5,7 +5,7 @@
 #SBATCH -n 4
 #SBATCH --mem=8G
 #SBATCH -t 06:00:00
-#SBATCH --partition=carney-afleisc2-condo
+#SBATCH --account=carney-afleisc2-condo
 #SBATCH --mail-type=begin       # send email when job begins
 #SBATCH --mail-type=end         # send email when job ends
 #SBATCH --mail-user=andrea_pierre@brown.edu
