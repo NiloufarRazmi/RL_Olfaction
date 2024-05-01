@@ -1,5 +1,9 @@
 import torch
+import torch.nn as nn
 from utils import make_deterministic, random_choice
+
+
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 class EpsilonGreedy:
@@ -58,3 +62,63 @@ class EpsilonGreedy:
         else:
             epsilon = self.epsilon
         return epsilon
+
+
+ENCODER_NEURONS_NUM = 5
+
+
+class DQN(nn.Module):
+    """Define network."""
+
+    def __init__(self, n_observations, n_actions, n_units=16):
+        super(DQN, self).__init__()
+        self.mlp = nn.Sequential(
+            nn.Linear(n_observations, n_units),
+            nn.ReLU(),
+            nn.Linear(n_units, n_units),
+            nn.ReLU(),
+            nn.Linear(n_units, ENCODER_NEURONS_NUM),
+            nn.ReLU(),
+            nn.Linear(ENCODER_NEURONS_NUM, n_units),
+            nn.ReLU(),
+            nn.Linear(n_units, n_units),
+            nn.ReLU(),
+            nn.Linear(n_units, n_actions),
+            # nn.ReLU(),
+        )
+
+    def forward(self, x):
+        return self.mlp(x)
+
+
+def neural_network(n_observations, n_actions, nHiddenUnits):
+    """Define policy and target networks."""
+    # if env.one_hot_state:
+    #     net = DQN(
+    #         n_observations=n_observations,
+    #         n_actions=n_actions,
+    #         n_units=4 * n_observations,
+    #     ).to(DEVICE)
+    # else:
+    #     net = DQN(
+    #         n_observations=n_observations,
+    #         n_actions=n_actions,
+    #         n_units=nHiddenUnits,
+    #     ).to(DEVICE)
+    # net
+
+    policy_net = DQN(
+        n_observations=n_observations,
+        n_actions=n_actions,
+        n_units=nHiddenUnits,
+    ).to(DEVICE)
+
+    target_net = DQN(
+        n_observations=n_observations,
+        n_actions=n_actions,
+        n_units=nHiddenUnits,
+    ).to(DEVICE)
+
+    target_net.load_state_dict(policy_net.state_dict())
+
+    return policy_net, target_net

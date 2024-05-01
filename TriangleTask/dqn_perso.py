@@ -51,7 +51,7 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 DEVICE
 
 # %%
-import plotting
+import plotting as viz
 
 # from environment_lights_tensor import (
 #     WrappedEnvironment,
@@ -68,7 +68,7 @@ from environment_tensor import (
     WrappedEnvironment,
     TriangleState,
 )
-from utils import Params, make_deterministic, random_choice
+import utils
 
 # %%
 # Formatting & autoreload stuff
@@ -148,6 +148,7 @@ p = Params(
     batch_size=32,
     # target_net_update=200,
     tau=0.005,
+    experiment_tag="scratch",
 )
 p
 
@@ -155,9 +156,18 @@ p
 if p.batch_size < 2:
     raise ValueError("The batch size needs to be more that one data point")
 
+# %% [markdown]
+# ### Utilies
+
+# %%
+CURRENT_PATH = utils.create_save_path(p.experiment_tag)
+
+# %%
+LOGGER = utils.get_logger(current_path=CURRENT_PATH)
+
 # %%
 # Set the seed
-GENERATOR = make_deterministic(seed=p.seed)
+GENERATOR = utils.make_deterministic(seed=p.seed)
 
 # %% [markdown]
 # ### Environment definition
@@ -278,76 +288,8 @@ for eps_i, epsi in enumerate(epsilons):
     epsilons[eps_i] = explorer.epsilon
     explorer.epsilon = explorer.update_epsilon(episodes[eps_i])
 
-
 # %%
-def plot_exploration_rate(epsilons, xlabel="", figpath=None):
-    fig, ax = plt.subplots()
-    sns.lineplot(epsilons, color="black")
-    ax.set(ylabel="Epsilon")
-    if xlabel:
-        ax.set(xlabel=xlabel)
-    ax.set_facecolor("0.9")
-    fig.tight_layout()
-    fig.patch.set_alpha(0)
-    fig.patch.set_facecolor("white")
-    if figpath:
-        fig.savefig(figpath / "exploration-rate.png", bbox_inches="tight")
-    plt.show()
-
-
-# %%
-plot_exploration_rate(epsilons, xlabel="Episodes")
-
-
-# %%
-def collect_weights_biases(net):
-    biases = {"val": [], "grad": []}
-    weights = {"val": [], "grad": []}
-    for layer in net.mlp.children():
-        layer_params = layer.parameters()
-        for idx, subparams in enumerate(layer_params):
-            if idx > 2:
-                raise ValueError(
-                    "There should be max 2 sets of parameters: weights and biases"
-                )
-            if len(subparams.shape) > 2:
-                raise ValueError("The weights have more dimensions than expected")
-
-            if len(subparams.shape) == 1:
-                biases["val"].append(subparams)
-                biases["grad"].append(subparams.grad)
-            elif len(subparams.shape) == 2:
-                weights["val"].append(subparams)
-                weights["grad"].append(subparams.grad)
-    return weights, biases
-
-
-# %%
-def params_df_stats(weights, key, current_df=None):
-    if current_df is not None:
-        last_idx = current_df.index[-1] + 1
-        df = current_df
-    else:
-        last_idx = 0
-        df = None
-
-    for idx, val in enumerate(weights[key]):
-        tmp_df = pd.DataFrame(
-            data={
-                "Std": val.detach().cpu().std().item(),
-                "Avg": val.detach().cpu().mean().item(),
-                "Layer": idx,
-                "Index": [last_idx + idx],
-            },
-            index=[last_idx + idx],
-        )
-
-        if df is None:
-            df = tmp_df
-        else:
-            df = pd.concat((df, tmp_df))
-    return df
-
+viz.plot_exploration_rate(epsilons, xlabel="Episodes")
 
 # %% [markdown]
 # ## Training
@@ -426,7 +368,7 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
 
             # Start training when `replay_buffer` is full
             if len(replay_buffer) == p.replay_buffer_max_size:
-                transitions = random_choice(
+                transitions = utils.random_choice(
                     replay_buffer,
                     length=len(replay_buffer),
                     num_samples=p.batch_size,
@@ -525,17 +467,17 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
 
                 losses[run].append(loss.item())
 
-                weights, biases = collect_weights_biases(net=net)
-                weights_val_stats = params_df_stats(
+                weights, biases = utils.collect_weights_biases(net=net)
+                weights_val_stats = utils.params_df_stats(
                     weights, key="val", current_df=weights_grad_stats
                 )
-                biases_val_stats = params_df_stats(
+                biases_val_stats = utils.params_df_stats(
                     biases, key="val", current_df=biases_val_stats
                 )
-                biases_grad_stats = params_df_stats(
+                biases_grad_stats = utils.params_df_stats(
                     biases, key="grad", current_df=biases_grad_stats
                 )
-                weights_grad_stats = params_df_stats(
+                weights_grad_stats = utils.params_df_stats(
                     weights, key="grad", current_df=weights_val_stats
                 )
 
@@ -550,7 +492,7 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
 
         rewards[episode, run] = total_rewards
         steps[episode, run] = step_count
-        logger.info(
+        LOGGER.info(
             f"Run: {run+1}/{p.n_runs} - Episode: {episode+1}/{p.total_episodes} - Steps: {step_count} - Loss: {loss.item()}"
         )
     weights_val_stats.set_index("Index", inplace=True)
@@ -562,437 +504,94 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
 # ### Save data to disk
 
 # %%
-data_path = CURRENT_PATH / "data.npz"
-with open(data_path, "wb") as fhd:
-    np.savez(
-        fhd,
-        rewards=rewards.cpu(),
-        steps=steps.cpu(),
-        episodes=episodes.cpu(),
-        all_actions=all_actions,
-        losses=losses,
-        p=p,
-    )
+# data_path = CURRENT_PATH / "data.npz"
+# with open(data_path, "wb") as fhd:
+#     np.savez(
+#         fhd,
+#         rewards=rewards.cpu(),
+#         steps=steps.cpu(),
+#         episodes=episodes.cpu(),
+#         all_actions=all_actions,
+#         losses=losses,
+#         p=p,
+#     )
 
 # %%
-# data_path = CURRENT_PATH / "data.pkl"
-# with open(data_path, "wb") as fhd:
-#     pickle.dump(
-#         [
-#             rewards,
-#             steps,
-#             episodes,
-#             all_actions,
-#             losses,
-#             p,
-#         ],
-#         fhd,
-#     )
+data_dict = {
+    "rewards": rewards.cpu(),
+    "steps": steps.cpu(),
+    "episodes": episodes.cpu(),
+    "all_actions": all_actions,
+    "losses": losses,
+    "p": p,
+}
+
+# %%
+data_path = utils.save_data(data_dict=data_dict, current_path=CURRENT_PATH)
 
 # %% [markdown]
 # ## Visualization
 
 # %% [markdown]
-# ### Load data from disk
-
-# %%
-with open(data_path, "rb") as fhd:
-    # Load the arrays from the .npz file
-    data = np.load(fhd, allow_pickle=True)
-
-    # Access individual arrays by their names
-    rewards = data["rewards"]
-    steps = data["steps"]
-    episodes = data["episodes"]
-    all_actions = data["all_actions"]
-    losses = data["losses"]
-    p = data["p"][()]
-
-# %%
-# with open(data_path, "rb") as fhd:
-#     obj = pickle.load(fhd)
-
-# %%
-# obj[0]
-
-# %% [markdown]
 # ### Exploration rate
 
 # %%
-plot_exploration_rate(epsilons, xlabel="Steps", figpath=CURRENT_PATH)
-
+viz.plot_exploration_rate(epsilons, xlabel="Steps", figpath=CURRENT_PATH)
 
 # %% [markdown]
 # ### States & actions distributions
 
+# %%
+rew_steps_df = utils.postprocess_rewards_steps(
+    episodes=episodes, n_runs=p.n_runs, rewards=rewards, steps=steps
+)
+rew_steps_df
 
 # %%
-def postprocess(episodes, p, rewards, steps):
-    """Convert the results of the simulation in dataframes."""
-    res = pd.DataFrame(
-        data={
-            "Episodes": np.tile(episodes, p.n_runs),
-            "Rewards": rewards.T.flatten(),
-            "Steps": steps.T.flatten(),
-        }
-    )
-    # res["cum_rewards"] = rewards.cumsum(axis=0).flatten(order="F")
-    return res
-
-
-# %%
-res = postprocess(episodes, p, rewards, steps)
-res
-
-
-# %% [markdown]
-# As a sanity check, we will plot the distributions of states and actions
-# with the following function:
-
-
-# %%
-def plot_actions_distribution(actions, figpath=None):
-    """Plot the distributions of states and actions."""
-    fig, ax = plt.subplots()
-    sns.histplot(data=actions, ax=ax, color="black")
-    ax.set_xticks(
-        [item.value for item in Actions], labels=[item.name for item in Actions]
-    )
-    ax.set_title("Actions")
-    ax.set_facecolor("0.9")
-    fig.tight_layout()
-    fig.patch.set_alpha(0)
-    fig.patch.set_facecolor("white")
-    if figpath:
-        fig.savefig(figpath / "actions-distribution.png", bbox_inches="tight")
-    plt.show()
-
-
-# %%
-plot_actions_distribution(all_actions, figpath=CURRENT_PATH)
-
+viz.plot_actions_distribution(all_actions, figpath=CURRENT_PATH)
 
 # %% [markdown]
 # ### Steps & rewards
 
+# %%
+viz.plot_steps_and_rewards_dist(rew_steps_df, figpath=CURRENT_PATH)
 
 # %%
-def plot_steps_and_rewards(df, figpath=None):
-    """Plot the steps and rewards from dataframes."""
-    fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(15, 5))
-    sns.lineplot(data=df, x="Episodes", y="Rewards", ax=ax[0], color="black")
-    ax[0].set(
-        ylabel=f"Rewards\naveraged over {p.n_runs} runs" if p.n_runs > 1 else "Rewards"
-    )
-
-    sns.lineplot(data=df, x="Episodes", y="Steps", ax=ax[1], color="black")
-    ax[1].set(
-        ylabel=(
-            f"Steps number\naveraged over {p.n_runs} runs"
-            if p.n_runs > 1
-            else "Steps number"
-        )
-    )
-
-    for axi in ax:
-        axi.set_facecolor("0.9")
-    fig.tight_layout()
-    fig.patch.set_alpha(0)
-    fig.patch.set_facecolor("white")
-    if figpath:
-        fig.savefig(figpath / "steps-and-rewards.png", bbox_inches="tight")
-    plt.show()
-
-
-# %%
-plot_steps_and_rewards(res, figpath=CURRENT_PATH)
-
-
-# %%
-def plot_steps_and_rewards_dist(df, figpath=None):
-    """Plot the steps and rewards distributions from dataframes."""
-    fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(15, 5))
-    sns.histplot(data=df, x="Rewards", ax=ax[0], color="black")
-    sns.histplot(data=df, x="Steps", ax=ax[1], color="black")
-    for axi in ax:
-        axi.set_facecolor("0.9")
-    fig.tight_layout()
-    fig.patch.set_alpha(0)
-    fig.patch.set_facecolor("white")
-    if figpath:
-        fig.savefig(
-            figpath / "steps-and-rewards-distrib.png",
-            bbox_inches="tight",
-        )
-    plt.show()
-
-
-# %%
-plot_steps_and_rewards_dist(res, figpath=CURRENT_PATH)
+viz.plot_steps_and_rewards(rew_steps_df, n_runs=p.n_runs, figpath=CURRENT_PATH)
 
 # %% [markdown]
 # ### Loss
 
 # %%
-window_size = 1
-for idx, loss in enumerate(losses):
-    current_loss = torch.tensor(loss, device=DEVICE)
-    losses_rolling_avg = nn.functional.avg_pool1d(
-        current_loss.view(1, 1, -1), kernel_size=window_size
-    ).squeeze()
-    tmp_df = pd.DataFrame(
-        data={
-            "Run": idx * torch.ones(len(losses_rolling_avg), device=DEVICE).int().cpu(),
-            "Steps": torch.arange(0, len(losses_rolling_avg), device=DEVICE).cpu(),
-            "Loss": losses_rolling_avg.cpu(),
-        }
-    )
-    if idx == 0:
-        loss_df = tmp_df
-    else:
-        loss_df = pd.concat((loss_df, tmp_df))
+loss_df = utils.postprocess_loss(losses=losses, window_size=1)
 loss_df
 
 # %%
-fig, ax = plt.subplots()
-sns.lineplot(data=loss_df, x="Steps", y="Loss", ax=ax, color="black")
-if USETEX:
-    ax.set(
-        ylabel=(
-            f"$Log_{{10}}(\mathrm{{Loss}})$\naveraged over {p.n_runs} runs"
-            if p.n_runs > 1
-            else "$Log_{10}(\mathrm{Loss})$"
-        )
-    )
-else:
-    ax.set(
-        ylabel=(
-            f"$Log_{{10}}(\\text{{Loss}})$\naveraged over {p.n_runs} runs"
-            if p.n_runs > 1
-            else "$Log_{10}(\\text{Loss})$"
-        )
-    )
-ax.set(xlabel="Steps")
-ax.set(yscale="log")
-ax.set_facecolor("0.9")
-fig.tight_layout()
-fig.patch.set_alpha(0)
-fig.patch.set_facecolor("white")
-fig.savefig(CURRENT_PATH / "loss.png", bbox_inches="tight")
-plt.show()
+viz.plot_loss(loss_df, n_runs=p.n_runs, figpath=CURRENT_PATH)
 
 # %% [markdown]
 # ### Policy learned
 
 # %%
-with torch.no_grad():
-    q_values = torch.nan * torch.empty(
-        (len(env.tiles_locations), len(Cues), p.n_actions), device=DEVICE
-    )
-    for tile_i, tile_v in enumerate(env.tiles_locations):
-        for cue_i, cue_v in enumerate(Cues):
-            state = torch.tensor([tile_v, cue_v.value], device=DEVICE).float()
-            if env.one_hot_state:
-                state = env.to_one_hot(state).float()
-            q_values[tile_i, cue_i, :] = net(state).to(DEVICE)
+q_values = utils.get_q_values_by_states(
+    env=env, cues=Cues, n_actions=p.n_actions, net=net
+)
 q_values.shape
 
-
 # %%
-# with torch.no_grad():
-#     q_values = torch.nan * torch.empty(
-#         (len(env.tiles_locations), len(OdorCues), len(LightCues), p.n_actions),
-#         device=DEVICE,
-#     )
-#     for tile_i, tile_v in enumerate(env.tiles_locations):
-#         for o_cue_i, o_cue_v in enumerate(OdorCues):
-#             for l_cue_i, l_cue_v in enumerate(LightCues):
-#                 state = torch.tensor(
-#                     [tile_v, o_cue_v.value, l_cue_v.value], device=DEVICE
-#                 ).float()
-#                 if env.one_hot_state:
-#                     state = env.to_one_hot(state).float()
-#                 q_values[tile_i, cue_i, :] = net(state).to(DEVICE)
-# q_values.shape
-
-
-# %%
-def qtable_directions_map(qtable, rows, cols):
-    """Get the best learned action & map it to arrows."""
-    qtable_val_max = qtable.max(axis=1).values.reshape(rows, cols)
-    qtable_best_action = qtable.argmax(axis=1).reshape(rows, cols)
-    directions = {
-        Actions.UP: "↑",
-        Actions.DOWN: "↓",
-        Actions.LEFT: "←",
-        Actions.RIGHT: "→",
-    }
-    qtable_directions = np.empty(qtable_best_action.flatten().shape, dtype=str)
-    eps = torch.finfo(torch.float64).eps  # Minimum float number on the machine
-    for idx, val in enumerate(qtable_best_action.flatten()):
-        if qtable_val_max.flatten()[idx] > eps:
-            # Assign an arrow only if a minimal Q-value has been learned as best action
-            # otherwise since 0 is a direction, it also gets mapped on the tiles where
-            # it didn't actually learn anything
-            qtable_directions[idx] = directions[Actions(val.item())]
-    qtable_directions = qtable_directions.reshape(rows, cols)
-    return qtable_val_max, qtable_directions
-
-
-# %%
-def plot_policies(q_values, labels, figpath=None):
-    """
-    Plot the heatmap of the Q-values.
-
-    Also plot the best action's direction with arrows.
-    """
-    fig, ax = plt.subplots(2, len(labels), figsize=(13, 8))
-    for tri_i, tri_v in enumerate(TriangleState):
-        for cue_i, cue_v in enumerate(labels):
-            qtable_val_max, qtable_directions = qtable_directions_map(
-                qtable=q_values[:, cue_i, :], rows=env.rows, cols=env.cols
-            )
-            if tri_v == TriangleState.upper:
-                qtable_val_max = torch.triu(qtable_val_max)
-                qtable_directions = np.triu(qtable_directions)
-            elif tri_v == TriangleState.lower:
-                qtable_val_max = torch.tril(qtable_val_max)
-                qtable_directions = np.tril(qtable_directions)
-            sns.heatmap(
-                qtable_val_max.cpu(),
-                annot=qtable_directions,
-                fmt="",
-                ax=ax[tri_i, cue_i],
-                cmap=sns.color_palette("Blues", as_cmap=True),
-                linewidths=0.7,
-                linecolor="black",
-                xticklabels=[],
-                yticklabels=[],
-                annot_kws={"fontsize": "xx-large"},
-                cbar_kws={"label": "Q-value"},
-            ).set(title=labels[cue_v])
-            for _, spine in ax[tri_i, cue_i].spines.items():
-                spine.set_visible(True)
-                spine.set_linewidth(0.7)
-                spine.set_color("black")
-
-            # Annotate the ports names
-            bbox = {
-                "facecolor": "black",
-                "edgecolor": "none",
-                "boxstyle": "round",
-                "alpha": 0.1,
-            }
-            ax[tri_i, cue_i].text(
-                x=4.7,
-                y=0.3,
-                s="N",
-                bbox=bbox,
-                color="white",
-            )
-            ax[tri_i, cue_i].text(
-                x=0.05,
-                y=4.9,
-                s="S",
-                bbox=bbox,
-                color="white",
-            )
-            ax[tri_i, cue_i].text(
-                x=4.7,
-                y=4.9,
-                s="E",
-                bbox=bbox,
-                color="white",
-            )
-            ax[tri_i, cue_i].text(
-                x=0.05,
-                y=0.3,
-                s="W",
-                bbox=bbox,
-                color="white",
-            )
-
-    # Make background transparent
-    fig.patch.set_alpha(0)
-    fig.patch.set_facecolor("white")
-    fig.tight_layout()
-    if figpath:
-        fig.savefig(figpath / "policy.png", bbox_inches="tight")
-    plt.show()
-
-
-# %%
-plot_policies(q_values=q_values, labels=CONTEXTS_LABELS, figpath=CURRENT_PATH)
-
+viz.plot_policies(
+    q_values=q_values,
+    labels=CONTEXTS_LABELS,
+    n_rows=env.rows,
+    n_cols=env.cols,
+    figpath=CURRENT_PATH,
+)
 
 # %% [markdown]
 # ### Weights matrix
 
-
 # %%
-def plot_weights_matrices(weights_untrained, weights_trained, figpath=None):
-    fig = plt.figure(layout="constrained", figsize=(12, 17))
-    subfigs = fig.subfigures(nrows=1, ncols=2)
-    ax = []
-    for subf in subfigs:
-        ax.append(
-            subf.subplots(
-                nrows=round(len(weights_trained) / 2),
-                ncols=2,
-                width_ratios=[10, 1],
-            )
-        )
-    subfigs[0].suptitle("Before training")
-    subfigs[1].suptitle("After training")
-    # subfigs[0].colorbar(pc, shrink=0.6, ax=axsLeft, location='bottom')
-    # subfigs[1].colorbar(pc, shrink=0.6, ax=axsRight)
-    # fig.suptitle('Weights')
-
-    for idx, (w_untrained, w_trained) in enumerate(
-        zip(weights_untrained, weights_trained)
-    ):
-        # cmap = "bwr"
-        cmap = "coolwarm"
-
-        plot_row = int(np.floor(idx / 2))  # Row index to lay out the plots
-
-        if len(w_trained.shape) < 2:  # Biases
-            b_untrained_current = w_untrained.unsqueeze(-1).detach().numpy()
-            b_trained_current = w_trained.unsqueeze(-1).detach().numpy()
-            sns.heatmap(b_untrained_current, ax=ax[0][plot_row, 1], cmap=cmap)
-            sns.heatmap(b_trained_current, ax=ax[1][plot_row, 1], cmap=cmap)
-            for axi in ax:
-                axi[plot_row, 1].xaxis.set_major_locator(mpl.ticker.NullLocator())
-
-        else:  # Weights
-            w_untrained_current = w_untrained.detach().numpy()
-            w_trained_current = w_trained.detach().numpy()
-            sns.heatmap(w_untrained_current, ax=ax[0][plot_row, 0], cmap=cmap)
-            sns.heatmap(w_trained_current, ax=ax[1][plot_row, 0], cmap=cmap)
-            for axi in ax:
-                axi[plot_row, 0].tick_params(labelbottom=False, labeltop=True)
-                axi[plot_row, 0].xaxis.set_major_locator(
-                    mpl.ticker.LinearLocator(numticks=3)
-                )
-                for axj in axi.flatten():
-                    axj.xaxis.set_major_formatter(mpl.ticker.FormatStrFormatter("%d"))
-
-    for axlr in ax:
-        for axi in axlr:
-            for axj in axi:
-                axj.yaxis.set_major_locator(mpl.ticker.LinearLocator(numticks=3))
-                axj.yaxis.set_major_formatter(mpl.ticker.FormatStrFormatter("%d"))
-
-        # fig.tight_layout()
-        fig.patch.set_alpha(0)
-        fig.patch.set_facecolor("white")
-    if figpath:
-        fig.savefig(figpath / "weights-matrices.png", bbox_inches="tight")
-    plt.show()
-
-
-# %%
-plot_weights_matrices(
+viz.plot_weights_matrices(
     weights_untrained=weights_untrained,
     weights_trained=[layer for layer in net.parameters()],
     figpath=CURRENT_PATH,
@@ -1002,115 +601,84 @@ plot_weights_matrices(
 # ### Activations learned
 
 # %%
-[item for item in net.mlp.named_children()]
+# [item for item in net.mlp.named_children()]
 
 # %%
-# Hook to capture the activations
-activations = {}
+# # Hook to capture the activations
+# activations = {}
 
 
-def get_activation(name):
-    def hook(module, args, output):
-        activations[name] = output.detach()
+# def get_activation(name):
+#     def hook(module, args, output):
+#         activations[name] = output.detach()
 
-    return hook
-
-
-# %%
-# Register the hooks for all layers
-for name, layer in net.mlp.named_children():
-    layer.register_forward_hook(get_activation(name))
+#     return hook
 
 # %%
-x = torch.randn(28)
-output = net(x)
+# # Register the hooks for all layers
+# for name, layer in net.mlp.named_children():
+#     layer.register_forward_hook(get_activation(name))
 
 # %%
-[val.shape for key, val in activations.items()]
+# x = torch.randn(28)
+# output = net(x)
 
 # %%
-# Construct input dictionnary to be fed to the network
-input_cond = OrderedDict({})
-for cue_obj, cue_txt in CONTEXTS_LABELS.items():
-    for loc in env.state_space["location"]:
-        current_state = torch.tensor([loc, cue_obj.value], device=DEVICE)
-        if env.one_hot_state:
-            current_state = env.to_one_hot(current_state)
-        input_cond[f"{loc}-{cue_txt}"] = current_state.float()
+# [val.shape for key, val in activations.items()]
 
 # %%
-# Get the activations from the network
-layer_inspected = 6 - 1
-activations_layer = (
-    torch.ones((len(input_cond), ENCODER_NEURONS_NUM), device=DEVICE) * torch.nan
-)
-for idx, (cond, input_val) in enumerate(input_cond.items()):
-    net(input_val)
-    activations_layer[idx, :] = activations[str(layer_inspected)]
+# # Construct input dictionnary to be fed to the network
+# input_cond = OrderedDict({})
+# for cue_obj, cue_txt in CONTEXTS_LABELS.items():
+#     for loc in env.state_space["location"]:
+#         current_state = torch.tensor([loc, cue_obj.value], device=DEVICE)
+#         if env.one_hot_state:
+#             current_state = env.to_one_hot(current_state)
+#         input_cond[f"{loc}-{cue_txt}"] = current_state.float()
 
 # %%
-# cols = pd.MultiIndex.from_tuples(
-#     [("neuron", str(item)) for item in range(1, ENCODER_NEURONS_NUM + 1)]
+# layer = list(net.mlp.children())[6]
+# parameters = list(layer.named_parameters())
+# weights = [params[1] for params in parameters if params[0] == "weight"][0]
+# neurons_num = weights.shape[1]
+# neurons_num
+
+# %%
+# # Get the activations from the network
+# layer_inspected = 6 - 1
+# activations_layer = (
+#     torch.ones((len(input_cond), ENCODER_NEURONS_NUM), device=DEVICE) * torch.nan
 # )
-activations_layer_df = pd.DataFrame(activations_layer)  # , columns=cols)
-activations_layer_df["Input"] = list(input_cond.keys())
-activations_layer_df.set_index("Input", inplace=True)
+# for idx, (cond, input_val) in enumerate(input_cond.items()):
+#     net(input_val)
+#     activations_layer[idx, :] = activations[str(layer_inspected)]
+
+# %%
+# # cols = pd.MultiIndex.from_tuples(
+# #     [("neuron", str(item)) for item in range(1, ENCODER_NEURONS_NUM + 1)]
+# # )
+# activations_layer_df = pd.DataFrame(activations_layer)  # , columns=cols)
+# activations_layer_df["Input"] = list(input_cond.keys())
+# activations_layer_df.set_index("Input", inplace=True)
+# activations_layer_df
+
+# %%
+input_cond, activations_layer_df = utils.get_activations_learned(
+    net=net, env=env, layer_inspected=p.layer_inspected, contexts_labels=CONTEXTS_LABELS
+)
+
+# %%
+# input_cond
+
+# %%
 activations_layer_df
 
-
 # %%
-# def plot_activations(activations_layer, figpath=None):
-#     fig, ax = plt.subplots(figsize=(10, 15))
-#     sns.heatmap(activations_layer, ax=ax)
-#     ax.set(xlabel=f"Neurons activations in layer {layer_inspected + 1}")
-#     ax.tick_params(top=True, labeltop=True, bottom=False, labelbottom=False)
-#     ax.xaxis.set_label_position("top")
-#     ax.set_yticks(np.arange(len(input_cond)) + 0.5)
-#     ax.set_yticklabels(list(input_cond.keys()), rotation=0)
-#     fig.tight_layout()
-#     fig.patch.set_alpha(0)
-#     fig.patch.set_facecolor("white")
-#     if figpath:
-#         fig.savefig(figpath / "activations-learned.png", bbox_inches="tight")
-#     plt.show()
-
-# %%
-# plot_activations(activations_layer, figpath=CURRENT_PATH)
-
-
-# %%
-def plot_activations(activations_layer, input_cond, labels, figpath=None):
-    # Create a categorical palette to identify the clusters
-    # cluster_palette = sns.color_palette("Pastel2")
-    cluster_palette = sns.color_palette("Accent")
-    cluster_colors = dict(zip(list(labels.values()), cluster_palette))
-    row_colors = [cluster_colors[cond.split("-")[1]] for cond in input_cond.keys()]
-    row_colors_serie = pd.Series(row_colors)
-    row_colors_serie = row_colors_serie.set_axis(list(input_cond.keys()))
-
-    # cmap = "mako"
-    # cmap = "rocket"
-    # cmap = "magma"
-    cmap = "viridis"
-    chart = sns.clustermap(activations_layer_df, cmap=cmap, row_colors=row_colors_serie)
-    chart.ax_heatmap.set_xlabel(f"Neurons activations in layer {layer_inspected + 1}")
-
-    for label, col_val in cluster_colors.items():
-        chart.ax_col_dendrogram.bar(0, 0, color=col_val, label=label, linewidth=0)
-    chart.ax_col_dendrogram.legend(loc="center", bbox_to_anchor=(1.1, 0.7))  # , ncol=6)
-
-    chart.fig.patch.set_alpha(0)
-    chart.fig.patch.set_facecolor("white")
-    if figpath:
-        chart.savefig(figpath / "activations-learned.png", bbox_inches="tight")
-    plt.show()
-
-
-# %%
-plot_activations(
-    activations_layer=activations_layer,
+viz.plot_activations(
+    activations_layer_df=activations_layer_df,
     input_cond=input_cond,
     labels=CONTEXTS_LABELS,
+    layer_inspected=p.layer_inspected,
     figpath=CURRENT_PATH,
 )
 
@@ -1118,84 +686,49 @@ plot_activations(
 # ### Weights & gradients metrics
 
 # %%
-weights, biases = collect_weights_biases(net=net)
-
-
-# %%
-def params_df_flat(weights):
-    for idx, val in enumerate(weights):
-        tmp_df = pd.DataFrame(
-            data={
-                "Val": val.detach().cpu().flatten(),
-                "Layer": idx,
-            }
-        )
-        if idx == 0:
-            df = tmp_df
-        else:
-            df = pd.concat((df, tmp_df))
-    return df
-
+weights, biases = utils.collect_weights_biases(net=net)
 
 # %%
-weights_val_df = params_df_flat(weights["val"])
+weights_val_df = utils.postprocess_weights(weights["val"])
 weights_val_df
 
 # %%
 weights_val_df.describe()
 
 # %%
-biases_val_df = params_df_flat(biases["val"])
+biases_val_df = utils.postprocess_weights(biases["val"])
 biases_val_df
 
 # %%
 biases_val_df.describe()
 
 # %%
-weights_grad_df = params_df_flat(weights["grad"])
+weights_grad_df = utils.postprocess_weights(weights["grad"])
 weights_grad_df
 
 # %%
 weights_grad_df.describe()
 
 # %%
-biases_grad_df = params_df_flat(biases["grad"])
+biases_grad_df = utils.postprocess_weights(biases["grad"])
 biases_grad_df
 
 # %%
 biases_grad_df.describe()
 
-
 # %%
-def check_grad_stats(grad_df):
-    grad_stats = torch.tensor(
-        [
-            grad_df.Val.mean(),
-            grad_df.Val.std(),
-            grad_df.Val.min(),
-            grad_df.Val.max(),
-        ],
-        device=DEVICE,
-    )
-    assert not torch.equal(
-        torch.zeros_like(grad_stats, device=DEVICE),
-        grad_stats,
-    ), "Gradients are zero"
-
-
-# %%
-plotting.plot_weights_biases_distributions(
+viz.plot_weights_biases_distributions(
     weights_val_df, biases_val_df, label="Values", figpath=CURRENT_PATH
 )
 
 # %%
-check_grad_stats(weights_grad_df)
+assert utils.check_grad_stats(weights_grad_df), "Gradients are zero"
 
 # %%
-check_grad_stats(biases_grad_df)
+assert utils.check_grad_stats(biases_grad_df), "Gradients are zero"
 
 # %%
-plotting.plot_weights_biases_distributions(
+viz.plot_weights_biases_distributions(
     weights_grad_df, biases_grad_df, label="Gradients", figpath=CURRENT_PATH
 )
 
@@ -1211,93 +744,13 @@ weights_grad_stats
 # %%
 biases_grad_stats
 
-
 # %%
-def plot_weights_biases_stats(weights_stats, biases_stats, label=None, figpath=None):
-    fig, ax = plt.subplots(nrows=2, ncols=2, figsize=(13, 8))
-
-    if label:
-        ax[0, 0].set_title("Weights " + label)
-    else:
-        ax[0, 0].set_title("Weights")
-    ax[0, 0].set_xlabel("Episodes")
-    palette = sns.color_palette()[0 : len(weights_stats.Layer.unique())]
-    sns.lineplot(
-        data=weights_stats,
-        x="Index",
-        y="Std",
-        hue="Layer",
-        palette=palette,
-        ax=ax[0, 0],
-    )
-    ax[0, 0].set(yscale="log")
-
-    if label:
-        ax[0, 1].set_title("Weights " + label)
-    else:
-        ax[0, 1].set_title("Weights")
-    ax[0, 1].set_xlabel("Episodes")
-    palette = sns.color_palette()[0 : len(weights_stats.Layer.unique())]
-    sns.lineplot(
-        data=weights_stats,
-        x="Index",
-        y="Avg",
-        hue="Layer",
-        palette=palette,
-        ax=ax[0, 1],
-    )
-    ax[0, 1].set(yscale="log")
-
-    if label:
-        ax[1, 0].set_title("Biases " + label)
-    else:
-        ax[1, 0].set_title("Biases")
-    ax[1, 0].set_xlabel("Steps")
-    palette = sns.color_palette()[0 : len(biases_stats.Layer.unique())]
-    sns.lineplot(
-        data=biases_stats,
-        x="Index",
-        y="Std",
-        hue="Layer",
-        palette=palette,
-        ax=ax[1, 0],
-    )
-    ax[1, 0].set(yscale="log")
-
-    if label:
-        ax[1, 1].set_title("Biases " + label)
-    else:
-        ax[1, 1].set_title("Biases")
-    ax[1, 1].set_xlabel("Steps")
-    palette = sns.color_palette()[0 : len(biases_stats.Layer.unique())]
-    sns.lineplot(
-        data=biases_stats,
-        x="Index",
-        y="Avg",
-        hue="Layer",
-        palette=palette,
-        ax=ax[1, 1],
-    )
-    ax[1, 1].set(yscale="log")
-
-    fig.tight_layout()
-    fig.patch.set_alpha(0)
-    fig.patch.set_facecolor("white")
-    if figpath:
-        fig.savefig(
-            figpath / f"weights-biases-stats-{label}.png",
-            bbox_inches="tight",
-        )
-    plt.show()
-
-
-# %%
-plot_weights_biases_stats(
+viz.plot_weights_biases_stats(
     weights_val_stats, biases_val_stats, label="values", figpath=CURRENT_PATH
 )
 
 # %%
-plot_weights_biases_stats(
+viz.plot_weights_biases_stats(
     weights_grad_stats, biases_grad_stats, label="gradients", figpath=CURRENT_PATH
 )
 

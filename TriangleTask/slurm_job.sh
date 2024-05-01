@@ -16,4 +16,4 @@ module load texlive/20220321-pocclov
 
 # Run program
 . /users/apierre3/RL_Olfaction/.venv/
-python run_experiment.py
+python RL_Olfaction/TriangleTask/run_experiment.py
