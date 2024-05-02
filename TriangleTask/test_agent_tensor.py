@@ -1,6 +1,6 @@
 import pandas as pd
 import torch
-from agent_tensor import EpsilonGreedy
+from .agent_tensor import EpsilonGreedy
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 

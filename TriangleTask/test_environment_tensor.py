@@ -1,7 +1,7 @@
 import pytest
 import torch
-from agent_tensor import EpsilonGreedy
-from environment_tensor import (
+from .agent_tensor import EpsilonGreedy
+from .environment_tensor import (
     Actions,
     Cues,
     OdorCondition,
