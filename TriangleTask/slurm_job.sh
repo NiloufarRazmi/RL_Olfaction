@@ -22,4 +22,6 @@ module load texlive/20220321-pocclov
 
 # Run program
 . /users/apierre3/RL_Olfaction/.venv/bin/activate
-python ./TriangleTask/run_experiment.py
+pip install -Ue .
+# python ./TriangleTask/run_experiment.py
+runexp $$PARAMSFILE
