@@ -1,14 +1,18 @@
 #!/bin/bash
 
+# Run with:
+# export PARAMSFILE="TriangleTask/params.ini"; sbatch TriangleTask/slurm_job.sh
+
 ########## Begin Slurm header ##########
 #SBATCH -p gpu --gres=gpu:1
 #SBATCH -N 1  # Number of node
+##SBATCH -n 1
 #SBATCH -n 4
 #SBATCH --mem=8G
-##SBATCH -t 01:00:00
+##SBATCH -t 00:15:00
 #SBATCH -t 06:00:00
-#SBATCH --partition=gpu-debug
-##SBATCH --account=carney-afleisc2-condo
+##SBATCH --partition=gpu-debug
+#SBATCH --account=carney-afleisc2-condo
 #SBATCH --mail-type=begin       # send email when job begins
 #SBATCH --mail-type=end         # send email when job ends
 #SBATCH --mail-user=andrea_pierre@brown.edu
@@ -24,4 +28,4 @@ module load texlive/20220321-pocclov
 . /users/apierre3/RL_Olfaction/.venv/bin/activate
 pip install -Ue .
 # python ./TriangleTask/run_experiment.py
-runexp $$PARAMSFILE
+runexp $PARAMSFILE
