@@ -33,5 +33,7 @@ dependencies:
   # - torchinfo
   - pytest
   - tensordict
+  - click
   - pip:
       - imojify
+      - -e .

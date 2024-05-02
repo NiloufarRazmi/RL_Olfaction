@@ -149,6 +149,7 @@ p = Params(
     # target_net_update=200,
     tau=0.005,
     experiment_tag="scratch",
+    layer_inspected=6 - 1,
 )
 p
 
@@ -226,20 +227,20 @@ def neural_network():
     #     net = DQN(
     #         n_observations=p.n_observations,
     #         n_actions=p.n_actions,
-    #         n_units=p.nHiddenUnits,
+    #         n_units=p.n_hidden_units,
     #     ).to(DEVICE)
     # net
 
     net = DQN(
         n_observations=p.n_observations,
         n_actions=p.n_actions,
-        n_units=p.nHiddenUnits,
+        n_units=p.n_hidden_units,
     ).to(DEVICE)
 
     target_net = DQN(
         n_observations=p.n_observations,
         n_actions=p.n_actions,
-        n_units=p.nHiddenUnits,
+        n_units=p.n_hidden_units,
     ).to(DEVICE)
 
     target_net.load_state_dict(net.state_dict())

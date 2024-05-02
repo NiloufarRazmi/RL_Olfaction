@@ -24,5 +24,7 @@ ruff:
 	ruff check
 
 lint: ## Lint all files
-	# make flake8
 	make ruff
+
+env-update: ## Update the Conda environment & install CLI
+	mamba env update -f environment.yml

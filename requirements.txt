@@ -16,3 +16,4 @@ scikit-learn
 imojify
 notebook
 ipykernel
+click

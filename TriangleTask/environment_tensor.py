@@ -3,7 +3,7 @@ from enum import Enum
 
 import torch
 import torch.nn.functional as F
-from utils import make_deterministic, random_choice
+from .utils import make_deterministic, random_choice
 
 
 class OdorCondition(Enum):

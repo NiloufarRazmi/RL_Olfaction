@@ -1,5 +1,7 @@
+from pathlib import Path
 from tqdm import tqdm
 
+import click
 import numpy as np
 import pandas as pd
 import torch
@@ -7,39 +9,17 @@ import torch.optim as optim
 import torch.nn as nn
 
 from collections import namedtuple, deque
-from agent_tensor import neural_network, EpsilonGreedy
-from environment_tensor import WrappedEnvironment, Actions, Cues, CONTEXTS_LABELS
-import plotting as viz
-import utils
 
-p = utils.Params(
-    # seed=42,
-    # seed=123,
-    n_runs=1,
-    total_episodes=60,
-    epsilon=0.5,
-    alpha=1e-4,
-    gamma=0.99,
-    # nHiddenUnits=(5 * 5 + 3) * 5,
-    nHiddenUnits=128,
-    replay_buffer_max_size=5000,
-    epsilon_min=0.2,
-    epsilon_max=1.0,
-    decay_rate=0.01,
-    epsilon_warmup=100,
-    batch_size=32,
-    # target_net_update=200,
-    tau=0.005,
-    experiment_tag="scratch",
-    layer_inspected=6 - 1,
-)
-CURRENT_PATH = utils.create_save_path(p.experiment_tag)
-LOGGER = utils.get_logger(current_path=CURRENT_PATH)
-GENERATOR = utils.make_deterministic(seed=p.seed)
+from .agent_tensor import neural_network, EpsilonGreedy
+from .environment_tensor import WrappedEnvironment, Actions, Cues, CONTEXTS_LABELS
+from . import plotting as viz
+from . import utils
+
+
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
-def training_loop():
+def training_loop(p, current_path, logger, generator=None):
     Transition = namedtuple(
         "Transition", ("state", "action", "reward", "next_state", "done")
     )
@@ -57,14 +37,14 @@ def training_loop():
         state = env.reset()
         p.n_actions = env.numActions
         p.n_observations = len(state)
-        LOGGER.info(f"Number of actions: {p.n_actions}")
-        LOGGER.info(f"Number of observations: {p.n_observations}")
+        logger.info(f"Number of actions: {p.n_actions}")
+        logger.info(f"Number of observations: {p.n_observations}")
 
         # Reset everything
         net, target_net = neural_network(
             n_observations=p.n_observations,
             n_actions=p.n_actions,
-            nHiddenUnits=p.nHiddenUnits,
+            nHiddenUnits=p.n_hidden_units,
         )  # Reset weights
         optimizer = optim.AdamW(net.parameters(), lr=p.alpha, amsgrad=True)
         explorer = EpsilonGreedy(
@@ -125,7 +105,7 @@ def training_loop():
                         replay_buffer,
                         length=len(replay_buffer),
                         num_samples=p.batch_size,
-                        generator=GENERATOR,
+                        generator=generator,
                     )
                     batch = Transition(*zip(*transitions, strict=True))
                     state_batch = torch.stack(batch.state)
@@ -249,7 +229,7 @@ def training_loop():
 
             rewards[episode, run] = total_rewards
             steps[episode, run] = step_count
-            LOGGER.info(
+            logger.info(
                 f"Run: {run+1}/{p.n_runs} - Episode: {episode+1}/{p.total_episodes} - Steps: {step_count} - Loss: {loss.item()}"
             )
         weights_val_stats.set_index("Index", inplace=True)
@@ -275,11 +255,11 @@ def training_loop():
         "net": net,
         "env": env,
     }
-    data_path = utils.save_data(data_dict=data_dict, current_path=CURRENT_PATH)
+    data_path = utils.save_data(data_dict=data_dict, current_path=current_path)
     return data_path
 
 
-def visualization_plots(data_path):
+def visualization_plots(data_path, p, current_path, logger):
     # Load data from disk
     with open(data_path, "rb") as fhd:
         # Load the arrays from the .npz file
@@ -313,7 +293,7 @@ def visualization_plots(data_path):
     untrained_net, _ = neural_network(
         n_observations=p.n_observations,
         n_actions=p.n_actions,
-        nHiddenUnits=p.nHiddenUnits,
+        nHiddenUnits=p.n_hidden_units,
     )
     weights_untrained = [layer.detach() for layer in untrained_net.parameters()]
 
@@ -338,41 +318,41 @@ def visualization_plots(data_path):
 
     # Plots
     viz.plot_exploration_rate(
-        epsilons, xlabel="Steps", figpath=CURRENT_PATH, logger=LOGGER
+        epsilons, xlabel="Steps", figpath=current_path, logger=logger
     )
-    viz.plot_actions_distribution(all_actions, figpath=CURRENT_PATH, logger=LOGGER)
-    viz.plot_steps_and_rewards_dist(rew_steps_df, figpath=CURRENT_PATH, logger=LOGGER)
+    viz.plot_actions_distribution(all_actions, figpath=current_path, logger=logger)
+    viz.plot_steps_and_rewards_dist(rew_steps_df, figpath=current_path, logger=logger)
     viz.plot_steps_and_rewards(
-        rew_steps_df, n_runs=p.n_runs, figpath=CURRENT_PATH, logger=LOGGER
+        rew_steps_df, n_runs=p.n_runs, figpath=current_path, logger=logger
     )
-    viz.plot_loss(loss_df, n_runs=p.n_runs, figpath=CURRENT_PATH, logger=LOGGER)
+    viz.plot_loss(loss_df, n_runs=p.n_runs, figpath=current_path, logger=logger)
     viz.plot_policies(
         q_values=q_values,
         labels=CONTEXTS_LABELS,
         n_rows=env.rows,
         n_cols=env.cols,
-        figpath=CURRENT_PATH,
-        logger=LOGGER,
+        figpath=current_path,
+        logger=logger,
     )
     viz.plot_weights_matrices(
         weights_untrained=weights_untrained,
         weights_trained=[layer for layer in net.parameters()],
-        figpath=CURRENT_PATH,
-        logger=LOGGER,
+        figpath=current_path,
+        logger=logger,
     )
     viz.plot_activations(
         activations_layer_df=activations_layer_df,
         input_cond=input_cond,
         labels=CONTEXTS_LABELS,
         layer_inspected=p.layer_inspected,
-        figpath=CURRENT_PATH,
+        figpath=current_path,
     )
     viz.plot_weights_biases_distributions(
         weights_val_df,
         biases_val_df,
         label="Values",
-        figpath=CURRENT_PATH,
-        logger=LOGGER,
+        figpath=current_path,
+        logger=logger,
     )
     if utils.check_grad_stats(weights_grad_df) or utils.check_grad_stats(
         biases_grad_df
@@ -381,8 +361,8 @@ def visualization_plots(data_path):
             weights_grad_df,
             biases_grad_df,
             label="Gradients",
-            figpath=CURRENT_PATH,
-            logger=LOGGER,
+            figpath=current_path,
+            logger=logger,
         )
     else:
         msg = "Gradients are zero"
@@ -393,19 +373,41 @@ def visualization_plots(data_path):
             weights_val_stats,
             biases_val_stats,
             label="values",
-            figpath=CURRENT_PATH,
-            logger=LOGGER,
+            figpath=current_path,
+            logger=logger,
         )
     if weights_grad_stats and biases_grad_stats:
         viz.plot_weights_biases_stats(
             weights_grad_stats,
             biases_grad_stats,
             label="gradients",
-            figpath=CURRENT_PATH,
-            logger=LOGGER,
+            figpath=current_path,
+            logger=logger,
         )
 
 
+@click.command()
+@click.argument(
+    "paramsfile",
+    type=click.Path(exists=True),
+    required=True,
+)
+def cli(paramsfile):
+    """Run the main command-line function."""
+    paramsfile = Path(paramsfile)
+    p = utils.get_exp_params_from_config(config_path=paramsfile)
+    current_path = utils.create_save_path(p.experiment_tag)
+    logger = utils.get_logger(current_path=current_path)
+    generator = utils.make_deterministic(seed=p.seed)
+
+    data_path = training_loop(
+        p=p, current_path=current_path, logger=logger, generator=generator
+    )
+    visualization_plots(
+        data_path=data_path, p=p, current_path=current_path, logger=logger
+    )
+    return
+
+
 if __name__ == "__main__":
-    data_path = training_loop()
-    visualization_plots(data_path=data_path)
+    cli()

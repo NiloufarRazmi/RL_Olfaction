@@ -1,3 +1,4 @@
+import configparser
 from collections import OrderedDict
 import datetime
 from pathlib import Path
@@ -31,7 +32,7 @@ class Params:
     epsilon_min: float = 0.1
     epsilon_max: float = 1.0
     decay_rate: float = 0.05
-    epsilon_warmup: float = 100
+    epsilon_warmup: int = 100
 
     # Learning parameters
     gamma: float = 0.8
@@ -39,7 +40,7 @@ class Params:
 
     # Deep network
     nLayers: int = 5
-    nHiddenUnits: int = 20
+    n_hidden_units: int = 20
 
     # Environment
     # action_size: Optional[int] = None
@@ -306,3 +307,40 @@ def get_activations_learned(net, env, layer_inspected, contexts_labels):
     activations_layer_df["Input"] = list(input_cond.keys())
     activations_layer_df.set_index("Input", inplace=True)
     return input_cond, activations_layer_df
+
+
+def get_exp_params_from_config(config_path):
+    print(f"Experiments parameters path: {config_path.absolute()}")
+    config = configparser.ConfigParser()
+    config.read(config_path)
+    params = {}
+    for key in config["experiment"]:
+        if key in [
+            "seed",
+            "n_runs",
+            "total_episodes",
+            "n_layers",
+            "n_hidden_units",
+            "n_observations",
+            "n_actions",
+            "replay_buffer_max_size",
+            "batch_size",
+            "target_net_update",
+            "layer_inspected",
+            "epsilon_warmup",
+        ]:
+            params[key] = int(config["experiment"][key])
+        elif key in [
+            "epsilon",
+            "epsilon_min",
+            "epsilon_max",
+            "decay_rate",
+            "gamma",
+            "alpha",
+            "tau",
+        ]:
+            params[key] = float(config["experiment"][key])
+        else:
+            params[key] = config["experiment"][key]
+    p = Params(**params)
+    return p

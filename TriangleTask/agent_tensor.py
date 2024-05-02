@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from utils import make_deterministic, random_choice
+from .utils import make_deterministic, random_choice
 
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")

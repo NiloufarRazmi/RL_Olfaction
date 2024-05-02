@@ -15,7 +15,7 @@ import torch
 from imojify import imojify
 
 # from utils import get_location_count
-from environment_tensor import Actions, TriangleState
+from .environment_tensor import Actions, TriangleState
 
 sns.set_theme(font_scale=1.5)
 # plt.style.use("ggplot")

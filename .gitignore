@@ -16,3 +16,4 @@ tmp/
 *.fdb_latexmk
 .virtual_documents
 .spyproject
+**/*.egg-info
