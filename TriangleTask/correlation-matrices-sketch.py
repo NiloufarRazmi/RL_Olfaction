@@ -168,6 +168,8 @@ with plt.xkcd():
             lw=2,
             int_line_num=2,
         )
+    # fig.patch.set_alpha(0)
+    # fig.patch.set_facecolor("white")
 
     plt.show()
 

@@ -1,0 +1,76 @@
+% % \begin{figure}%[htb]
+%     \centering
+%     \begin{adjustbox}{max width=\columnwidth, keepaspectratio}
+%     % \begin{adjustbox}{max width=.45\textwidth, keepaspectratio}
+%     \begin{ganttchart}[
+%         y unit title=0.4cm,
+%         y unit chart=0.5cm,
+%         x unit=0.8cm,
+%         vgrid,
+%         time slot format=isodate-yearmonth,
+%         time slot unit=month,
+%         title/.append style={draw=none, fill=white!20!black},
+%         title label font=\sffamily\bfseries\color{white},
+%         title label node/.append style={below=-2.5ex},
+%         title left shift=.05,
+%         title right shift=-.05,
+%         title height=1,
+%         bar/.append style={draw=none, fill=white!50!black},
+%         bar height=.6,
+%         bar label font=\normalsize\color{black!50},
+%         group right shift=0,
+%         group top shift=.6,
+%         group height=.2,
+%         group peaks height=.3,
+%         bar incomplete/.append style={fill=Maroon}
+%         ]{2024-03}{2024-09}
+%         \gantttitlecalendar{year, month=shortname} \\
+%         \ganttgroup{New baseline}{2024-05-15}{2024-06-30} \\
+%         \ganttbar{Write environment logic}{2024-05-15}{2024-05-31} \\
+%         \ganttlinkedbar{Baseline training}{2024-06-01}{2024-06-30} \\
+
+%         \ganttgroup{Community work}{2024-04}{2024-08} \\
+%         \ganttbar{Raise issue}{2024-04}{2024-04} \\
+%         \ganttlinkedbar{\textcolor{green!25}{Work on PR}}{2024-06}{2024-06} \\
+%         \ganttlinkedbar{\textcolor{blue}{Merge PR}}{2024-08}{2024-08} \\
+%     \end{ganttchart}
+%     \end{adjustbox}
+% % \end{figure}
+
+
+\begin{adjustbox}{max width=\columnwidth, keepaspectratio}
+\begin{ganttchart}[
+y unit title=0.4cm,
+y unit chart=0.5cm,
+vgrid,
+time slot format=isodate-yearmonth,
+time slot unit=month,
+title/.append style={draw=none, fill=blue!50!black},
+title label font=\sffamily\bfseries\color{white},
+title label node/.append style={below=-1.6ex},
+title left shift=.05,
+title right shift=-.05,
+title height=1,
+bar/.append style={draw=none, fill=gray!75},
+bar height=.6,
+bar label font=\normalsize\color{black!50},
+group right shift=0,
+group top shift=.6,
+group height=.3,
+group peaks height=.2,
+bar incomplete/.append style={fill=gray}
+]{2024-01}{2024-12}
+\gantttitlecalendar{year} \\
+\ganttset{progress label text={}, link/.style={black, -to}}
+
+\ganttgroup{New baseline}{2024-05-15}{2024-06} \\
+\ganttbar{Write new environment}{2024-05-15}{2024-05-31} \\
+\ganttlinkedbar{Baseline training}{2024-06-01}{2024-06-30} \\
+\ganttgroup{Objective 2}{2024-01}{2024-12} \\
+\ganttbar{Task A}{2024-01}{2024-09} \\
+\ganttlinkedbar{Task B}{2024-10}{2024-12} \\
+\ganttgroup{Objective 3}{2024-05}{2024-08} \\
+\ganttbar{Task A}{2024-05}{2024-08}
+\ganttset{link/.style={green}}
+\end{ganttchart}
+\end{adjustbox}

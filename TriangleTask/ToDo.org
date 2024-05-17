@@ -1,16 +1,8 @@
 #+title: To-Do
-* Running is slow
-** DONE Implement checkpointing to save the model parameters and not have to start from scratch everytime
-[[https://pytorch.org/tutorials/beginner/saving_loading_models.html#saving-loading-a-general-checkpoint-for-inference-and-or-resuming-training]]
-** Profile code on the GPU
-** DONE Simplify model
-*** DONE Remove target network?
-*** DONE Remove replay traces?
-*** DONE Replace decaying \epsilon-greedy with my own
-* TODO Remote GPU
-** TODO Run as batch script
+* DONE Remote GPU
+** DONE Run as batch script
 *** DONE Run Jupytext converted script
-*** TODO Convert training as a script with arguments
+*** DONE Convert training as a script with arguments
 **** Notebook should be refactored for loading weights, inference and plotting
 **** Example:
 [[https://github.com/NICALab/SUPPORT/blob/main/src/train.py][~train.py~ example script]] which can be run with ~python -m src.train --exp_name mytest --n_epochs 11 --checkpoint_interval 10~

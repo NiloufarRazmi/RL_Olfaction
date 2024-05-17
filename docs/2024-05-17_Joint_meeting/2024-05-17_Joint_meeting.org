@@ -1,0 +1,88 @@
+#+MACRO: faicon \faicon{$1}
+#+MACRO: col \colorbox{black!15!white}{[$1]}
+#+TITLE: Research plan
+#+SUBTITLE: Fleischmann -- Nassar joint meeting
+#+author: Andrea Pierré
+#+date: May 17, 2024
+* HEADER :noexport:
+#+SETUPFILE: ./style.org
+
+* Conceptual directions & questions {{{faicon(question-circle)}}}
+** What do we want to know?
+:PROPERTIES:
+:BEAMER_act: [<+->]
+:END:
+- Understand what the network learns
+  \to What *function* does it learns?
+- How the constrains of the task affect learning & the representations learned?
+- Does the network learn something related to the real neurons? (million {{{faicon(dollar)}}}{{{faicon(dollar)}}}{{{faicon(dollar)}}} question)
+** Compositional hypothesis
+- From indexed locations (current) to coordinate system \to does the network learn a generalizable policy?
+- Merged actions space
+** Compositional hypothesis
+[[file:img/env_new-triangle-task.drawio.png]]
+** Implementation
+[[file:img/nn.drawio.png]]
+* Experiments & expected results {{{faicon(eyedropper)}}} {{{faicon(area-chart)}}}
+** 1) How training impacts the representations learned?
+:PROPERTIES:
+:BEAMER_act: [<+->]
+:END:
+- Feed both coordinates information (Cartesian & polar) to the input layer (+ merge actions spaces in a common one)
+- Train on left/right task \to we expect the weights are close to zero on Cartesian representation?
+- Train on east/west task \to we expect the weights are close to zero on polar representation?
+- Not clear to me how to extract/define which neurons belong/contribute to Cartesian/polar representation
+** 1) How training impacts the representations learned?
+[[file:img/exp1-weights-heatmap.png]]
+** 2) Does the network learn a coordinate system?
+:PROPERTIES:
+:BEAMER_act: [<+->]
+:END:
+1. After training, move the population of agents in a translated coordinate system
+   \to we expect the population of agents to be able to solve the task with zero shot learning
+2. Train with both coordinates information (Cartesian & polar), after training feed incorrect polar angles
+   - On the left/right task \to we expect the population of agents still solves the task consistently
+   - On the east/west task \to we expect the network doesn't converge to a stable policy (i.e all the agents don't solve the task consistently)
+** 2) Does the network learn a coordinate system?
+[[file:img/exp2-boxplot.png]]
+*** TODO Heatmap of all the units :noexport:
+- Function from angle to neural activations
+- Y: Layer activations
+- X: deviation from the angle that should have been predicted
+** 3) Conjunctive odor-place coding
+:PROPERTIES:
+:BEAMER_act: [<+->]
+:END:
+- Train a population of agents, then after training, flip odor A and odor B in the task
+- In general we expect to find a population of conjunctive neurons that get active with the combination of both odor and specific location
+- Do the conjunctive cells get conserved or remapped? (Not clear to me, I'd expect they get remapped)
+*** TODO Matrix plot :noexport:
+* Roadmap {{{faicon(road)}}}
+** Milestones/how to get there
+:PROPERTIES:
+:BEAMER_act: [<+->]
+:END:
+1. Rewrite the environment(s) {{{faicon(star)}}}{{{faicon(star)}}}{{{faicon(star-o)}}}
+   1. Code logic for new environment {{{col($\textasciitilde$1 week)}}}
+   2. Check everything works as expected (unit testing) {{{col($\textasciitilde$1 week)}}}
+   3. Bugs? {{{col($\textasciitilde$1 week)}}}
+2. Baseline training on new environment (convergence, hyperparameter tweaking, etc.) {{{faicon(star)}}}{{{faicon(star)}}}{{{faicon(star)}}}{{{faicon(warning)}}} {{{col(1 week -- 1 month)}}}
+3. Experiments
+   1. Task code {{{faicon(star)}}}{{{faicon(star-o)}}}{{{faicon(star-o)}}} {{{col($\textasciitilde$1 week)}}}
+   2. Training {{{faicon(star)}}}{{{faicon(star)}}}{{{faicon(star-o)}}}{{{faicon(warning)}}} {{{col($\textasciitilde$2 week)}}}
+   3. Analysis code {{{faicon(star)}}}{{{faicon(star)}}}{{{faicon(star-o)}}} {{{col($\textasciitilde$2 week)}}}
+** TODO Planning :noexport:
+#+ATTR_LaTeX: :width \textwidth
+#+INCLUDE: "./planning.tex" src latex
+** \nbsp{}
+:PROPERTIES:
+:BEAMER_opt: standout
+:END:
+Thanks!
+
+* COMMENT Add plain option to Beamer TOC
+% Local variables:
+% org-beamer-outline-frame-options: "plain"
+% End:
+
+* Feedback :noexport:
