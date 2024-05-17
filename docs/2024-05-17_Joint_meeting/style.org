@@ -31,7 +31,7 @@
 # Show section number in the table of contents
 #+BEAMER_HEADER: \setbeamertemplate{section in toc}[sections numbered]
 # Show table of content between each section, do not increment the frame numbering and do not show the footer
-#+BEAMER_HEADER: \AtBeginSection[]{\begin{frame}[plain, noframenumbering]{Outline}    \setbeamertemplate{section in toc}[sections numbered]\setbeamertemplate{subsection in toc}[subsections numbered]\vspace{-0.8em}\tableofcontents[currentsection, currentsubsection]\end{frame}}
+#+BEAMER_HEADER: \AtBeginSection[]{\begin{frame}[plain, noframenumbering]{Outline}    \setbeamertemplate{section in toc}[sections numbered]\setbeamertemplate{subsection in toc}[subsections numbered]\tableofcontents[currentsection, currentsubsection]\end{frame}}
 #+BEAMER_HEADER: \AtBeginSubsection[]{\begin{frame}[plain, noframenumbering]{Outline}\setbeamertemplate{section in toc}[sections numbered]\setbeamertemplate{subsection in toc}[subsections numbered]\tableofcontents[currentsection,currentsubsection]\end{frame}}
 
 # Brown color styling

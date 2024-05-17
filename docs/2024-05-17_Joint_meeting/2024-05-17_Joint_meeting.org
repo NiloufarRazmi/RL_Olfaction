@@ -7,7 +7,7 @@
 * HEADER :noexport:
 #+SETUPFILE: ./style.org
 
-* Conceptual directions & questions {{{faicon(question-circle)}}}
+* Hypothesis & directions {{{faicon(question-circle)}}}
 ** What do we want to know?
 :PROPERTIES:
 :BEAMER_act: [<+->]
@@ -17,8 +17,12 @@
 - How the constrains of the task affect learning & the representations learned?
 - Does the network learn something related to the real neurons? (million {{{faicon(dollar)}}}{{{faicon(dollar)}}}{{{faicon(dollar)}}} question)
 ** Compositional hypothesis
-- From indexed locations (current) to coordinate system \to does the network learn a generalizable policy?
-- Merged actions space
+:PROPERTIES:
+:BEAMER_act: [<+->]
+:END:
+- Does the network learn a generalizable policy? \to\nbsp{}How to test it?
+  - From indexed locations (current) to coordinate system
+  - Merged actions space
 ** Compositional hypothesis
 [[file:img/env_new-triangle-task.drawio.png]]
 ** Implementation
@@ -42,7 +46,7 @@
    \to we expect the population of agents to be able to solve the task with zero shot learning
 2. Train with both coordinates information (Cartesian & polar), after training feed incorrect polar angles
    - On the left/right task \to we expect the population of agents still solves the task consistently
-   - On the east/west task \to we expect the network doesn't converge to a stable policy (i.e all the agents don't solve the task consistently)
+   - On the east/west task \to we expect the network won't converge to a stable policy (i.e all the agents don't solve the task consistently)
 ** 2) Does the network learn a coordinate system?
 [[file:img/exp2-boxplot.png]]
 *** TODO Heatmap of all the units :noexport:
@@ -56,7 +60,7 @@
 - Train a population of agents, then after training, flip odor A and odor B in the task
 - In general we expect to find a population of conjunctive neurons that get active with the combination of both odor and specific location
 - Do the conjunctive cells get conserved or remapped? (Not clear to me, I'd expect they get remapped)
-*** TODO Matrix plot :noexport:
+  [[file:img/cell-types.png]]
 * Roadmap {{{faicon(road)}}}
 ** Milestones/how to get there
 :PROPERTIES:

@@ -1,4 +1,4 @@
-% Created 2024-05-17 Fri 03:54
+% Created 2024-05-17 Fri 09:26
 % Intended LaTeX compiler: lualatex
 \documentclass[bigger]{beamer}
 \usepackage{amsmath}
@@ -62,7 +62,7 @@ tabsize=2
 \titlegraphic{\hfill\includegraphics[height=1.5cm]{img/Brown Logo_2016_2 Color Process ST_1300.png}}
 \setbeamercovered{transparent=10}
 \setbeamertemplate{section in toc}[sections numbered]
-\AtBeginSection[]{\begin{frame}[plain, noframenumbering]{Outline}    \setbeamertemplate{section in toc}[sections numbered]\setbeamertemplate{subsection in toc}[subsections numbered]\vspace{-0.8em}\tableofcontents[currentsection, currentsubsection]\end{frame}}
+\AtBeginSection[]{\begin{frame}[plain, noframenumbering]{Outline}    \setbeamertemplate{section in toc}[sections numbered]\setbeamertemplate{subsection in toc}[subsections numbered]\tableofcontents[currentsection, currentsubsection]\end{frame}}
 \AtBeginSubsection[]{\begin{frame}[plain, noframenumbering]{Outline}\setbeamertemplate{section in toc}[sections numbered]\setbeamertemplate{subsection in toc}[subsections numbered]\tableofcontents[currentsection,currentsubsection]\end{frame}}
 \hypersetup{
  pdfauthor={Andrea Pierré},
@@ -78,9 +78,9 @@ tabsize=2
 \tableofcontents
 \end{frame}
 
-\section{Conceptual directions \& questions \faicon{question-circle}}
-\label{sec:orga5c26cb}
-\begin{frame}[<+->][label={sec:org422f1d5}]{What do we want to know?}
+\section{Hypothesis \& directions \faicon{question-circle}}
+\label{sec:org99b0d5c}
+\begin{frame}[<+->][label={sec:org0593a3a}]{What do we want to know?}
 \begin{itemize}
 \item Understand what the network learns
 \(\to\) What \alert{function} does it learns?
@@ -88,25 +88,28 @@ tabsize=2
 \item Does the network learn something related to the real neurons? (million \faicon{dollar}\faicon{dollar}\faicon{dollar} question)
 \end{itemize}
 \end{frame}
-\begin{frame}[label={sec:orgf3fe8b7}]{Compositional hypothesis}
+\begin{frame}[<+->][label={sec:org1366ba2}]{Compositional hypothesis}
 \begin{itemize}
-\item From indexed locations (current) to coordinate system \(\to\) does the network learn a generalizable policy?
+\item Does the network learn a generalizable policy? \(\to\)~How to test it?
+\begin{itemize}
+\item From indexed locations (current) to coordinate system
 \item Merged actions space
 \end{itemize}
+\end{itemize}
 \end{frame}
-\begin{frame}[label={sec:orgdb095a5}]{Compositional hypothesis}
+\begin{frame}[label={sec:orgd0450ed}]{Compositional hypothesis}
 \begin{center}
 \includegraphics[width=.9\linewidth]{img/env_new-triangle-task.drawio.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org5cd5afd}]{Implementation}
+\begin{frame}[label={sec:org934d203}]{Implementation}
 \begin{center}
 \includegraphics[width=.9\linewidth]{img/nn.drawio.png}
 \end{center}
 \end{frame}
 \section{Experiments \& expected results \faicon{eyedropper} \faicon{area-chart}}
-\label{sec:orgca6f00f}
-\begin{frame}[<+->][label={sec:org772cab1}]{1) How training impacts the representations learned?}
+\label{sec:org4be11b0}
+\begin{frame}[<+->][label={sec:org1e29ec6}]{1) How training impacts the representations learned?}
 \begin{itemize}
 \item Feed both coordinates information (Cartesian \& polar) to the input layer (+ merge actions spaces in a common one)
 \item Train on left/right task \(\to\) we expect the weights are close to zero on Cartesian representation?
@@ -114,37 +117,40 @@ tabsize=2
 \item Not clear to me how to extract/define which neurons belong/contribute to Cartesian/polar representation
 \end{itemize}
 \end{frame}
-\begin{frame}[label={sec:orga34032d}]{1) How training impacts the representations learned?}
+\begin{frame}[label={sec:orgcf076ee}]{1) How training impacts the representations learned?}
 \begin{center}
 \includegraphics[width=.9\linewidth]{img/exp1-weights-heatmap.png}
 \end{center}
 \end{frame}
-\begin{frame}[<+->][label={sec:org8e0c19d}]{2) Does the network learn a coordinate system?}
+\begin{frame}[<+->][label={sec:orgdb1dafa}]{2) Does the network learn a coordinate system?}
 \begin{enumerate}
 \item After training, move the population of agents in a translated coordinate system
 \(\to\) we expect the population of agents to be able to solve the task with zero shot learning
 \item Train with both coordinates information (Cartesian \& polar), after training feed incorrect polar angles
 \begin{itemize}
 \item On the left/right task \(\to\) we expect the population of agents still solves the task consistently
-\item On the east/west task \(\to\) we expect the network doesn't converge to a stable policy (i.e all the agents don't solve the task consistently)
+\item On the east/west task \(\to\) we expect the network won't converge to a stable policy (i.e all the agents don't solve the task consistently)
 \end{itemize}
 \end{enumerate}
 \end{frame}
-\begin{frame}[label={sec:org3ecf81b}]{2) Does the network learn a coordinate system?}
+\begin{frame}[label={sec:org49d07f6}]{2) Does the network learn a coordinate system?}
 \begin{center}
 \includegraphics[width=.9\linewidth]{img/exp2-boxplot.png}
 \end{center}
 \end{frame}
-\begin{frame}[<+->][label={sec:orgd1b69a9}]{3) Conjunctive odor-place coding}
+\begin{frame}[<+->][label={sec:org4674001}]{3) Conjunctive odor-place coding}
 \begin{itemize}
 \item Train a population of agents, then after training, flip odor A and odor B in the task
 \item In general we expect to find a population of conjunctive neurons that get active with the combination of both odor and specific location
 \item Do the conjunctive cells get conserved or remapped? (Not clear to me, I'd expect they get remapped)
+\begin{center}
+\includegraphics[width=.9\linewidth]{img/cell-types.png}
+\end{center}
 \end{itemize}
 \end{frame}
 \section{Roadmap \faicon{road}}
-\label{sec:org61e243e}
-\begin{frame}[<+->][label={sec:orgacec153}]{Milestones/how to get there}
+\label{sec:org4ae5ded}
+\begin{frame}[<+->][label={sec:orgbd10d24}]{Milestones/how to get there}
 \begin{enumerate}
 \item Rewrite the environment(s) \faicon{star}\faicon{star}\faicon{star-o}
 \begin{enumerate}
@@ -161,7 +167,7 @@ tabsize=2
 \end{enumerate}
 \end{enumerate}
 \end{frame}
-\begin{frame}[label={sec:orged85e83},standout]{~}
+\begin{frame}[label={sec:org1f6b307},standout]{~}
 Thanks!
 \end{frame}
 \end{document}
