@@ -13,6 +13,9 @@
 #     name: python3
 # ---
 
+# %% [markdown]
+# ## Setup
+
 # %%
 from collections import OrderedDict
 from enum import Enum
@@ -21,6 +24,7 @@ from enum import Enum
 import seaborn as sns
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib.ticker as mticker
 import torch
 import numpy as np
 
@@ -37,6 +41,9 @@ device
 # %load_ext autoreload
 # %autoreload 2
 # # %matplotlib ipympl
+
+# %% [markdown]
+# ## Weights heatmap
 
 # %%
 loc_rand = torch.randn((34, 34)) * 0.2
@@ -253,12 +260,23 @@ df_wrong_angle
 plt.style.use("ggplot")
 with plt.xkcd():
     fig, ax = plt.subplots(1, 2, figsize=(15, 8))
+    palette = sns.color_palette("tab10")
 
-    sns.boxplot(data=df_transl, x="translated_experiment", y="task_solved", ax=ax[0])
+    sns.boxplot(
+        data=df_transl,
+        x="translated_experiment",
+        y="task_solved",
+        ax=ax[0],
+        color=palette[0],
+    )
     ax[0].set(ylim=(0, 1))
 
     sns.boxplot(
-        data=df_wrong_angle, x="incorrect_angle_experiment", y="task_solved", ax=ax[1]
+        data=df_wrong_angle,
+        x="incorrect_angle_experiment",
+        y="task_solved",
+        ax=ax[1],
+        color=palette[1],
     )
 
     fig.patch.set_alpha(0)
@@ -369,5 +387,26 @@ plot_activations(
     labels=CONTEXTS_LABELS,
     layer_inspected="L",
 )
+
+# %% [markdown]
+# ## Deviation from correct angle
+
+# %%
+angle_activations = torch.randn((128, 360), device=device)
+angle_activations
+
+# %%
+# plt.style.use("ggplot")
+with plt.xkcd():
+    fig, ax = plt.subplots(figsize=(12, 12))
+    ax.imshow(angle_activations, extent=[-180, 180, 0, 128])
+    ax.set_title("Mapping from angles to neural activations")
+    ax.set_xlabel("Deviation from correct angle [°]")  # , fontsize=30)
+    ax.set_ylabel("Activations")  # , fontsize=30)
+    ax.set_yticks([])
+    fig.patch.set_alpha(0)
+    fig.patch.set_facecolor("white")
+    fig.tight_layout()
+    plt.show()
 
 # %%

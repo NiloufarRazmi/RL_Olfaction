@@ -1,0 +1,48 @@
+% \begin{figure}%[htb]
+    % \centering
+    \begin{adjustbox}{max width=\columnwidth, keepaspectratio}
+    \begin{ganttchart}[
+        y unit title=1.5em,
+        y unit chart=1.3em,
+        x unit=0.4em,
+        vgrid,
+        time slot format=isodate,
+        time slot unit=day,
+        title/.append style={draw=none, fill=white!20!black},
+        title label font=\sffamily\bfseries\color{white},
+        title left shift=.05,
+        title right shift=-.05,
+        title height=1,
+        bar/.append style={draw=none, fill=white!50!black},
+        bar height=.6,
+        bar label font=\normalsize\color{black!50},
+        group right shift=0,
+        group top shift=.6,
+        group height=.2,
+        group peaks height=.3,
+        bar incomplete/.append style={fill=Maroon},
+        link bulge=2,
+        calendar week text=W~\currentweek,
+        % link tolerance=.1,
+        % link/.style={-},
+        ]{2024-05-13}{2024-09-15}
+        \gantttitlecalendar{year, month=shortname, week=20} \\
+
+        \ganttgroup{New baseline}{2024-05-27}{2024-07-07} \\
+        \ganttbar{New environment(s) logic}{2024-05-27}{2024-06-02} \\
+        \ganttlinkedbar{Unit testing}{2024-06-03}{2024-06-09} \\
+        \ganttlinkedbar{Debugging?}{2024-06-10}{2024-06-16} \\
+        \ganttlinkedbar{New baseline training \faicon{warning}}{2024-06-17}{2024-07-07} \\
+
+        \ganttgroup{Experiments}{2024-07-22}{2024-09-08} \\
+        \ganttbar{Tasks code}{2024-07-22}{2024-07-28} \\
+        \ganttlinkedbar{Training \faicon{warning}}{2024-08-05}{2024-08-25} \\
+        \ganttlinkedbar{Analysis}{2024-08-26}{2024-09-08} \\
+
+        \ganttgroup{Misc.}{2024-05-20}{2024-08-04} \\
+        \ganttbar{NWB paper}{2024-05-20}{2024-05-26} \\
+        \ganttbar{DL+RL summer school}{2024-07-08}{2024-07-17} \\
+        \ganttbar{Holidays}{2024-07-29}{2024-08-04} \\
+    \end{ganttchart}
+    \end{adjustbox}
+% \end{figure}

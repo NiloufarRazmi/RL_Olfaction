@@ -1,13 +1,29 @@
 #+MACRO: faicon \faicon{$1}
 #+MACRO: col \colorbox{black!15!white}{[$1]}
 #+TITLE: Research plan
-#+SUBTITLE: Fleischmann -- Nassar joint meeting
+#+SUBTITLE: Lab meeting
 #+author: Andrea Pierré
-#+date: May 17, 2024
+#+date: May 20, 2024
 * HEADER :noexport:
 #+SETUPFILE: ./style.org
 
-* Hypothesis & directions {{{faicon(question-circle)}}}
+* Context {{{faicon(question-circle)}}}
+
+** TODO Why modeling?
+:PROPERTIES:
+:BEAMER_act: [<+->]
+:END:
+- Posit: You understand a system if you can simulate it
+#+begin_quote
+What I cannot create, I do not understand. --Richard Feynman
+#+end_quote
+- If you have a good enough model you may uncover mechanisms that explain a phenomena
+  - Without a model \to you're limited to describe the *how*
+  - With a model \to you may be able to explain the *why*
+- Test hypothesis
+- Abstraction of the system: makes you think of the parameters/inputs/outputs
+- Find out what is needed to reproduce experimental results, what explains those results
+
 ** What do we want to know?
 :PROPERTIES:
 :BEAMER_act: [<+->]
@@ -27,6 +43,8 @@
 [[file:img/env_new-triangle-task.drawio.png]]
 ** Implementation
 [[file:img/nn.drawio.png]]
+** Example episode
+[[file:img/env_new-steps.drawio.png]]
 * Experiments & expected results {{{faicon(eyedropper)}}} {{{faicon(area-chart)}}}
 ** 1) How training impacts the representations learned?
 :PROPERTIES:
@@ -35,7 +53,6 @@
 - Feed both coordinates information (Cartesian & polar) to the input layer (+ merge actions spaces in a common one)
 - Train on left/right task \to we expect the weights are close to zero on Cartesian representation?
 - Train on east/west task \to we expect the weights are close to zero on polar representation?
-- Not clear to me how to extract/define which neurons belong/contribute to Cartesian/polar representation
 ** 1) How training impacts the representations learned?
 [[file:img/exp1-weights-heatmap.png]]
 ** 2) Does the network learn a coordinate system?
@@ -49,19 +66,31 @@
    - On the east/west task \to we expect the network won't converge to a stable policy (i.e all the agents don't solve the task consistently)
 ** 2) Does the network learn a coordinate system?
 [[file:img/exp2-boxplot.png]]
-*** TODO Heatmap of all the units :noexport:
-- Function from angle to neural activations
-- Y: Layer activations
-- X: deviation from the angle that should have been predicted
-** 3) Conjunctive odor-place coding
-:PROPERTIES:
-:BEAMER_act: [<+->]
-:END:
-- Train a population of agents, then after training, flip odor A and odor B in the task
-- In general we expect to find a population of conjunctive neurons that get active with the combination of both odor and specific location
-- Do the conjunctive cells get conserved or remapped? (Not clear to me, I'd expect they get remapped)
-  [[file:img/cell-types.png]]
+** 2) Does the network learn a coordinate system?
+[[file:img/angles-to-activations.png]]
 * Roadmap {{{faicon(road)}}}
+** Experiments table
+#+begin_export latex
+\scriptsize
+#+end_export
+| Experiment                                         | Agents | Hours estimation |
+|----------------------------------------------------+--------+------------------|
+| left/right Cartesian coordinates from center arena |     30 |                6 |
+| left/right Cartesian coordinates from 3 ports      |     30 |                6 |
+| east/west polar coordinates from center arena      |     30 |                6 |
+| east/west polar coordinates from 3 ports           |     30 |                6 |
+|----------------------------------------------------+--------+------------------|
+| No translation                                     |     30 |                6 |
+| Cartesian translated                               |     30 |                6 |
+| Polar translated                                   |     30 |                6 |
+| left/right correct angle                           |     30 |                6 |
+| left/right incorrect angle                         |     30 |                6 |
+| east/west correct angle                            |     30 |                6 |
+| east/west incorrect angle                          |     30 |                6 |
+|----------------------------------------------------+--------+------------------|
+| Total                                              |    330 |               66 |
+#+TBLFM: @13$2=vsum(@2..@12)::@13$3=vsum(@2..@12)
+
 ** Milestones/how to get there
 :PROPERTIES:
 :BEAMER_act: [<+->]
@@ -70,12 +99,12 @@
    1. Code logic for new environment {{{col($\textasciitilde$1 week)}}}
    2. Check everything works as expected (unit testing) {{{col($\textasciitilde$1 week)}}}
    3. Bugs? {{{col($\textasciitilde$1 week)}}}
-2. Baseline training on new environment (convergence, hyperparameter tweaking, etc.) {{{faicon(star)}}}{{{faicon(star)}}}{{{faicon(star)}}}{{{faicon(warning)}}} {{{col(1 week -- 1 month)}}}
-3. Experiments
+   4. Baseline training on new environment (convergence, hyperparameter tweaking, etc.) {{{faicon(star)}}}{{{faicon(star)}}}{{{faicon(star)}}}{{{faicon(warning)}}} {{{col(1 week -- 1 month)}}}
+2. Experiments
    1. Task code {{{faicon(star)}}}{{{faicon(star-o)}}}{{{faicon(star-o)}}} {{{col($\textasciitilde$1 week)}}}
    2. Training {{{faicon(star)}}}{{{faicon(star)}}}{{{faicon(star-o)}}}{{{faicon(warning)}}} {{{col($\textasciitilde$2 week)}}}
    3. Analysis code {{{faicon(star)}}}{{{faicon(star)}}}{{{faicon(star-o)}}} {{{col($\textasciitilde$2 week)}}}
-** TODO Planning :noexport:
+** Planning
 #+ATTR_LaTeX: :width \textwidth
 #+INCLUDE: "./planning.tex" src latex
 ** \nbsp{}
@@ -96,33 +125,44 @@ Move 31 May to 17th June
 11am
 Niloufar/Matt
 Alex grant presentation after 17th?
-** TODO Sketch steps
+** DONE Sketch steps
 *** How that changes in the coordinate systems
 *** Instead of static
 *** Leave the static sketch on the left
 *** What does it change? What do we gain?
-** TODO No one-hot encoded, need to be x & y
+** No one-hot encoded, need to be x & y
 ** Probabilistic population coding?
 10 neurons how it represent
 ** Polar
 *** From north
 *** From reward port
 ** 3 polar + 3 cartesian
-***
 ** Continuous values for angles
 ** Check DQN continuous/discrete
-** Third layer tuned to?
-*** Identify neurons type cart/polar sensitive
-*** Is this neuron sensitive to polar input
-*** Give it all possible inputs
-*** Function that auto identify the tuning
+** Tuning
+*** We expect the weights are close to zero on Cartesian/polar representation?
+**** Representation == identify neurons tuned to Cartesian/polar inputs
+**** Synthetic electrophysiology
+*** Third layer tuned to?
+**** Identify neurons type cart/polar sensitive
+**** Is this neuron sensitive to polar input?
+**** Give it all possible inputs
+**** TODO Function that auto identify the tuning
 ** Incorrect angle \to what does it mean?
-** Polar fplip north to South
-** Add more tiles -5 to 5 every 1 \to -5 to 5 every 0.5
+*** Polar flip north to South
+** Translation experiment
+*** Add more tiles -5 to 5 every 1 \to -5 to 5 every 0.5
 Network should have learn something else than digits
 ** How many variations of agents are needed
-** Table with conditions
+** DONE Table with conditions
 ** Keep polar in the same direction for now when changing
 ** 2 to 5 different conditions, which ones?
-** Step two: train network
-** Steps 3: only inference
+** Training/planning
+*** Step two: train network
+*** Steps 3: only inference
+** Trouver l'angle à partir de la longueur des côtés du triangle:
+#+begin_src
+length_sin = a
+length_cos = b
+alpha = atan(length_sin/length_cos)*180/pi
+#+end_src
