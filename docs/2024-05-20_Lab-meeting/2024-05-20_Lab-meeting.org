@@ -9,7 +9,7 @@
 
 * Context {{{faicon(question-circle)}}}
 
-** TODO Why modeling?
+** Why modeling?
 :PROPERTIES:
 :BEAMER_act: [<+->]
 :END:
@@ -24,6 +24,21 @@ What I cannot create, I do not understand. --Richard Feynman
 - Abstraction of the system: makes you think of the parameters/inputs/outputs
 - Find out what is needed to reproduce experimental results, what explains those results
 
+** Recap of previous episodes: it's converging! {{{faicon(smile-o)}}}
+#+ATTR_LaTeX: :width \linewidth
+[[file:img/steps-and-rewards.png]]
+** Why is it converging now?
+:PROPERTIES:
+:BEAMER_act: [<+->]
+:END:
+- Lights cues in the state?
+- Start training once replay buffer is full (5000 transitions) instead of when there are enough transitions for a batch (32 transitions)
+- Soft update of the networks weights (instead of sharp transition)
+- Huber loss instead of mean squared error \to should be less sensible to outliers
+- *Remove ReLU on output layer!*
+** What did it learn?
+#+ATTR_LaTeX: :width \linewidth
+[[file:img/policy.png]]
 ** What do we want to know?
 :PROPERTIES:
 :BEAMER_act: [<+->]
@@ -45,7 +60,7 @@ What I cannot create, I do not understand. --Richard Feynman
 [[file:img/nn.drawio.png]]
 ** Example episode
 [[file:img/env_new-steps.drawio.png]]
-* Experiments & expected results {{{faicon(eyedropper)}}} {{{faicon(area-chart)}}}
+* Experiments & expected results {{{faicon(flask)}}} {{{faicon(area-chart)}}}
 ** 1) How training impacts the representations learned?
 :PROPERTIES:
 :BEAMER_act: [<+->]
@@ -73,22 +88,22 @@ What I cannot create, I do not understand. --Richard Feynman
 #+begin_export latex
 \scriptsize
 #+end_export
-| Experiment                                         | Agents | Hours estimation |
-|----------------------------------------------------+--------+------------------|
-| left/right Cartesian coordinates from center arena |     30 |                6 |
-| left/right Cartesian coordinates from 3 ports      |     30 |                6 |
-| east/west polar coordinates from center arena      |     30 |                6 |
-| east/west polar coordinates from 3 ports           |     30 |                6 |
-|----------------------------------------------------+--------+------------------|
-| No translation                                     |     30 |                6 |
-| Cartesian translated                               |     30 |                6 |
-| Polar translated                                   |     30 |                6 |
-| left/right correct angle                           |     30 |                6 |
-| left/right incorrect angle                         |     30 |                6 |
-| east/west correct angle                            |     30 |                6 |
-| east/west incorrect angle                          |     30 |                6 |
-|----------------------------------------------------+--------+------------------|
-| Total                                              |    330 |               66 |
+| Experiment                                         | Agents | Training estimation [hours] |
+|----------------------------------------------------+--------+-----------------------------|
+| left/right Cartesian coordinates from center arena |     20 |                           6 |
+| left/right Cartesian coordinates from 3 ports      |     20 |                           6 |
+| east/west polar coordinates from center arena      |     20 |                           6 |
+| east/west polar coordinates from 3 ports           |     20 |                           6 |
+|----------------------------------------------------+--------+-----------------------------|
+| No translation                                     |     20 |                           6 |
+| Cartesian translated                               |     20 |                           6 |
+| Polar translated                                   |     20 |                           6 |
+| left/right correct angle                           |     20 |                           6 |
+| left/right incorrect angle                         |     20 |                           6 |
+| east/west correct angle                            |     20 |                           6 |
+| east/west incorrect angle                          |     20 |                           6 |
+|----------------------------------------------------+--------+-----------------------------|
+| Total                                              |    220 |                          66 |
 #+TBLFM: @13$2=vsum(@2..@12)::@13$3=vsum(@2..@12)
 
 ** Milestones/how to get there

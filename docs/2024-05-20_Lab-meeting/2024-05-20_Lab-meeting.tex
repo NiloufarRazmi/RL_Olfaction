@@ -1,4 +1,4 @@
-% Created 2024-05-20 Mon 01:41
+% Created 2024-05-20 Mon 08:18
 % Intended LaTeX compiler: lualatex
 \documentclass[bigger]{beamer}
 \usepackage{amsmath}
@@ -79,9 +79,9 @@ tabsize=2
 \end{frame}
 
 \section{Context \faicon{question-circle}}
-\label{sec:orgd5c51ff}
+\label{sec:orga4882f3}
 
-\begin{frame}[<+->][label={sec:org61b5b9c}]{Why modeling?}
+\begin{frame}[<+->][label={sec:orgacd0703}]{Why modeling?}
 \begin{itemize}
 \item Posit: You understand a system if you can simulate it
 \end{itemize}
@@ -99,7 +99,26 @@ What I cannot create, I do not understand. --Richard Feynman
 \item Find out what is needed to reproduce experimental results, what explains those results
 \end{itemize}
 \end{frame}
-\begin{frame}[<+->][label={sec:org2708416}]{What do we want to know?}
+\begin{frame}[label={sec:org13f81d1}]{Recap of previous episodes: it's converging! \faicon{smile-o}}
+\begin{center}
+\includegraphics[width=\linewidth]{img/steps-and-rewards.png}
+\end{center}
+\end{frame}
+\begin{frame}[<+->][label={sec:org0595c4b}]{Why is it converging now?}
+\begin{itemize}
+\item Lights cues in the state?
+\item Start training once replay buffer is full (5000 transitions) instead of when there are enough transitions for a batch (32 transitions)
+\item Soft update of the networks weights (instead of sharp transition)
+\item Huber loss instead of mean squared error \(\to\) should be less sensible to outliers
+\item \alert{Remove ReLU on output layer!}
+\end{itemize}
+\end{frame}
+\begin{frame}[label={sec:org91b2a66}]{What did it learn?}
+\begin{center}
+\includegraphics[width=\linewidth]{img/policy.png}
+\end{center}
+\end{frame}
+\begin{frame}[<+->][label={sec:org469cde1}]{What do we want to know?}
 \begin{itemize}
 \item Understand what the network learns
 \(\to\) What \alert{function} does it learns?
@@ -107,7 +126,7 @@ What I cannot create, I do not understand. --Richard Feynman
 \item Does the network learn something related to the real neurons? (million \faicon{dollar}\faicon{dollar}\faicon{dollar} question)
 \end{itemize}
 \end{frame}
-\begin{frame}[<+->][label={sec:org5f26c38}]{Compositional hypothesis}
+\begin{frame}[<+->][label={sec:orge437b65}]{Compositional hypothesis}
 \begin{itemize}
 \item Does the network learn a generalizable policy? \(\to\)~How to test it?
 \begin{itemize}
@@ -116,36 +135,36 @@ What I cannot create, I do not understand. --Richard Feynman
 \end{itemize}
 \end{itemize}
 \end{frame}
-\begin{frame}[label={sec:org046f332}]{Compositional hypothesis}
+\begin{frame}[label={sec:org9e330bc}]{Compositional hypothesis}
 \begin{center}
 \includegraphics[width=.9\linewidth]{img/env_new-triangle-task.drawio.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:orga3d528c}]{Implementation}
+\begin{frame}[label={sec:org40b847a}]{Implementation}
 \begin{center}
 \includegraphics[width=.9\linewidth]{img/nn.drawio.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:orge381525}]{Example episode}
+\begin{frame}[label={sec:orge31336d}]{Example episode}
 \begin{center}
 \includegraphics[width=.9\linewidth]{img/env_new-steps.drawio.png}
 \end{center}
 \end{frame}
-\section{Experiments \& expected results \faicon{eyedropper} \faicon{area-chart}}
-\label{sec:orgc67c098}
-\begin{frame}[<+->][label={sec:org41b93b0}]{1) How training impacts the representations learned?}
+\section{Experiments \& expected results \faicon{flask} \faicon{area-chart}}
+\label{sec:org30d62a7}
+\begin{frame}[<+->][label={sec:orgc382da5}]{1) How training impacts the representations learned?}
 \begin{itemize}
 \item Feed both coordinates information (Cartesian \& polar) to the input layer (+ merge actions spaces in a common one)
 \item Train on left/right task \(\to\) we expect the weights are close to zero on Cartesian representation?
 \item Train on east/west task \(\to\) we expect the weights are close to zero on polar representation?
 \end{itemize}
 \end{frame}
-\begin{frame}[label={sec:org31a4945}]{1) How training impacts the representations learned?}
+\begin{frame}[label={sec:org1a34467}]{1) How training impacts the representations learned?}
 \begin{center}
 \includegraphics[width=.9\linewidth]{img/exp1-weights-heatmap.png}
 \end{center}
 \end{frame}
-\begin{frame}[<+->][label={sec:orgf6295e5}]{2) Does the network learn a coordinate system?}
+\begin{frame}[<+->][label={sec:orgfd15c54}]{2) Does the network learn a coordinate system?}
 \begin{enumerate}
 \item After training, move the population of agents in a translated coordinate system
 \(\to\) we expect the population of agents to be able to solve the task with zero shot learning
@@ -156,42 +175,42 @@ What I cannot create, I do not understand. --Richard Feynman
 \end{itemize}
 \end{enumerate}
 \end{frame}
-\begin{frame}[label={sec:orgcae1452}]{2) Does the network learn a coordinate system?}
+\begin{frame}[label={sec:org154455c}]{2) Does the network learn a coordinate system?}
 \begin{center}
 \includegraphics[width=.9\linewidth]{img/exp2-boxplot.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:orgd4bf8ff}]{2) Does the network learn a coordinate system?}
+\begin{frame}[label={sec:orge0d12be}]{2) Does the network learn a coordinate system?}
 \begin{center}
 \includegraphics[width=.9\linewidth]{img/angles-to-activations.png}
 \end{center}
 \end{frame}
 \section{Roadmap \faicon{road}}
-\label{sec:orgd3cf5fd}
-\begin{frame}[label={sec:org817eb6e}]{Experiments table}
+\label{sec:orge6da991}
+\begin{frame}[label={sec:orga6192dd}]{Experiments table}
 \scriptsize
 \begin{center}
 \begin{tabular}{lrr}
-Experiment & Agents & Hours estimation\\
+Experiment & Agents & Training estimation [hours]\\
 \hline
-left/right Cartesian coordinates from center arena & 30 & 6\\
-left/right Cartesian coordinates from 3 ports & 30 & 6\\
-east/west polar coordinates from center arena & 30 & 6\\
-east/west polar coordinates from 3 ports & 30 & 6\\
+left/right Cartesian coordinates from center arena & 20 & 6\\
+left/right Cartesian coordinates from 3 ports & 20 & 6\\
+east/west polar coordinates from center arena & 20 & 6\\
+east/west polar coordinates from 3 ports & 20 & 6\\
 \hline
-No translation & 30 & 6\\
-Cartesian translated & 30 & 6\\
-Polar translated & 30 & 6\\
-left/right correct angle & 30 & 6\\
-left/right incorrect angle & 30 & 6\\
-east/west correct angle & 30 & 6\\
-east/west incorrect angle & 30 & 6\\
+No translation & 20 & 6\\
+Cartesian translated & 20 & 6\\
+Polar translated & 20 & 6\\
+left/right correct angle & 20 & 6\\
+left/right incorrect angle & 20 & 6\\
+east/west correct angle & 20 & 6\\
+east/west incorrect angle & 20 & 6\\
 \hline
-Total & 330 & 66\\
+Total & 220 & 66\\
 \end{tabular}
 \end{center}
 \end{frame}
-\begin{frame}[<+->][label={sec:orgb70ba54}]{Milestones/how to get there}
+\begin{frame}[<+->][label={sec:orgd909bb6}]{Milestones/how to get there}
 \begin{enumerate}
 \item Rewrite the environment(s) \faicon{star}\faicon{star}\faicon{star-o}
 \begin{enumerate}
@@ -208,7 +227,7 @@ Total & 330 & 66\\
 \end{enumerate}
 \end{enumerate}
 \end{frame}
-\begin{frame}[label={sec:org9acd4e9}]{Planning}
+\begin{frame}[label={sec:orgb744090}]{Planning}
 % \begin{figure}%[htb]
     % \centering
     \begin{adjustbox}{max width=\columnwidth, keepaspectratio}
@@ -258,7 +277,7 @@ Total & 330 & 66\\
     \end{adjustbox}
 % \end{figure}
 \end{frame}
-\begin{frame}[label={sec:org4979371},standout]{~}
+\begin{frame}[label={sec:orgdaa62a7},standout]{~}
 Thanks!
 \end{frame}
 \end{document}
