@@ -17,3 +17,4 @@ tmp/
 .virtual_documents
 .spyproject
 **/*.egg-info
+**/slurm-logs/*
