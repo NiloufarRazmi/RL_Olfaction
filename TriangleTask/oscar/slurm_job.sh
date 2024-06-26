@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Run with:
-# export PARAMSFILE="TriangleTask/params.ini"; sbatch TriangleTask/slurm_job.sh
+# export PARAMSFILE="TriangleTask/oscar/params.ini"; sbatch TriangleTask/oscar/slurm_job.sh
 
 ########## Begin Slurm header ##########
 #SBATCH -p gpu --gres=gpu:1

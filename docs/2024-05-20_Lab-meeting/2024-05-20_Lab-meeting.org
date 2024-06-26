@@ -134,7 +134,7 @@ Thanks!
 % End:
 
 * Feedback :noexport:
-** TODO Meeting
+** DONE Meeting
 Move 31 May to 17th June
 1.5h
 11am
@@ -181,3 +181,12 @@ length_sin = a
 length_cos = b
 alpha = atan(length_sin/length_cos)*180/pi
 #+end_src
+
+** IDEA Bin distribution to understand if agent is exploit/explore
+Why bump in the number of steps?
+
+** IDEA Gaussian activation? (Tuan)
+
+*** Have value in the neighborrood tiles at 0.5 in the input layer for example
+Not only 1 for the input for tile the agent is visit
+*** Adding noise to the system

@@ -11,20 +11,20 @@
 - https://pytorch.org/tutorials/recipes/recipes/tensorboard_with_pytorch.html
 - https://pytorch.org/tutorials/intermediate/tensorboard_tutorial.html
 *** KILL + Make tutorial for Oscar?
-** TODO Save everything to disk
-*** TODO Save all the data in file
-*** TODO Plot from file
+** DONE Save everything to disk
+*** DONE Save all the data in file
+*** DONE Plot from file
 *** DONE Save plot in files
 *** DONE Save progressbar log in file
 *** Use an MLOps tool like MLFlow or AimStack to save everything?
 ** Implement resume training feature
-* Viz
+* TODO Viz
 ** DONE Improve loss plot?
 Make number of bins not relative to the numer of episodes?
 
-** Get info during training
-*** TODO Either screen + interactive session
-*** WAIT Or batch script that writes in a file
+** KILL Get info during training
+*** KILL Either screen + interactive session
+*** Or batch script that writes in a file
 Using  Tensorboard ~SummaryWriter~
 ** DONE Plot neurons activations
 Get inspiration from https://pair.withgoogle.com/explorables/grokking/
@@ -160,6 +160,14 @@ def visualize_activations(model, color="C0", print_variance=False):
 [[https://wandb.ai/sauravmaheshkar/initialization/reports/A-Gentle-Introduction-To-Weight-Initialization-for-Neural-Networks--Vmlldzo2ODExMTg#he-initialization-]]
 ** TODO Plot policy animation
 ** DONE Divide policy plot in upper/lower triangle
+** TODO Plot clustermap before training?
+** TODO PCA of weights/activations?
+*** 10.48550/arXiv.2402.12067
+* TODO XAI/Analysis ideas
+** Frequency/FFT?
+10.48550/arXiv.2403.02241
+** https://www.astralcodexten.com/p/god-help-us-lets-try-to-understand
+** SHAP values/LIME?
 * DONE Model doesn't converge
 ** DONE Try to apply on simple MDP
 * TODO Experiments
@@ -221,14 +229,24 @@ Should learn faster than agent trained only in the lower triangle
 *** Check replay buffer is being sampled from correctly
 *** Make target network update frequency infinite to see whether Q-network converges
 ** DONE Add light cue to the state?
+** Running is slow
+*** DONE Implement checkpointing to save the model parameters and not have to start from scratch everytime
+[[https://pytorch.org/tutorials/beginner/saving_loading_models.html#saving-loading-a-general-checkpoint-for-inference-and-or-resuming-training]]
+*** Profile code on the GPU
+*** DONE Simplify model
+**** DONE Remove target network?
+**** DONE Remove replay traces?
+**** DONE Replace decaying \epsilon-greedy with my own
 * Metrics
 ** DONE Reward histogram
 ** average entropy of action distribution
-** Add logging
+** DONE Add logging
 - [[https://mlflow.org/docs/latest/python_api/mlflow.pytorch.html]]
 - [[https://dvc.org/doc/dvclive/ml-frameworks/pytorch]]
-* Next steps
+* TODO Next steps
 ** Look at what representations the neurons learn
 ** Memory in the environment + RNN?
 *** Only pass the odor information at the port, not at each time step
 ** Ego/allo choice?
+** TODO Why bump in the number of steps?
+Bin distribution to understand if agent is exploiting/exploring

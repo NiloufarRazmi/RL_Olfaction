@@ -96,12 +96,12 @@ Move 31 May to 17th June
 11am
 Niloufar/Matt
 Alex grant presentation after 17th?
-** TODO Sketch steps
+** DONE Sketch steps
 *** How that changes in the coordinate systems
 *** Instead of static
 *** Leave the static sketch on the left
 *** What does it change? What do we gain?
-** TODO No one-hot encoded, need to be x & y
+** DONE No one-hot encoded, need to be x & y
 ** Probabilistic population coding?
 10 neurons how it represent
 ** Polar

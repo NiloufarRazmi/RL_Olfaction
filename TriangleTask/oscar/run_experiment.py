@@ -10,10 +10,10 @@ import torch.nn as nn
 
 from collections import namedtuple, deque
 
-from .agent_tensor import neural_network, EpsilonGreedy
-from .environment_tensor import WrappedEnvironment, Actions, Cues, CONTEXTS_LABELS
-from . import plotting as viz
-from . import utils
+from ..agent_tensor import neural_network, EpsilonGreedy
+from ..environment_tensor import WrappedEnvironment, Actions, Cues, CONTEXTS_LABELS
+from .. import plotting as viz
+from .. import utils
 
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")

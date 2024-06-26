@@ -6,7 +6,7 @@ version = "0.0.1"
 packages = ["TriangleTask"]
 
 [project.scripts]
-runexp = "TriangleTask.run_experiment:cli"
+runexp = "TriangleTask.oscar.run_experiment:cli"
 
 [tool.jupytext]
 cell_metadata_filter = "-all"
