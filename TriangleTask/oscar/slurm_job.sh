@@ -6,11 +6,10 @@
 ########## Begin Slurm header ##########
 #SBATCH -p gpu --gres=gpu:1
 #SBATCH -N 1  # Number of node
-##SBATCH -n 1
-#SBATCH -n 4
-#SBATCH --mem=8G
+#SBATCH -n 2
+#SBATCH --mem=2G
 ##SBATCH -t 00:15:00
-#SBATCH -t 06:00:00
+#SBATCH -t 12:00:00
 ##SBATCH --partition=gpu-debug
 #SBATCH --account=carney-afleisc2-condo
 #SBATCH --mail-type=begin       # send email when job begins

@@ -243,7 +243,7 @@ def training_loop(p, current_path, logger, generator=None):
         "steps": steps.cpu(),
         "episodes": episodes.cpu(),
         "all_actions": all_actions,
-        "losses": losses,
+        "losses": np.array(losses, dtype=object),
         "p": p,
         "epsilons": epsilons,
         "weights": weights,
