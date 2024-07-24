@@ -163,7 +163,7 @@ def visualize_activations(model, color="C0", print_variance=False):
 ** TODO Plot clustermap before training?
 ** TODO PCA of weights/activations?
 *** 10.48550/arXiv.2402.12067
-* TODO XAI/Analysis ideas
+* XAI/Analysis ideas
 ** Frequency/FFT?
 10.48550/arXiv.2403.02241
 ** https://www.astralcodexten.com/p/god-help-us-lets-try-to-understand
@@ -188,10 +188,31 @@ Should learn faster than agent trained only in the lower triangle
 ** Normalizing states/actions?
 ** Reward at 1 instead of 10?
 ** DONE Start training when replay buffer is full?
-** TODO Minimum representations topic
+** Minimum representations topic
 *** Compress to a 3? neurons layer and look at the compressed representations learned
 *** Find the smallest network able to learn the task (single hidden layer, X neurons), and look at the representations learned
 *** Check the neurons activity and compare to the normal/fully connected case
+** KILL Memory in the environment + RNN?
+*** Only pass the odor information at the port, not at each time step
+** TODO Polar/Cartesian experiment
+*** Code
+**** Merge action space for ego/allo
+Allow moving backward?
+**** Make functions to compute polar and Cartesian coordinates from different landmarks
+**** Create function to switch between left/right & east/west task?
+*** Exp. 1: How the constraints of the task impact learning?
+**** Train left/right task
+**** Train east/west task
+**** Analyze the activity learned on polar vs. Cartesian representations
+*** Exp. 2: Does the network learn a coordinate system?
+**** Train on the normal task, then move the agent to a translated coordinate system, i.e. same values but more interpolated points between 2 discreet values
+- Same experiment also on translated polar coordinates?
+- Both left/right and east/west task?
+- Only input Cartesian coordinates into the network?
+*** Exp. 3: does having redundant info makes the agent more robust in a noisy environment?
+**** Train on the normal task, then after training feed incorrect polar angles, i.e. rotated by X degree
+- Same experiment also on incorrect Cartesian coordinates?
+- Both left/right and east/west task?
 * DONE Debug
 ** DONE Unit test env
 ** DONE Unit test one hot case
@@ -205,7 +226,7 @@ Should learn faster than agent trained only in the lower triangle
 ** DONE One hot encoding of state inputs
 ** DONE Plot stats of weights and biases
 ** DONE Plot gradients
-* Improvements
+* TODO Improvements
 ** DONE Batches
 ** DONE Experience replay
 ** DONE Target network
@@ -237,16 +258,14 @@ Should learn faster than agent trained only in the lower triangle
 **** DONE Remove target network?
 **** DONE Remove replay traces?
 **** DONE Replace decaying \epsilon-greedy with my own
+** Incrementally save after each run?
+** TODO Save ~params.ini~ file
 * Metrics
 ** DONE Reward histogram
 ** average entropy of action distribution
 ** DONE Add logging
 - [[https://mlflow.org/docs/latest/python_api/mlflow.pytorch.html]]
 - [[https://dvc.org/doc/dvclive/ml-frameworks/pytorch]]
-* TODO Next steps
-** Look at what representations the neurons learn
-** Memory in the environment + RNN?
-*** Only pass the odor information at the port, not at each time step
-** Ego/allo choice?
+* TODO Questions
 ** TODO Why bump in the number of steps?
 Bin distribution to understand if agent is exploiting/exploring

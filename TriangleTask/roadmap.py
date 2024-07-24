@@ -43,7 +43,7 @@ device
 # # %matplotlib ipympl
 
 # %% [markdown]
-# ## Weights heatmap
+# ## Activity heatmap
 
 # %%
 loc_rand = torch.randn((34, 34)) * 0.2
@@ -141,21 +141,21 @@ braces = []
 braces.append(
     {
         "p1": [-2, 0],
-        "p2": [-2, 20],
+        "p2": [-2, 19],
         "str_text": "cartesian",
     }
 )
 braces.append(
     {
-        "p1": [-2, 21],
+        "p1": [-2, 20],
         "p2": [-2, 34],
         "str_text": "polar",
     }
 )
 braces.append(
     {
-        "p1": [-2, 35],
-        "p2": [-2, 37],
+        "p1": [-2, 34],
+        "p2": [-2, 36],
         "str_text": "odor",
     }
 )
@@ -184,13 +184,13 @@ with plt.xkcd():
     ax[0].set_yticks([])
     # ax.set_xlabel('time')
     # ax.set_xlabel("Neural data", fontsize=30)
-    ax[0].set_title("Weights on left/right task")
+    ax[0].set_title("Activity on left/right task")
     neural[0:20, :] = neural[0:20, :] * 5
     neural[21:34, :] = neural[21:34, :] / 5
     ax[1].matshow(neural)
     ax[1].set_xticks([])
     ax[1].set_yticks([])
-    ax[1].set_title("Weights on east/west task")
+    ax[1].set_title("Activity on east/west task")
 
     for axi in ax:
         for spine in axi.spines.values():
