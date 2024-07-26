@@ -19,3 +19,4 @@ tmp/
 .spyproject
 **/*.egg-info
 **/slurm-logs/*
+flycheck_*

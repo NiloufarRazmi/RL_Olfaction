@@ -3,10 +3,12 @@ name = "RL_Olfaction"
 version = "0.0.1"
 
 [tool.setuptools]
-packages = ["TriangleTask"]
+# packages = ["TriangleTask"]
+packages = ["cartesian_polar"]
 
 [project.scripts]
-runexp = "TriangleTask.oscar.run_experiment:cli"
+# runexp = "TriangleTask.oscar.run_experiment:cli"
+runexp = "cartesian_polar.run_experiment:cli"
 
 [tool.jupytext]
 cell_metadata_filter = "-all"

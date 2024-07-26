@@ -226,7 +226,7 @@ Allow moving backward?
 ** DONE One hot encoding of state inputs
 ** DONE Plot stats of weights and biases
 ** DONE Plot gradients
-* TODO Improvements
+* Improvements
 ** DONE Batches
 ** DONE Experience replay
 ** DONE Target network
@@ -259,7 +259,7 @@ Allow moving backward?
 **** DONE Remove replay traces?
 **** DONE Replace decaying \epsilon-greedy with my own
 ** Incrementally save after each run?
-** TODO Save ~params.ini~ file
+** DONE Save ~params.ini~ file
 * Metrics
 ** DONE Reward histogram
 ** average entropy of action distribution
