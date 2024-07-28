@@ -39,7 +39,12 @@
 ]
 
 #slide(title: [2) How the constraints of the task impact the representations learned?])[
-    #side-by-side(gutter: 1em, columns: (0.7fr, 1fr))[
+    #side-by-side(gutter: 1em, columns: (0.7fr, 0.7fr, 1fr))[
+        #align(horizon)[
+            - Where to put the coordinate systems?
+            - How many coordinate systems?
+        ]
+    ][
         #align(horizon)[#image("img/RL_env-cartesian-polar.drawio.svg")]
     ][
         #align(horizon)[#image("img/cartesian-polar-exp-activity-heatmap.png")]

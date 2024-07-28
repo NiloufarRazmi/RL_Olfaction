@@ -62,7 +62,10 @@
 ]
 
 == 2) How the constraints of the task impact the representations learned?
-#slide(composer: (0.7fr, 1fr))[
+#slide(composer: (0.7fr, 0.7fr, 1fr))[
+    - Where to put the coordinate systems?
+    - How many coordinate systems?
+][
     #image("img/RL_env-cartesian-polar.drawio.svg")
 
 ][
