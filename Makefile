@@ -8,6 +8,9 @@ jupytext: ## Convert JSON notebook to plain text
 	# conda activate rl-olfaction
 	jupytext --to py:percent **/*.ipynb
 
+black-check:
+	black --check .
+
 black-format:
 	black .
 
@@ -20,11 +23,12 @@ format: ## Autoformat everything
 	make ruff-format
 	make black-format
 
-ruff:
+ruff-lint:
 	ruff check
 
 lint: ## Lint all files
-	make ruff
+	make black-check && \
+	make ruff-lint
 
 env-update: ## Update the Conda environment & install CLI
 	mamba env update -f environment.yml
