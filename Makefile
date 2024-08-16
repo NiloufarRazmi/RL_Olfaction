@@ -12,7 +12,7 @@ black-format:
 	black .
 
 ruff-format:
-	# ruff check --fix
+	ruff check --fix
 	ruff format
 
 format: ## Autoformat everything

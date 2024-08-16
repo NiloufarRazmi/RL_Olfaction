@@ -20,3 +20,4 @@ tmp/
 **/*.egg-info
 **/slurm-logs/*
 flycheck_*
+.direnv/*

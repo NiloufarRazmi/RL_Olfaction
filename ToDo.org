@@ -200,6 +200,10 @@ Should learn faster than agent trained only in the lower triangle
 Allow moving backward?
 **** Make functions to compute polar and Cartesian coordinates from different landmarks
 **** Create function to switch between left/right & east/west task?
+*** TODO Baseline
+**** 2 Cartesian + 2 polar with symmetric orientation
+**** Coordinate systems at North and South for now
+**** Then discretized version
 *** Exp. 1: How the constraints of the task impact learning?
 **** Train left/right task
 **** Train east/west task
@@ -209,7 +213,7 @@ Allow moving backward?
 - Same experiment also on translated polar coordinates?
 - Both left/right and east/west task?
 - Only input Cartesian coordinates into the network?
-*** Exp. 3: does having redundant info makes the agent more robust in a noisy environment?
+*** KILL Exp. 3: does having redundant info makes the agent more robust in a noisy environment?
 **** Train on the normal task, then after training feed incorrect polar angles, i.e. rotated by X degree
 - Same experiment also on incorrect Cartesian coordinates?
 - Both left/right and east/west task?

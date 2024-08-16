@@ -1,18 +1,16 @@
-import shutil
 import itertools
-import os
-from pathlib import Path
+import shutil
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-from matplotlib.offsetbox import AnnotationBbox, OffsetImage
 import numpy as np
-import seaborn as sns
 import pandas as pd
+import seaborn as sns
 import torch
 
 # from curlyBrace import curlyBrace
 from imojify import imojify
+from matplotlib.offsetbox import AnnotationBbox, OffsetImage
 
 # from utils import get_location_count
 from .cartesian_polar_env import Actions, TriangleState
@@ -769,7 +767,7 @@ def plot_policies(q_values, labels, n_rows, n_cols, figpath=None, logger=None):
 def plot_weights_matrices(
     weights_untrained, weights_trained, figpath=None, logger=None
 ):
-    msg = f"Plotting weights matrices..."
+    msg = "Plotting weights matrices..."
     print(msg)
     if logger:
         logger.info(msg)
@@ -842,7 +840,7 @@ def plot_weights_matrices(
 def plot_activations(
     activations_layer_df, input_cond, labels, layer_inspected, figpath=None, logger=None
 ):
-    msg = f"Plotting activations learned..."
+    msg = "Plotting activations learned..."
     print(msg)
     if logger:
         logger.info(msg)

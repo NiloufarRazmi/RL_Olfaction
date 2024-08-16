@@ -1,21 +1,19 @@
-from pathlib import Path
-from tqdm import tqdm
 import shutil
+from collections import deque, namedtuple
+from pathlib import Path
 
 import click
 import numpy as np
 import pandas as pd
 import torch
-import torch.optim as optim
 import torch.nn as nn
+import torch.optim as optim
+from tqdm import tqdm
 
-from collections import namedtuple, deque
-
-from .agent_tensor import neural_network, EpsilonGreedy
-from .cartesian_polar_env import WrappedEnvironment, Actions, Cues, CONTEXTS_LABELS
 from . import plotting as viz
 from . import utils
-
+from .agent import EpsilonGreedy, neural_network
+from .cartesian_polar_env import CONTEXTS_LABELS, Actions, Cues, WrappedEnvironment
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 

@@ -1,27 +1,23 @@
 name: CI
-
 on: [push]
-
 jobs:
-  tests:
-    name: Run tests
+  build:
     runs-on: "ubuntu-latest"
     steps:
-      - uses: actions/checkout@v4
-      - uses: conda-incubator/setup-miniconda@v2
-        with:
-          python-version: 3.11
-          mamba-version: "*"
-          channels: conda-forge,defaults
-          channel-priority: true
-          activate-environment: rl-olfaction
-          environment-file: environment.yml
-      - shell: bash -el {0}
-        run: |
-          conda info
-          conda list
-          conda config --show-sources
-          conda config --show
-          printenv | sort
-      - shell: bash -el {0}
-        run: pytest -v .
+    - name: Checkout source
+      uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
+        cache: 'pip'
+    - name: Install dependencies
+      run: |
+        pip install -U pip
+        pip install -Ue .
+    - name: Lint
+      run: |
+        make lint
+      continue-on-error: true
+    - name: Run tests
+      run: pytest -v

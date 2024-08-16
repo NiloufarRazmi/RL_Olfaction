@@ -1,17 +1,16 @@
 import configparser
-from collections import OrderedDict
 import datetime
-from pathlib import Path
-import os
-from dataclasses import dataclass
-from typing import Optional
 import logging
+import os
+from collections import OrderedDict
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Optional
 
 import numpy as np
 import pandas as pd
 import torch
 import torch.nn as nn
-
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -299,7 +298,7 @@ def get_activations_learned(net, env, layer_inspected, contexts_labels):
     activations_layer = (
         torch.ones((len(input_cond), neurons_num), device=DEVICE) * torch.nan
     )
-    for idx, (cond, input_val) in enumerate(input_cond.items()):
+    for idx, (_, input_val) in enumerate(input_cond.items()):
         net(input_val)
         activations_layer[idx, :] = activations[str(layer_inspected)]
 
