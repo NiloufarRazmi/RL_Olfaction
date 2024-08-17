@@ -1,8 +1,7 @@
 name: CI
 on: [push]
 jobs:
-
-  lint:
+  build:
     runs-on: "ubuntu-latest"
     steps:
     - name: Checkout source
@@ -18,20 +17,5 @@ jobs:
         pip install -Ue .
     - name: Lint
       run: make lint
-
-  test:
-    runs-on: "ubuntu-latest"
-    steps:
-    - name: Checkout source
-      uses: actions/checkout@v4
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.x'
-        cache: 'pip'
-    - name: Install dependencies
-      run: |
-        pip install -U pip
-        pip install -Ue .
     - name: Run tests
       run: pytest -v

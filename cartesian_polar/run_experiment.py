@@ -1,3 +1,5 @@
+"""Run experiment from CLI."""
+
 import shutil
 from collections import deque, namedtuple
 from pathlib import Path
@@ -19,6 +21,7 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 def training_loop(p, current_path, logger, generator=None):
+    """Run the main training loop."""
     Transition = namedtuple(
         "Transition", ("state", "action", "reward", "next_state", "done")
     )
@@ -86,7 +89,8 @@ def training_loop(p, current_path, logger, generator=None):
                 next_state, reward, done = env.step(action=action, current_state=state)
 
                 # Store transition in replay buffer
-                # [current_state (2 or 28 x1), action (1x1), next_state (2 or 28 x1), reward (1x1), done (1x1 bool)]
+                # [current_state (2 or 28 x1), action (1x1), next_state (2 or 28 x1),
+                # reward (1x1), done (1x1 bool)]
                 done = torch.tensor(done, device=DEVICE).unsqueeze(-1)
                 replay_buffer.append(
                     Transition(
@@ -110,8 +114,8 @@ def training_loop(p, current_path, logger, generator=None):
                     state_batch = torch.stack(batch.state)
                     action_batch = torch.tensor(batch.action, device=DEVICE)
                     reward_batch = torch.cat(batch.reward)
-                    next_state_batch = torch.stack(batch.next_state)
-                    done_batch = torch.cat(batch.done)
+                    # next_state_batch = torch.stack(batch.next_state)
+                    # done_batch = torch.cat(batch.done)
 
                     # See DQN paper for equations: https://doi.org/10.1038/nature14236
                     state_action_values_sampled = net(state_batch).to(DEVICE)  # Q(s_t)
@@ -121,44 +125,24 @@ def training_loop(p, current_path, logger, generator=None):
                         index=action_batch.unsqueeze(-1),
                     ).squeeze()  # Q(s_t, a)
 
-                    # done_false = torch.argwhere(done_batch == False).squeeze()
-                    # done_true = torch.argwhere(done_batch == True).squeeze()
-                    # expected_state_action_values = (
-                    #     torch.zeros_like(done_batch, device=DEVICE)
-                    # ).float()
-                    # with torch.no_grad():
-                    #     if done_true.numel() > 0:
-                    #         expected_state_action_values[done_true] = reward_batch[
-                    #             done_true
-                    #         ]
-                    #     if done_false.numel() > 0:
-                    #         next_state_values = (
-                    #             target_net(next_state_batch[done_false]).to(DEVICE).max(1)
-                    #         )  # Q(s_t+1, a)
-                    #         expected_state_action_values[done_false] = (
-                    #             reward_batch[done_false]
-                    #             + p.gamma * next_state_values.values
-                    #         )  # y_j (Bellman optimality equation)
-
-                    # Compute a mask of non-final states and concatenate the batch elements
+                    # Compute a mask of non-final states and concatenate
+                    # the batch elements
                     # (a final state would've been the one after which simulation ended)
                     non_final_mask = torch.tensor(
-                        tuple(map(lambda s: s == False, batch.done)),
+                        tuple(map(lambda s: not s, batch.done)),
                         device=DEVICE,
                         dtype=torch.bool,
                     )
                     non_final_next_states = torch.stack(
-                        [
-                            s[1]
-                            for s in zip(batch.done, batch.next_state)
-                            if s[0] == False
-                        ]
+                        [s[1] for s in zip(batch.done, batch.next_state) if not s[0]]
                     )
 
                     # Compute V(s_{t+1}) for all next states.
-                    # Expected values of actions for non_final_next_states are computed based
-                    # on the "older" target_net; selecting their best reward with max(1).values
-                    # This is merged based on the mask, such that we'll have either the expected
+                    # Expected values of actions for non_final_next_states are computed
+                    # based on the "older" target_net;
+                    # selecting their best reward with max(1).values
+                    # This is merged based on the mask,
+                    # such that we'll have either the expected
                     # state value or 0 in case the state was final.
                     next_state_values = torch.zeros(p.batch_size, device=DEVICE)
                     if non_final_next_states.numel() > 0 and non_final_mask.numel() > 0:
@@ -229,7 +213,8 @@ def training_loop(p, current_path, logger, generator=None):
             rewards[episode, run] = total_rewards
             steps[episode, run] = step_count
             logger.info(
-                f"Run: {run+1}/{p.n_runs} - Episode: {episode+1}/{p.total_episodes} - Steps: {step_count} - Loss: {loss.item()}"
+                f"Run: {run+1}/{p.n_runs} - Episode: {episode+1}/{p.total_episodes} "
+                "- Steps: {step_count} - Loss: {loss.item()}"
             )
         weights_val_stats.set_index("Index", inplace=True)
         biases_val_stats.set_index("Index", inplace=True)
@@ -259,6 +244,7 @@ def training_loop(p, current_path, logger, generator=None):
 
 
 def visualization_plots(data_path, p, current_path, logger):
+    """Make all the plots."""
     # Load data from disk
     with open(data_path, "rb") as fhd:
         # Load the arrays from the .npz file

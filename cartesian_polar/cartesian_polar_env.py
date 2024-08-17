@@ -11,17 +11,23 @@ from .utils import make_deterministic, random_choice
 
 
 class OdorCondition(Enum):
+    """Keeps track before and after the odor has been presented."""
+
     pre = 1
     post = 2
 
 
 class Cues(Enum):
+    """List the possible cues conditions."""
+
     NoOdor = 0
     OdorA = 1
     OdorB = 2
 
 
 class Ports(Enum):
+    """List the coordinates of the 4 ports."""
+
     North = (2, 2)
     South = (-2, -2)
     West = (-2, 2)
@@ -29,11 +35,15 @@ class Ports(Enum):
 
 
 class OdorPorts(Enum):
+    """List the odor ports."""
+
     North = Ports.North.value
     South = Ports.South.value
 
 
 class Actions(Enum):
+    """List the possible actions."""
+
     forward = 0
     backward = 1
     left = 2
@@ -41,11 +51,15 @@ class Actions(Enum):
 
 
 class TriangleState(Enum):
+    """Keeps track of which part of the arena the agent is located."""
+
     upper = 1
     lower = 2
 
 
 class TaskID(Enum):
+    """List the different tasks."""
+
     EastWest = 1
     LeftRight = 2
 
@@ -167,14 +181,14 @@ class Environment:
         return coords
 
     def is_terminated(self, state):
-        """Returns if the episode is terminated or not."""
+        """Return if the episode is terminated or not."""
+        is_terminated = False
         if self.odor_condition == OdorCondition.post and (
             state["location"] == Ports.West.value
             or state["location"] == Ports.East.value
         ):
-            return True
-        else:
-            return False
+            is_terminated = True
+        return is_terminated
 
     def reward(self, state):
         """Observe the reward."""
@@ -257,7 +271,7 @@ class Environment:
         """Where the agent ends up on the map."""
 
         def LEFT(x, y):
-            """Moving left in the allocentric sense."""
+            """Move left in the allocentric sense."""
             x_min = (
                 self.rangeX["min"] if self.TriangleState == TriangleState.lower else -y
             )
@@ -266,7 +280,7 @@ class Environment:
             return angle, x
 
         def DOWN(x, y):
-            """Moving down in the allocentric sense."""
+            """Move down in the allocentric sense."""
             y_min = (
                 self.rangeY["min"] if self.TriangleState == TriangleState.lower else -x
             )
@@ -275,7 +289,7 @@ class Environment:
             return angle, y
 
         def RIGHT(x, y):
-            """Moving right in the allocentric sense."""
+            """Move right in the allocentric sense."""
             x_max = (
                 self.rangeX["max"] if self.TriangleState == TriangleState.upper else -y
             )
@@ -284,7 +298,7 @@ class Environment:
             return angle, x
 
         def UP(x, y):
-            """Moving up in the allocentric sense."""
+            """Move up in the allocentric sense."""
             y_max = (
                 self.rangeY["max"] if self.TriangleState == TriangleState.upper else -x
             )
@@ -405,7 +419,7 @@ class DuplicatedCoordsEnv(Environment):
             {
                 "cue": torch.tensor([state[0]], device=DEVICE),
                 "x": torch.tensor([coords_orig[0]], device=DEVICE),
-                "y": torch.tensor([x_orig[1]], device=DEVICE),
+                "y": torch.tensor([coords_orig[1]], device=DEVICE),
                 "direction": torch.tensor([state[1]], device=DEVICE),
             },
             batch_size=[1],
@@ -413,7 +427,7 @@ class DuplicatedCoordsEnv(Environment):
         return conv_state
 
     def step(self, action, current_state):
-        """Wrapper around the base method."""
+        """Wrap the base method."""
         current_conv_state = self.conv_flat_duplicated_coords_to_dict(current_state)
         new_state, reward, done = super().step(action, current_conv_state)
         new_state_conv = self.conv_dict_to_flat_duplicated_coords(new_state)
@@ -425,43 +439,44 @@ class DuplicatedCoordsEnv(Environment):
         return new_state_conv, reward, done
 
     def reset(self):
-        """Wrapper around the base method."""
+        """Wrap the base method."""
         state = super().reset()
         conv_state = self.conv_dict_to_flat_duplicated_coords(state)
         conv_state = conv_state.float()  # Cast to float for PyTorch multiplication
         return conv_state
 
     def conv2north_cartesian(self, coords_orig):
-        """Convert from center coordinates to Cartesian coordinates from the North port."""
+        """Convert origin (0, 0) coords to Cartesian coords from the North port."""
         new_x = -coords_orig[0] + 2
         new_y = -coords_orig[1] + 2
         return torch.tensor([new_x, new_y], device=DEVICE)
 
     def conv2south_cartesian(self, coords_orig):
-        """Convert from center coordinates to Cartesian coordinates from the South port."""
+        """Convert origin (0, 0) coords to Cartesian coords from the South port."""
         new_x = coords_orig[0] + 2
         new_y = coords_orig[1] + 2
         return torch.tensor([new_x, new_y], device=DEVICE)
 
     def cartesian2polar(self, coords_orig):
+        """Convert coordinates from Cartesian to polar."""
         length = torch.sqrt(coords_orig[0] ** 2 + coords_orig[1] ** 2)
         alpha = torch.atan2(input=coords_orig[1], other=coords_orig[0]) * 180 / math.pi
         return torch.tensor([length, alpha], device=DEVICE)
 
     def conv2north_polar(self, coords_orig):
-        """Convert from center coordinates to polar coordinates from the North port."""
+        """Convert from origin (0, 0) coords to polar coords from the North port."""
         north_coords = self.conv2north_cartesian(coords_orig)
         north_polar = self.cartesian2polar(north_coords)
         return north_polar
 
     def conv2south_polar(self, coords_orig):
-        """Convert from center coordinates to polar coordinates from the South port."""
+        """Convert from origin (0, 0) coords to polar coords from the South port."""
         south_coords = self.conv2south_cartesian(coords_orig)
         south_polar = self.cartesian2polar(south_coords)
         return south_polar
 
     def conv_north_cartesian2orig(self, coords_orig):
-        """Convert from Cartesian coordinates from North port to origin (0, 0) coordinates."""
+        """Convert Cartesian coords from North port to origin (0, 0) coords."""
         new_x = coords_orig[0] - 2
         new_y = coords_orig[1] - 2
         return torch.tensor([new_x, new_y], device=DEVICE)

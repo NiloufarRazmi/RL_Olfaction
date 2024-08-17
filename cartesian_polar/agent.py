@@ -1,3 +1,5 @@
+"""Agent related routines."""
+
 import torch
 import torch.nn as nn
 
@@ -7,6 +9,8 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 class EpsilonGreedy:
+    """Define the Epsilon-greedy algorithm to chose an action."""
+
     def __init__(
         self,
         epsilon,
@@ -27,7 +31,7 @@ class EpsilonGreedy:
             self.generator = None
 
     def choose_action(self, action_space, state, state_action_values):
-        """Choose an action a in the current world state (s)"""
+        """Choose an action a in the current world state (s)."""
 
         def sample(action_space, generator=None):
             return random_choice(action_space, generator=self.generator)
@@ -52,6 +56,7 @@ class EpsilonGreedy:
         return action
 
     def update_epsilon(self, ep):
+        """Reduce epsilon after `ep` episodes."""
         if ep > self.epsilon_warmup:
             """Reduce epsilon (because we need less and less exploration)"""
             epsilon = (
@@ -71,7 +76,7 @@ class DQN(nn.Module):
     """Define network."""
 
     def __init__(self, n_observations, n_actions, n_units=16):
-        super(DQN, self).__init__()
+        super().__init__()
         self.mlp = nn.Sequential(
             nn.Linear(n_observations, n_units),
             nn.ReLU(),
@@ -88,6 +93,7 @@ class DQN(nn.Module):
         )
 
     def forward(self, x):
+        """Define the forward pass."""
         return self.mlp(x)
 
 

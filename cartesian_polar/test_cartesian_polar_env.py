@@ -1,3 +1,5 @@
+"""Tests on the environment."""
+
 import pytest
 import torch
 from tensordict.tensordict import TensorDict
@@ -15,6 +17,7 @@ DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 
 def test_env_general_props():
+    """Test general properties of the environment."""
     env = Environment()
     assert env
     state = env.reset()
@@ -30,6 +33,7 @@ def test_env_general_props():
 
 
 def test_starting_point_coords():
+    """Test that the starting points are in the allwed boundaries of the arena."""
     env = Environment()
     for _ in range(100):
         agent_coords = env.sample_coord_position()
@@ -75,6 +79,7 @@ def test_moves(
     y_expect,
     direction_expect,
 ):
+    """Test basic moves."""
     env = Environment()
     env.TriangleState = TriangleState
     state_orig = TensorDict(
@@ -129,6 +134,7 @@ def test_coords_convertions(
     coords_north_polar,
     coords_south_polar,
 ):
+    """Test the conversion routines."""
     env = DuplicatedCoordsEnv()
     assert torch.equal(env.conv2north_cartesian(coords_orig), coords_north_cart)
     assert torch.equal(env.conv2south_cartesian(coords_orig), coords_south_cart)

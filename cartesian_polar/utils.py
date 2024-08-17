@@ -1,3 +1,5 @@
+"""Utilities functions."""
+
 import configparser
 import datetime
 import logging
@@ -105,6 +107,7 @@ def make_deterministic(seed=None):
 
 
 def check_grad_stats(grad_df):
+    """Check that gradients are not zero."""
     grad_stats = torch.tensor(
         [
             grad_df.Val.mean(),
@@ -135,6 +138,7 @@ def get_logger(current_path):
 
 
 def create_save_path(experiment_tag):
+    """Make saving directory for the experiment results."""
     now = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     root_path = Path("env").parent
     save_path = root_path / "save"
@@ -146,6 +150,7 @@ def create_save_path(experiment_tag):
 
 
 def collect_weights_biases(net):
+    """Collect weights & baisis in a dataframe."""
     biases = {"val": [], "grad": []}
     weights = {"val": [], "grad": []}
     for layer in net.mlp.children():
@@ -168,6 +173,7 @@ def collect_weights_biases(net):
 
 
 def params_df_stats(weights, key, current_df=None):
+    """Collect weights stats in a dataframe."""
     if current_df is not None:
         last_idx = current_df.index[-1] + 1
         df = current_df
@@ -186,14 +192,12 @@ def params_df_stats(weights, key, current_df=None):
             index=[last_idx + idx],
         )
 
-        if df is None:
-            df = tmp_df
-        else:
-            df = pd.concat((df, tmp_df))
+        df = tmp_df if df is None else pd.concat((df, tmp_df))
     return df
 
 
 def save_data(data_dict, current_path):
+    """Save variables to disk."""
     data_path = current_path / "data.npz"
     with open(data_path, "wb") as fhd:
         np.savez(fhd, **data_dict)
@@ -214,6 +218,7 @@ def postprocess_rewards_steps(episodes, n_runs, rewards, steps):
 
 
 def postprocess_loss(losses, window_size=1):
+    """Convert losses to dataframe."""
     for idx, loss in enumerate(losses):
         current_loss = torch.tensor(loss.astype(float), device=DEVICE)
         losses_rolling_avg = nn.functional.avg_pool1d(
@@ -227,7 +232,7 @@ def postprocess_loss(losses, window_size=1):
                 "Loss": losses_rolling_avg.cpu(),
             }
         )
-        if idx == 0:
+        if idx == 0:  # noqa SIM108
             loss_df = tmp_df
         else:
             loss_df = pd.concat((loss_df, tmp_df))
@@ -250,6 +255,7 @@ def get_q_values_by_states(env, cues, n_actions, net):
 
 
 def postprocess_weights(weights):
+    """Convert weights to dataframe."""
     for idx, val in enumerate(weights):
         tmp_df = pd.DataFrame(
             data={
@@ -257,7 +263,7 @@ def postprocess_weights(weights):
                 "Layer": idx,
             }
         )
-        if idx == 0:
+        if idx == 0:  # noqa SIM108
             df = tmp_df
         else:
             df = pd.concat((df, tmp_df))
@@ -265,6 +271,7 @@ def postprocess_weights(weights):
 
 
 def get_activations_learned(net, env, layer_inspected, contexts_labels):
+    """Extract activations learned from the network."""
     activations = {}
 
     def get_activations_hook(name):
@@ -309,6 +316,7 @@ def get_activations_learned(net, env, layer_inspected, contexts_labels):
 
 
 def get_exp_params_from_config(config_path):
+    """Extract parameters from config file."""
     print(f"Experiments parameters path: {config_path.absolute()}")
     config = configparser.ConfigParser()
     config.read(config_path)

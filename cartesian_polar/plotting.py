@@ -1,3 +1,5 @@
+"""Define all the plotting functions."""
+
 import itertools
 import shutil
 
@@ -18,7 +20,7 @@ from .cartesian_polar_env import Actions, TriangleState
 sns.set_theme(font_scale=1.5)
 # plt.style.use("ggplot")
 # print(shutil.which("latex"))
-USETEX = True if shutil.which("latex") else False
+USETEX = bool(shutil.which("latex"))
 mpl.rcParams["text.usetex"] = USETEX
 if USETEX:
     mpl.rcParams["font.family"] = ["serif"]
@@ -139,40 +141,41 @@ def plot_q_values_map(qtable, rows, cols):
     plt.show()
 
 
-def plot_heatmap(matrix, title=None, xlabel=None, ylabel=None, braces=[]):
-    fig, ax = plt.subplots(figsize=(9, 9))
-    cmap = sns.light_palette("seagreen", as_cmap=True)
-    # cmap = sns.color_palette("light:b", as_cmap=True)
-    chart = sns.heatmap(matrix, cmap=cmap, ax=ax)
-    if title:
-        chart.set(title=title)
-    if xlabel:
-        chart.set(xlabel=xlabel)
-    if ylabel:
-        chart.set(ylabel=ylabel)
-    ax.tick_params(axis="x", rotation=90)
-    ax.tick_params(axis="y", rotation=0)
-    ax.tick_params(left=True)
-    ax.xaxis.tick_top()
-    if braces:
-        for idx, brace in enumerate(braces):
-            curlyBrace(
-                fig=fig,
-                ax=ax,
-                p1=brace["p1"],
-                p2=brace["p2"],
-                k_r=0.05,
-                bool_auto=False,
-                str_text=brace["str_text"],
-                color="black",
-                lw=2,
-                int_line_num=2,
-            )
-    plt.show()
+# def plot_heatmap(matrix, title=None, xlabel=None, ylabel=None, braces=[]):
+#     """Plot heatmap."""
+#     fig, ax = plt.subplots(figsize=(9, 9))
+#     cmap = sns.light_palette("seagreen", as_cmap=True)
+#     # cmap = sns.color_palette("light:b", as_cmap=True)
+#     chart = sns.heatmap(matrix, cmap=cmap, ax=ax)
+#     if title:
+#         chart.set(title=title)
+#     if xlabel:
+#         chart.set(xlabel=xlabel)
+#     if ylabel:
+#         chart.set(ylabel=ylabel)
+#     ax.tick_params(axis="x", rotation=90)
+#     ax.tick_params(axis="y", rotation=0)
+#     ax.tick_params(left=True)
+#     ax.xaxis.tick_top()
+#     if braces:
+#         for _, brace in enumerate(braces):
+#             curlyBrace(
+#                 fig=fig,
+#                 ax=ax,
+#                 p1=brace["p1"],
+#                 p2=brace["p2"],
+#                 k_r=0.05,
+#                 bool_auto=False,
+#                 str_text=brace["str_text"],
+#                 color="black",
+#                 lw=2,
+#                 int_line_num=2,
+#             )
+#     plt.show()
 
 
 def plot_tiles_locations(tiles_list, rows, cols, title=None):
-    """Simple plot to show the states/tiles numbers."""
+    """Plot the states/tiles numbers."""
     tiles_annot = np.reshape(list(tiles_list), (rows, cols))
     tiles_val = np.zeros_like(tiles_annot)
 
@@ -346,6 +349,7 @@ def plot_policy_emoji(qtable, rows, cols, label, emoji):
 
 
 def plot_rotated_q_values_maps(qtable, rows, cols, labels):
+    """Plot 45° rotated Q-values."""
     # See https://stackoverflow.com/q/12848581/4129062
 
     fig, ax = plt.subplots(2, 2, figsize=(12, 10))
@@ -388,16 +392,12 @@ def plot_rotated_q_values_maps(qtable, rows, cols, labels):
         im = ax.flatten()[idx].pcolormesh(X, Y, C, cmap="Blues")
         ax.flatten()[idx].figure.colorbar(im, ax=ax.flatten()[idx])
 
-        def arrow_color(table, val):
-            if val > table.mean():
-                color = "white"
-            else:
-                color = "black"
-            return color
-
         # Loop over data dimensions and create text annotations.
         for i in range(rows):
             for j in range(cols):
+                color = (
+                    "white" if qtable_val_max[i, j] > qtable_val_max.mean() else "black"
+                )
                 ax.flatten()[idx].text(
                     # j,
                     # i,
@@ -406,7 +406,7 @@ def plot_rotated_q_values_maps(qtable, rows, cols, labels):
                     qtable_directions[i, j],
                     ha="center",
                     va="center",
-                    color=arrow_color(qtable_val_max, qtable_val_max[i, j]),
+                    color=color,
                     rotation=45,
                 )
 
@@ -425,48 +425,50 @@ def plot_rotated_q_values_maps(qtable, rows, cols, labels):
     plt.show()
 
 
-def plot_location_count(
-    all_state_composite, tiles_locations, cols, rows, cues=None, contexts_labels=None
-):
-    # cmap = sns.color_palette("Blues", as_cmap=True)
-    cmap = sns.color_palette("rocket_r", as_cmap=True)
+# def plot_location_count(
+#     all_state_composite, tiles_locations, cols, rows, cues=None, contexts_labels=None
+# ):
+#     """Plot location counts heatmap."""
+#     # cmap = sns.color_palette("Blues", as_cmap=True)
+#     cmap = sns.color_palette("rocket_r", as_cmap=True)
 
-    if cues and contexts_labels:
-        fig, ax = plt.subplots(1, 3, figsize=(12, 4))
-        for idx, cue in enumerate(cues):
-            location_count = get_location_count(
-                all_state_composite=all_state_composite,
-                tiles_locations=tiles_locations,
-                cols=cols,
-                rows=rows,
-                cue=cue,
-            )
-            chart = sns.heatmap(location_count, cmap=cmap, ax=ax.flatten()[idx])
-            chart.set(title=contexts_labels[cue])
-            ax.flatten()[idx].set_xticks([])
-            ax.flatten()[idx].set_yticks([])
-        fig.suptitle("Locations counts during training")  # , fontsize="xx-large")
+#     if cues and contexts_labels:
+#         fig, ax = plt.subplots(1, 3, figsize=(12, 4))
+#         for idx, cue in enumerate(cues):
+#             location_count = get_location_count(
+#                 all_state_composite=all_state_composite,
+#                 tiles_locations=tiles_locations,
+#                 cols=cols,
+#                 rows=rows,
+#                 cue=cue,
+#             )
+#             chart = sns.heatmap(location_count, cmap=cmap, ax=ax.flatten()[idx])
+#             chart.set(title=contexts_labels[cue])
+#             ax.flatten()[idx].set_xticks([])
+#             ax.flatten()[idx].set_yticks([])
+#         fig.suptitle("Locations counts during training")  # , fontsize="xx-large")
 
-    else:  # Plot everything
-        location_count = get_location_count(
-            all_state_composite,
-            tiles_locations=tiles_locations,
-            cols=cols,
-            rows=rows,
-            cue=cues,
-        )
-        fig, ax = plt.subplots(figsize=(10, 8))
-        chart = sns.heatmap(location_count, cmap=cmap, ax=ax)
-        chart.set(title="Locations count during training")
-        ax.set_xticks([])
-        ax.set_yticks([])
-    fig.tight_layout()
-    plt.show()
+#     else:  # Plot everything
+#         location_count = get_location_count(
+#             all_state_composite,
+#             tiles_locations=tiles_locations,
+#             cols=cols,
+#             rows=rows,
+#             cue=cues,
+#         )
+#         fig, ax = plt.subplots(figsize=(10, 8))
+#         chart = sns.heatmap(location_count, cmap=cmap, ax=ax)
+#         chart.set(title="Locations count during training")
+#         ax.set_xticks([])
+#         ax.set_yticks([])
+#     fig.tight_layout()
+#     plt.show()
 
 
 def plot_weights_biases_distributions(
     weights_df, biases_df, label=None, figpath=None, logger=None
 ):
+    """Plot weights biases distributions."""
     fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(13, 5))
 
     ax[0].set_title("Weights")
@@ -522,6 +524,7 @@ def plot_weights_biases_distributions(
 def plot_weights_biases_stats(
     weights_stats, biases_stats, label=None, figpath=None, logger=None
 ):
+    """Plot weights biases stats."""
     fig, ax = plt.subplots(nrows=2, ncols=2, figsize=(13, 8))
 
     if label:
@@ -602,6 +605,7 @@ def plot_weights_biases_stats(
 
 
 def plot_loss(loss_df, n_runs=1, figpath=None, logger=None):
+    """Plot the training loss."""
     fig, ax = plt.subplots()
     sns.lineplot(data=loss_df, x="Steps", y="Loss", ax=ax, color="black")
     if USETEX:
@@ -637,6 +641,7 @@ def plot_loss(loss_df, n_runs=1, figpath=None, logger=None):
 
 
 def plot_exploration_rate(epsilons, xlabel="", figpath=None, logger=None):
+    """Plot the exploration rate."""
     fig, ax = plt.subplots()
     sns.lineplot(epsilons, color="black")
     ax.set(ylabel="Epsilon")
@@ -767,6 +772,7 @@ def plot_policies(q_values, labels, n_rows, n_cols, figpath=None, logger=None):
 def plot_weights_matrices(
     weights_untrained, weights_trained, figpath=None, logger=None
 ):
+    """Plot heatmap weights before and after training."""
     msg = "Plotting weights matrices..."
     print(msg)
     if logger:
@@ -840,6 +846,7 @@ def plot_weights_matrices(
 def plot_activations(
     activations_layer_df, input_cond, labels, layer_inspected, figpath=None, logger=None
 ):
+    """Plot activations learned in `layer_inspected`."""
     msg = "Plotting activations learned..."
     print(msg)
     if logger:
@@ -849,7 +856,7 @@ def plot_activations(
     # cluster_palette = sns.color_palette("Pastel2")
     cluster_palette = sns.color_palette("Accent")
     cluster_colors = dict(zip(list(labels.values()), cluster_palette))
-    row_colors = [cluster_colors[cond.split("-")[1]] for cond in input_cond.keys()]
+    row_colors = [cluster_colors[cond.split("-")[1]] for cond in input_cond]
     row_colors_serie = pd.Series(row_colors)
     row_colors_serie = row_colors_serie.set_axis(list(input_cond.keys()))
 
