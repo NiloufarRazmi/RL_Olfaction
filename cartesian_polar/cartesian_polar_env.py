@@ -184,8 +184,10 @@ class Environment:
         """Return if the episode is terminated or not."""
         is_terminated = False
         if self.odor_condition == OdorCondition.post and (
-            state["location"] == Ports.West.value
-            or state["location"] == Ports.East.value
+            (state["x"], state["y"]) == Ports.West.value
+            and state["direction"] in [0, 270]
+            or (state["x"], state["y"]) == Ports.East.value
+            and state["direction"] in [90, 180]
         ):
             is_terminated = True
         return is_terminated
@@ -197,26 +199,32 @@ class Environment:
             if self.TaskID == TaskID.EastWest:
                 if (
                     state["cue"] == Cues.OdorA
-                    and state["location"] == Ports.West.value
+                    and (state["x"], state["y"]) == Ports.West.value
+                    and state["direction"] in [0, 270]
                     or state["cue"] == Cues.OdorB
-                    and state["location"] == Ports.East.value
+                    and (state["x"], state["y"]) == Ports.East.value
+                    and state["direction"] in [90, 180]
                 ):
                     reward = 1
             elif self.TaskID == TaskID.LeftRight:
                 if self.TriangleState == TriangleState.upper:
                     if (
                         state["cue"] == Cues.OdorA
-                        and state["location"] == Ports.West.value
+                        and (state["x"], state["y"]) == Ports.West.value
+                        and state["direction"] in [0, 270]
                         or state["cue"] == Cues.OdorB
-                        and state["location"] == Ports.East.value
+                        and (state["x"], state["y"]) == Ports.East.value
+                        and state["direction"] in [90, 180]
                     ):
                         reward = 1
                 elif self.TriangleState == TriangleState.lower:
                     if (
                         state["cue"] == Cues.OdorA
-                        and state["location"] == Ports.East.value
+                        and (state["x"], state["y"]) == Ports.East.value
+                        and state["direction"] in [90, 180]
                         or state["cue"] == Cues.OdorB
-                        and state["location"] == Ports.West.value
+                        and (state["x"], state["y"]) == Ports.West.value
+                        and state["direction"] in [0, 270]
                     ):
                         reward = 1
                 else:
@@ -246,7 +254,9 @@ class Environment:
         new_state["direction"] = new_agent_loc[2].unsqueeze(-1)
 
         # Update internal states
-        if (new_state["x"], new_state["y"]) in {item.value for item in OdorPorts}:
+        if (new_state["x"].item(), new_state["y"].item()) in {
+            item.value for item in OdorPorts
+        }:
             self.odor_condition = OdorCondition.post
             new_state["cue"] = self.odor_ID
 
@@ -307,46 +317,46 @@ class Environment:
             return angle, y
 
         if direction == 0:  # Facing north
-            if action == Actions.left.value:
+            if action == Actions.left:
                 direction, x = LEFT(x=x, y=y)
-            elif action == Actions.right.value:
+            elif action == Actions.right:
                 direction, x = RIGHT(x=x, y=y)
-            elif action == Actions.forward.value:
+            elif action == Actions.forward:
                 direction, y = UP(x=x, y=y)
-            elif action == Actions.backward.value:
+            elif action == Actions.backward:
                 direction, y = DOWN(x=x, y=y)
                 direction = 0
 
         elif direction == 90:  # Facing east
-            if action == Actions.left.value:
+            if action == Actions.left:
                 direction, y = UP(x=x, y=y)
-            elif action == Actions.right.value:
+            elif action == Actions.right:
                 direction, y = DOWN(x=x, y=y)
-            elif action == Actions.forward.value:
+            elif action == Actions.forward:
                 direction, x = RIGHT(x=x, y=y)
-            elif action == Actions.backward.value:
+            elif action == Actions.backward:
                 direction, x = LEFT(x=x, y=y)
                 direction = 90
 
         elif direction == 180:  # Facing south
-            if action == Actions.left.value:
+            if action == Actions.left:
                 direction, x = RIGHT(x=x, y=y)
-            elif action == Actions.right.value:
+            elif action == Actions.right:
                 direction, x = LEFT(x=x, y=y)
-            elif action == Actions.forward.value:
+            elif action == Actions.forward:
                 direction, y = DOWN(x=x, y=y)
-            elif action == Actions.backward.value:
+            elif action == Actions.backward:
                 direction, y = UP(x=x, y=y)
                 direction = 180
 
         elif direction == 270:  # Facing west
-            if action == Actions.left.value:
+            if action == Actions.left:
                 direction, y = DOWN(x=x, y=y)
-            elif action == Actions.right.value:
+            elif action == Actions.right:
                 direction, y = UP(x=x, y=y)
-            elif action == Actions.forward.value:
+            elif action == Actions.forward:
                 direction, x = LEFT(x=x, y=y)
-            elif action == Actions.backward.value:
+            elif action == Actions.backward:
                 direction, x = RIGHT(x=x, y=y)
                 direction = 270
 
