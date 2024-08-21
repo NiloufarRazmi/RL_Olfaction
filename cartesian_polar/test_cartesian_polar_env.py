@@ -391,12 +391,12 @@ def test_env_logic(task, triangle, expected_reward):
     )
     state, reward, done = env.step(action=Actions.forward, current_state=state)
     assert env.odor_condition == OdorCondition.post
-    assert state["cue"] == Cues.OdorA or Cues.OdorB
+    assert state["cue"] == Cues.OdorA.value or Cues.OdorB.value
 
     # Post odor presentation
     if task == TaskID.EastWest:
         if triangle == TriangleState.upper:
-            if state["cue"] == Cues.OdorA:
+            if state["cue"] == Cues.OdorA.value:
                 if expected_reward == 1:
                     action = Actions.left
                     state, reward, done = env.step(action=action, current_state=state)
@@ -404,7 +404,7 @@ def test_env_logic(task, triangle, expected_reward):
                     action = Actions.right
                     state, reward, done = env.step(action=action, current_state=state)
                     state, reward, done = env.step(action=action, current_state=state)
-            elif state["cue"] == Cues.OdorB:
+            elif state["cue"] == Cues.OdorB.value:
                 if expected_reward == 1:
                     action = Actions.right
                     state, reward, done = env.step(action=action, current_state=state)
@@ -413,7 +413,7 @@ def test_env_logic(task, triangle, expected_reward):
                     action = Actions.left
                     state, reward, done = env.step(action=action, current_state=state)
         elif triangle == TriangleState.lower:
-            if state["cue"] == Cues.OdorA:
+            if state["cue"] == Cues.OdorA.value:
                 if expected_reward == 1:
                     action = Actions.right
                     state, reward, done = env.step(action=action, current_state=state)
@@ -421,7 +421,7 @@ def test_env_logic(task, triangle, expected_reward):
                 else:
                     action = Actions.left
                     state, reward, done = env.step(action=action, current_state=state)
-            elif state["cue"] == Cues.OdorB:
+            elif state["cue"] == Cues.OdorB.value:
                 if expected_reward == 1:
                     action = Actions.left
                     state, reward, done = env.step(action=action, current_state=state)
@@ -431,7 +431,7 @@ def test_env_logic(task, triangle, expected_reward):
                     state, reward, done = env.step(action=action, current_state=state)
     elif task == TaskID.LeftRight:
         if triangle == TriangleState.upper:
-            if state["cue"] == Cues.OdorA:
+            if state["cue"] == Cues.OdorA.value:
                 if expected_reward == 1:
                     action = Actions.left
                     state, reward, done = env.step(action=action, current_state=state)
@@ -439,7 +439,7 @@ def test_env_logic(task, triangle, expected_reward):
                     action = Actions.right
                     state, reward, done = env.step(action=action, current_state=state)
                     state, reward, done = env.step(action=action, current_state=state)
-            elif state["cue"] == Cues.OdorB:
+            elif state["cue"] == Cues.OdorB.value:
                 if expected_reward == 1:
                     action = Actions.right
                     state, reward, done = env.step(action=action, current_state=state)
@@ -448,7 +448,7 @@ def test_env_logic(task, triangle, expected_reward):
                     action = Actions.left
                     state, reward, done = env.step(action=action, current_state=state)
         elif triangle == TriangleState.lower:
-            if state["cue"] == Cues.OdorB:
+            if state["cue"] == Cues.OdorB.value:
                 if expected_reward == 1:
                     action = Actions.right
                     state, reward, done = env.step(action=action, current_state=state)
@@ -456,7 +456,7 @@ def test_env_logic(task, triangle, expected_reward):
                 else:
                     action = Actions.left
                     state, reward, done = env.step(action=action, current_state=state)
-            elif state["cue"] == Cues.OdorA:
+            elif state["cue"] == Cues.OdorA.value:
                 if expected_reward == 1:
                     action = Actions.left
                     state, reward, done = env.step(action=action, current_state=state)
@@ -481,15 +481,64 @@ def test_env_logic(task, triangle, expected_reward):
             torch.tensor([0, 0]),
             torch.tensor([2, 2]),
             torch.tensor([2, 2]),
-            torch.tensor([2.8284, 45]),
-            torch.tensor([2.8284, 45]),
+            torch.tensor([2.8, 45]),
+            torch.tensor([2.8, 45]),
         ),
         (
             torch.tensor([2, 2]),
             torch.tensor([0, 0]),
             torch.tensor([4, 4]),
             torch.tensor([0, 0]).to(torch.float32),
-            torch.tensor([5.6568, 45]),
+            torch.tensor([5.7, 45]),
+        ),
+        (
+            torch.tensor([-2, -2]),
+            torch.tensor([4, 4]),
+            torch.tensor([0, 0]),
+            torch.tensor([5.7, 45]),
+            torch.tensor([0, 0]).to(torch.float32),
+        ),
+        (
+            torch.tensor([2, -2]),
+            torch.tensor([0, 4]),
+            torch.tensor([4, 0]),
+            torch.tensor([4, 90]).to(torch.float32),
+            torch.tensor([4, 0]).to(torch.float32),
+        ),
+        (
+            torch.tensor([-2, 2]),
+            torch.tensor([4, 0]),
+            torch.tensor([0, 4]),
+            torch.tensor([4, 0]).to(torch.float32),
+            torch.tensor([4, 90]).to(torch.float32),
+        ),
+        (
+            torch.tensor([3, 3]),
+            torch.tensor([-1, -1]),
+            torch.tensor([5, 5]),
+            torch.tensor([1.4, -135]),
+            torch.tensor([7.1, 45]),
+        ),
+        (
+            torch.tensor([-3, -3]),
+            torch.tensor([5, 5]),
+            torch.tensor([-1, -1]),
+            torch.tensor([7.1, 45]),
+            torch.tensor([1.4, -135]),
+        ),
+        (
+            torch.tensor([1, -1]),
+            torch.tensor([1, 3]),
+            torch.tensor([3, 1]),
+            torch.tensor([3.2, 72]),
+            torch.tensor([3.2, 18]),
+        ),
+        (
+            torch.tensor([-1, 1]),
+            torch.tensor([3, 1]),
+            torch.tensor([1, 3]),
+            torch.tensor([3.2, 18]),
+            torch.tensor([3.2, 72]),
         ),
     ],
 )
@@ -502,17 +551,194 @@ def test_coords_convertions(
 ):
     """Test the conversion routines."""
     env = DuplicatedCoordsEnv()
-    assert torch.equal(env.conv2north_cartesian(coords_orig), coords_north_cart)
-    assert torch.equal(env.conv2south_cartesian(coords_orig), coords_south_cart)
+    assert torch.equal(
+        input=env.conv2north_cartesian(coords_orig), other=coords_north_cart
+    )
+    assert torch.equal(
+        input=env.conv2south_cartesian(coords_orig), other=coords_south_cart
+    )
     torch.testing.assert_close(
         actual=env.conv2north_polar(coords_orig),
         expected=coords_north_polar,
-        rtol=1e-5,
-        atol=1e-4,
+        # rtol=1e-5,
+        # atol=1e-4,
     )
     torch.testing.assert_close(
         actual=env.conv2south_polar(coords_orig),
         expected=coords_south_polar,
-        rtol=1e-5,
-        atol=1e-4,
+        # rtol=1e-5,
+        # atol=1e-4,
     )
+
+    # Test round trip conversion
+    assert torch.equal(
+        input=env.conv_north_cartesian2orig(env.conv2north_cartesian(coords_orig)),
+        other=coords_orig,
+    )
+
+
+@pytest.mark.parametrize(
+    "task, triangle, expected_reward",
+    [
+        (
+            TaskID.EastWest,
+            TriangleState.upper,
+            1,
+        ),
+        (
+            TaskID.EastWest,
+            TriangleState.upper,
+            0,
+        ),
+        (
+            TaskID.EastWest,
+            TriangleState.lower,
+            1,
+        ),
+        (
+            TaskID.EastWest,
+            TriangleState.lower,
+            0,
+        ),
+        (
+            TaskID.LeftRight,
+            TriangleState.upper,
+            1,
+        ),
+        (
+            TaskID.LeftRight,
+            TriangleState.upper,
+            0,
+        ),
+        (
+            TaskID.LeftRight,
+            TriangleState.lower,
+            1,
+        ),
+        (
+            TaskID.LeftRight,
+            TriangleState.lower,
+            0,
+        ),
+    ],
+    ids=[
+        "east/west - upper - solved",
+        "east/west - upper - not solved",
+        "east/west - lower - solved",
+        "east/west - lower - not solved",
+        "left/right - upper - solved",
+        "left/right - upper - not solved",
+        "left/right - lower - solved",
+        "left/right - lower - not solved",
+    ],
+)
+def test_DuplicatedCoordsEnv_logic(task, triangle, expected_reward):
+    """Test environment logic."""
+    env = DuplicatedCoordsEnv()
+    env.reset()
+    env.TaskID = task
+    env.TriangleState = triangle
+    assert env.odor_condition == OdorCondition.pre
+
+    if triangle == TriangleState.upper:
+        x_orig = 2
+        y_orig = 1
+        direction_orig = 0
+    elif triangle == TriangleState.lower:
+        x_orig = -2
+        y_orig = -1
+        direction_orig = 180
+
+    coords_orig = torch.tensor([x_orig, y_orig])
+    state = torch.cat(
+        (
+            torch.tensor(Cues.NoOdor.value).unsqueeze(-1),
+            torch.tensor(direction_orig).unsqueeze(-1),
+            env.conv2north_cartesian(coords_orig),
+            env.conv2south_cartesian(coords_orig),
+            env.conv2north_polar(coords_orig),
+            env.conv2south_polar(coords_orig),
+        )
+    )
+    state, reward, done = env.step(action=Actions.forward, current_state=state)
+    assert env.odor_condition == OdorCondition.post
+    assert state[0] == Cues.OdorA.value or Cues.OdorB.value
+
+    # Post odor presentation
+    if task == TaskID.EastWest:
+        if triangle == TriangleState.upper:
+            if state[0] == Cues.OdorA.value:
+                if expected_reward == 1:
+                    action = Actions.left
+                    state, reward, done = env.step(action=action, current_state=state)
+                else:
+                    action = Actions.right
+                    state, reward, done = env.step(action=action, current_state=state)
+                    state, reward, done = env.step(action=action, current_state=state)
+            elif state[0] == Cues.OdorB.value:
+                if expected_reward == 1:
+                    action = Actions.right
+                    state, reward, done = env.step(action=action, current_state=state)
+                    state, reward, done = env.step(action=action, current_state=state)
+                else:
+                    action = Actions.left
+                    state, reward, done = env.step(action=action, current_state=state)
+        elif triangle == TriangleState.lower:
+            if state[0] == Cues.OdorA.value:
+                if expected_reward == 1:
+                    action = Actions.right
+                    state, reward, done = env.step(action=action, current_state=state)
+                    state, reward, done = env.step(action=action, current_state=state)
+                else:
+                    action = Actions.left
+                    state, reward, done = env.step(action=action, current_state=state)
+            elif state[0] == Cues.OdorB.value:
+                if expected_reward == 1:
+                    action = Actions.left
+                    state, reward, done = env.step(action=action, current_state=state)
+                else:
+                    action = Actions.right
+                    state, reward, done = env.step(action=action, current_state=state)
+                    state, reward, done = env.step(action=action, current_state=state)
+    elif task == TaskID.LeftRight:
+        if triangle == TriangleState.upper:
+            if state[0] == Cues.OdorA.value:
+                if expected_reward == 1:
+                    action = Actions.left
+                    state, reward, done = env.step(action=action, current_state=state)
+                else:
+                    action = Actions.right
+                    state, reward, done = env.step(action=action, current_state=state)
+                    state, reward, done = env.step(action=action, current_state=state)
+            elif state[0] == Cues.OdorB.value:
+                if expected_reward == 1:
+                    action = Actions.right
+                    state, reward, done = env.step(action=action, current_state=state)
+                    state, reward, done = env.step(action=action, current_state=state)
+                else:
+                    action = Actions.left
+                    state, reward, done = env.step(action=action, current_state=state)
+        elif triangle == TriangleState.lower:
+            if state[0] == Cues.OdorB.value:
+                if expected_reward == 1:
+                    action = Actions.right
+                    state, reward, done = env.step(action=action, current_state=state)
+                    state, reward, done = env.step(action=action, current_state=state)
+                else:
+                    action = Actions.left
+                    state, reward, done = env.step(action=action, current_state=state)
+            elif state[0] == Cues.OdorA.value:
+                if expected_reward == 1:
+                    action = Actions.left
+                    state, reward, done = env.step(action=action, current_state=state)
+                else:
+                    action = Actions.right
+                    state, reward, done = env.step(action=action, current_state=state)
+                    state, reward, done = env.step(action=action, current_state=state)
+
+    action = Actions.forward
+    for _ in range(3):
+        state, reward, done = env.step(action=action, current_state=state)
+
+    assert done is True
+    assert reward == expected_reward

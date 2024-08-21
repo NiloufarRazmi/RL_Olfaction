@@ -140,6 +140,7 @@ class Environment:
                 ),
             },
             batch_size=[1],
+            device=DEVICE,
         )
         self.odor_condition = OdorCondition.pre
         self.odor_ID = Cues(
@@ -198,10 +199,10 @@ class Environment:
         if self.odor_condition == OdorCondition.post:
             if self.TaskID == TaskID.EastWest:
                 if (
-                    state["cue"] == Cues.OdorA
+                    state["cue"] == Cues.OdorA.value
                     and (state["x"], state["y"]) == Ports.West.value
                     and state["direction"] in [0, 270]
-                    or state["cue"] == Cues.OdorB
+                    or state["cue"] == Cues.OdorB.value
                     and (state["x"], state["y"]) == Ports.East.value
                     and state["direction"] in [90, 180]
                 ):
@@ -209,20 +210,20 @@ class Environment:
             elif self.TaskID == TaskID.LeftRight:
                 if self.TriangleState == TriangleState.upper:
                     if (
-                        state["cue"] == Cues.OdorA
+                        state["cue"] == Cues.OdorA.value
                         and (state["x"], state["y"]) == Ports.West.value
                         and state["direction"] in [0, 270]
-                        or state["cue"] == Cues.OdorB
+                        or state["cue"] == Cues.OdorB.value
                         and (state["x"], state["y"]) == Ports.East.value
                         and state["direction"] in [90, 180]
                     ):
                         reward = 1
                 elif self.TriangleState == TriangleState.lower:
                     if (
-                        state["cue"] == Cues.OdorA
+                        state["cue"] == Cues.OdorA.value
                         and (state["x"], state["y"]) == Ports.East.value
                         and state["direction"] in [90, 180]
-                        or state["cue"] == Cues.OdorB
+                        or state["cue"] == Cues.OdorB.value
                         and (state["x"], state["y"]) == Ports.West.value
                         and state["direction"] in [0, 270]
                     ):
@@ -237,10 +238,7 @@ class Environment:
 
     def step(self, action, current_state):
         """Take an action, observe reward and the next state."""
-        new_state = TensorDict(
-            {},
-            batch_size=[1],
-        )
+        new_state = TensorDict({}, batch_size=[1], device=DEVICE)
         new_state["cue"] = current_state["cue"]
         new_agent_loc = self.move(
             x=current_state["x"],
@@ -258,7 +256,7 @@ class Environment:
             item.value for item in OdorPorts
         }:
             self.odor_condition = OdorCondition.post
-            new_state["cue"] = self.odor_ID
+            new_state["cue"] = torch.tensor([self.odor_ID.value], device=DEVICE)
 
         reward = self.reward(new_state)
         done = self.is_terminated(new_state)
@@ -433,6 +431,7 @@ class DuplicatedCoordsEnv(Environment):
                 "direction": torch.tensor([state[1]], device=DEVICE),
             },
             batch_size=[1],
+            device=DEVICE,
         )
         return conv_state
 
@@ -469,8 +468,10 @@ class DuplicatedCoordsEnv(Environment):
 
     def cartesian2polar(self, coords_orig):
         """Convert coordinates from Cartesian to polar."""
-        length = torch.sqrt(coords_orig[0] ** 2 + coords_orig[1] ** 2)
-        alpha = torch.atan2(input=coords_orig[1], other=coords_orig[0]) * 180 / math.pi
+        length = torch.sqrt(coords_orig[0] ** 2 + coords_orig[1] ** 2).round(decimals=1)
+        alpha = (
+            torch.atan2(input=coords_orig[1], other=coords_orig[0]) * 180 / math.pi
+        ).round()
         return torch.tensor([length, alpha], device=DEVICE)
 
     def conv2north_polar(self, coords_orig):
@@ -487,6 +488,6 @@ class DuplicatedCoordsEnv(Environment):
 
     def conv_north_cartesian2orig(self, coords_orig):
         """Convert Cartesian coords from North port to origin (0, 0) coords."""
-        new_x = coords_orig[0] - 2
-        new_y = coords_orig[1] - 2
+        new_x = -coords_orig[0] + 2
+        new_y = -coords_orig[1] + 2
         return torch.tensor([new_x, new_y], device=DEVICE)
