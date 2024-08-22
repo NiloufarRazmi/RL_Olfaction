@@ -315,46 +315,46 @@ class Environment:
             return angle, y
 
         if direction == 0:  # Facing north
-            if action == Actions.left:
+            if action == Actions.left.value:
                 direction, x = LEFT(x=x, y=y)
-            elif action == Actions.right:
+            elif action == Actions.right.value:
                 direction, x = RIGHT(x=x, y=y)
-            elif action == Actions.forward:
+            elif action == Actions.forward.value:
                 direction, y = UP(x=x, y=y)
-            elif action == Actions.backward:
+            elif action == Actions.backward.value:
                 direction, y = DOWN(x=x, y=y)
                 direction = 0
 
         elif direction == 90:  # Facing east
-            if action == Actions.left:
+            if action == Actions.left.value:
                 direction, y = UP(x=x, y=y)
-            elif action == Actions.right:
+            elif action == Actions.right.value:
                 direction, y = DOWN(x=x, y=y)
-            elif action == Actions.forward:
+            elif action == Actions.forward.value:
                 direction, x = RIGHT(x=x, y=y)
-            elif action == Actions.backward:
+            elif action == Actions.backward.value:
                 direction, x = LEFT(x=x, y=y)
                 direction = 90
 
         elif direction == 180:  # Facing south
-            if action == Actions.left:
+            if action == Actions.left.value:
                 direction, x = RIGHT(x=x, y=y)
-            elif action == Actions.right:
+            elif action == Actions.right.value:
                 direction, x = LEFT(x=x, y=y)
-            elif action == Actions.forward:
+            elif action == Actions.forward.value:
                 direction, y = DOWN(x=x, y=y)
-            elif action == Actions.backward:
+            elif action == Actions.backward.value:
                 direction, y = UP(x=x, y=y)
                 direction = 180
 
         elif direction == 270:  # Facing west
-            if action == Actions.left:
+            if action == Actions.left.value:
                 direction, y = DOWN(x=x, y=y)
-            elif action == Actions.right:
+            elif action == Actions.right.value:
                 direction, y = UP(x=x, y=y)
-            elif action == Actions.forward:
+            elif action == Actions.forward.value:
                 direction, x = LEFT(x=x, y=y)
-            elif action == Actions.backward:
+            elif action == Actions.backward.value:
                 direction, x = RIGHT(x=x, y=y)
                 direction = 270
 

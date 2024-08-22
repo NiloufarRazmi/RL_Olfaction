@@ -15,7 +15,7 @@ from tqdm import tqdm
 from . import plotting as viz
 from . import utils
 from .agent import EpsilonGreedy, neural_network
-from .cartesian_polar_env import CONTEXTS_LABELS, Actions, Cues, WrappedEnvironment
+from .cartesian_polar_env import CONTEXTS_LABELS, Actions, Cues, DuplicatedCoordsEnv
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -35,7 +35,7 @@ def training_loop(p, current_path, logger, generator=None):
 
     for run in range(p.n_runs):  # Run several times to account for stochasticity
         # Get the number of states and actions from the environment
-        env = WrappedEnvironment(one_hot_state=True, seed=p.seed)
+        env = DuplicatedCoordsEnv(seed=p.seed)
         state = env.reset()
         p.n_actions = env.numActions
         p.n_observations = len(state)
