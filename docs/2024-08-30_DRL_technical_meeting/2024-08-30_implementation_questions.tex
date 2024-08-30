@@ -1,4 +1,4 @@
-% Created 2024-08-30 Fri 00:36
+% Created 2024-08-30 Fri 11:59
 % Intended LaTeX compiler: lualatex
 \documentclass[bigger]{beamer}
 \usepackage{amsmath}
@@ -56,6 +56,7 @@ tabsize=2
 \author{Andrea Pierré}
 \date{August 30, 2024}
 \title{Implementation discussion}
+\subtitle{Cartesian/polar duplicated coordinates experiment}
 \institute{Brown University}
 \titlegraphic{\hfill\includegraphics[height=1.5cm]{img/Brown Logo_2016_2 Color Process ST_1300.png}}
 \setbeamercovered{transparent=10}
@@ -75,14 +76,28 @@ fg=headercolor
 \begin{document}
 
 \maketitle
-\section{Questions}
-\label{sec:orgd4357fa}
-\begin{frame}[label={sec:orgc284d02}]{Should there be a backward action?}
+\section{Status}
+\label{sec:org3e608ff}
+\begin{frame}[label={sec:org6048ddd}]{Status}
+\begin{itemize}
+\item Environment: done
+\begin{itemize}
+\item Main class with origin (0,0) at the center of the environment
+\item Subclass that converts the coordinates of the agent to North \& South ports in Cartesian and polar coordinates
+\item 44 unit tests to check that the code does what it's supposed to do and that the agent is where it's supposed to be
+\end{itemize}
+\item Visualization: WIP
+\item Training: to-do
+\end{itemize}
+\end{frame}
+\section{Discussion}
+\label{sec:org58cd819}
+\begin{frame}[label={sec:org4bc6b62}]{Should there be a backward action?}
 \begin{center}
 \includegraphics[height=0.8\textheight]{img/RL_env-cartesian-polar.drawio.pdf}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org33cbc9f},fragile]{What should be part of the state?}
+\begin{frame}[label={sec:org52e0a7b},fragile]{What should be part of the state?}
 \scriptsize
 \begin{lstlisting}[language={Python}]
 state = TensorDict(
@@ -99,7 +114,7 @@ state = TensorDict(
 \normalsize
 \(\to\) Should head direction be part of the state?
 \end{frame}
-\begin{frame}[label={sec:org555ba18}]{Tiles on the diagonal}
+\begin{frame}[label={sec:org973d3dc}]{Tiles on the diagonal}
 \begin{columns}
 \begin{column}[t]{0.6\columnwidth}
 \begin{center}
@@ -113,7 +128,7 @@ state = TensorDict(
 \end{column}
 \end{columns}
 \end{frame}
-\begin{frame}[label={sec:org07eb502}]{Length rounding in polar coordinates?}
+\begin{frame}[label={sec:org1b5354a}]{Length rounding in polar coordinates?}
 \begin{itemize}
 \item For step 1 tiles
 \item For step 0.5 tiles
@@ -122,7 +137,7 @@ state = TensorDict(
 \includegraphics[width=.9\linewidth]{img/polar-discretized-length.drawio.pdf}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:orgc984c75}]{Which architecture for the network?}
+\begin{frame}[label={sec:org5e64c86}]{Which architecture for the network?}
 \begin{itemize}
 \item 2 tasks (East/West \& Left/Right)
 \item upper/lower triangle
@@ -132,5 +147,8 @@ state = TensorDict(
 \item 360 discretized angles (polar)
 \item 50 discretized lengths (polar)
 \end{itemize}
+\end{frame}
+\begin{frame}[label={sec:orgc57e944},standout]{~}
+Thanks!
 \end{frame}
 \end{document}

@@ -1,10 +1,19 @@
 #+TITLE: Implementation discussion
+#+SUBTITLE: Cartesian/polar duplicated coordinates experiment
 #+author: Andrea Pierré
 #+date: August 30, 2024
 * HEADER :noexport:
 #+SETUPFILE: ./style.org
 
-* Questions
+* Status
+** Status
+- Environment: done
+  - Main class with origin (0,0) at the center of the environment
+  - Subclass that converts the coordinates of the agent to North & South ports in Cartesian and polar coordinates
+  - 44 unit tests to check that the code does what it's supposed to do and that the agent is where it's supposed to be
+- Visualization: WIP
+- Training: to-do
+* Discussion
 ** Should there be a backward action?
 #+ATTR_LaTeX: :height 0.8\textheight
 [[file:img/RL_env-cartesian-polar.drawio.pdf]]
@@ -54,6 +63,12 @@ state = TensorDict(
 - 5 discretized y coordinates (Cartesian)
 - 360 discretized angles (polar)
 - 50 discretized lengths (polar)
+
+** \nbsp{}
+:PROPERTIES:
+:BEAMER_opt: standout
+:END:
+Thanks!
 
 * COMMENT Add plain option to Beamer TOC
 % Local variables:
