@@ -291,8 +291,6 @@ def get_activations_learned(net, env, layer_inspected, contexts_labels):
     for cue_obj, cue_txt in contexts_labels.items():
         for loc in env.state_space["location"]:
             current_state = torch.tensor([loc, cue_obj.value], device=DEVICE)
-            if env.one_hot_state:
-                current_state = env.to_one_hot(current_state)
             input_cond[f"{loc}-{cue_txt}"] = current_state.float()
 
     # Get the number of neurons in the layer inspected

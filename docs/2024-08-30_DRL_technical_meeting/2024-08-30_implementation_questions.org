@@ -1,0 +1,63 @@
+#+TITLE: Implementation discussion
+#+author: Andrea Pierré
+#+date: August 30, 2024
+* HEADER :noexport:
+#+SETUPFILE: ./style.org
+
+* Questions
+** Should there be a backward action?
+#+ATTR_LaTeX: :height 0.8\textheight
+[[file:img/RL_env-cartesian-polar.drawio.pdf]]
+** What should be part of the state?
+:PROPERTIES:
+:BEAMER_opt: fragile
+:END:
+#+begin_export latex
+\scriptsize
+\begin{lstlisting}[language={Python}]
+state = TensorDict(
+    {
+        "cue": torch.tensor(Cues.NoOdor.value, device=DEVICE).unsqueeze(-1),
+        "x": torch.tensor([x], device=DEVICE),
+        "y": torch.tensor([y], device=DEVICE),
+        "direction": torch.tensor([direction], device=DEVICE),
+    },
+    batch_size=[1],
+    device=DEVICE,
+)
+\end{lstlisting}
+\normalsize
+#+end_export
+\to Should head direction be part of the state?
+** Tiles on the diagonal
+*** Left
+:PROPERTIES:
+:BEAMER_col: 0.6
+:BEAMER_opt: [t]
+:END:
+[[file:img/policy.png]]
+*** Right
+:PROPERTIES:
+:BEAMER_col: 0.4
+:BEAMER_opt: [t]
+:END:
+[[file:img/task-left-right.jpeg]]
+** Length rounding in polar coordinates?
+- For step 1 tiles
+- For step 0.5 tiles
+[[file:img/polar-discretized-length.drawio.pdf]]
+** Which architecture for the network?
+- 2 tasks (East/West & Left/Right)
+- upper/lower triangle
+- 4 head directions
+- 5 discretized x coordinates (Cartesian)
+- 5 discretized y coordinates (Cartesian)
+- 360 discretized angles (polar)
+- 50 discretized lengths (polar)
+
+* COMMENT Add plain option to Beamer TOC
+% Local variables:
+% org-beamer-outline-frame-options: "plain"
+% End:
+
+* Feedback :noexport:
