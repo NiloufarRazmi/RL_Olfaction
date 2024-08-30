@@ -1,4 +1,4 @@
-% Created 2024-08-29 Thu 23:40
+% Created 2024-08-30 Fri 00:36
 % Intended LaTeX compiler: lualatex
 \documentclass[bigger]{beamer}
 \usepackage{amsmath}
@@ -76,13 +76,13 @@ fg=headercolor
 
 \maketitle
 \section{Questions}
-\label{sec:org4e2530a}
-\begin{frame}[label={sec:orgf051d1b}]{Should there be a backward action?}
+\label{sec:orgd4357fa}
+\begin{frame}[label={sec:orgc284d02}]{Should there be a backward action?}
 \begin{center}
 \includegraphics[height=0.8\textheight]{img/RL_env-cartesian-polar.drawio.pdf}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:orgf3f09f1},fragile]{What should be part of the state?}
+\begin{frame}[label={sec:org33cbc9f},fragile]{What should be part of the state?}
 \scriptsize
 \begin{lstlisting}[language={Python}]
 state = TensorDict(
@@ -99,7 +99,7 @@ state = TensorDict(
 \normalsize
 \(\to\) Should head direction be part of the state?
 \end{frame}
-\begin{frame}[label={sec:orgb062178}]{Tiles on the diagonal}
+\begin{frame}[label={sec:org555ba18}]{Tiles on the diagonal}
 \begin{columns}
 \begin{column}[t]{0.6\columnwidth}
 \begin{center}
@@ -113,7 +113,7 @@ state = TensorDict(
 \end{column}
 \end{columns}
 \end{frame}
-\begin{frame}[label={sec:org24c9b95}]{Length rounding in polar coordinates?}
+\begin{frame}[label={sec:org07eb502}]{Length rounding in polar coordinates?}
 \begin{itemize}
 \item For step 1 tiles
 \item For step 0.5 tiles
@@ -122,7 +122,7 @@ state = TensorDict(
 \includegraphics[width=.9\linewidth]{img/polar-discretized-length.drawio.pdf}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org5241fc7}]{Which architecture for the network?}
+\begin{frame}[label={sec:orgc984c75}]{Which architecture for the network?}
 \begin{itemize}
 \item 2 tasks (East/West \& Left/Right)
 \item upper/lower triangle
