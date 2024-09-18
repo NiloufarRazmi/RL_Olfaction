@@ -69,9 +69,6 @@ class EpsilonGreedy:
         return epsilon
 
 
-ENCODER_NEURONS_NUM = 5
-
-
 class DQN(nn.Module):
     """Define network."""
 
@@ -82,14 +79,11 @@ class DQN(nn.Module):
             nn.ReLU(),
             nn.Linear(n_units, n_units),
             nn.ReLU(),
-            nn.Linear(n_units, ENCODER_NEURONS_NUM),
-            nn.ReLU(),
-            nn.Linear(ENCODER_NEURONS_NUM, n_units),
+            nn.Linear(n_units, n_units),
             nn.ReLU(),
             nn.Linear(n_units, n_units),
             nn.ReLU(),
             nn.Linear(n_units, n_actions),
-            # nn.ReLU(),
         )
 
     def forward(self, x):
@@ -99,20 +93,6 @@ class DQN(nn.Module):
 
 def neural_network(n_observations, n_actions, nHiddenUnits):
     """Define policy and target networks."""
-    # if env.one_hot_state:
-    #     net = DQN(
-    #         n_observations=n_observations,
-    #         n_actions=n_actions,
-    #         n_units=4 * n_observations,
-    #     ).to(DEVICE)
-    # else:
-    #     net = DQN(
-    #         n_observations=n_observations,
-    #         n_actions=n_actions,
-    #         n_units=nHiddenUnits,
-    #     ).to(DEVICE)
-    # net
-
     policy_net = DQN(
         n_observations=n_observations,
         n_actions=n_actions,

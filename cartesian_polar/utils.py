@@ -42,7 +42,7 @@ class Params:
 
     # Deep network
     nLayers: int = 5
-    n_hidden_units: int = 20
+    n_hidden_units: int = 2**7
 
     # Environment
     # action_size: Optional[int] = None
@@ -363,7 +363,6 @@ def get_exp_params_from_config(config_path):
             "n_runs",
             "total_episodes",
             "n_layers",
-            "n_hidden_units",
             "n_observations",
             "n_actions",
             "replay_buffer_max_size",
@@ -383,6 +382,8 @@ def get_exp_params_from_config(config_path):
             "tau",
         ]:
             params[key] = float(config["experiment"][key])
+        elif key == "n_hidden_units":
+            params[key] = int(eval(config["experiment"][key]))
         else:
             params[key] = config["experiment"][key]
     p = Params(**params)
