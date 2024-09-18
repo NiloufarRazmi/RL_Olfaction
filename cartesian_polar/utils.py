@@ -312,9 +312,24 @@ def get_activations_learned(net, env, layer_inspected, contexts_labels):
     # Construct input dictionnary to be fed to the network
     input_cond = OrderedDict({})
     for cue_obj, cue_txt in contexts_labels.items():
-        for loc in env.state_space["location"]:
-            current_state = torch.tensor([loc, cue_obj.value], device=DEVICE)
-            input_cond[f"{loc}-{cue_txt}"] = current_state.float()
+        for _, direction_v in enumerate(env.head_angle_space):
+            for _, x_v in enumerate(env.tiles_locations["x"]):
+                for _, y_v in enumerate(env.tiles_locations["y"]):
+                    current_state = env.conv_dict_to_flat_duplicated_coords(
+                        TensorDict(
+                            {
+                                "cue": torch.tensor([cue_obj.value], device=DEVICE),
+                                "x": torch.tensor([x_v], device=DEVICE),
+                                "y": torch.tensor([y_v], device=DEVICE),
+                                "direction": torch.tensor([direction_v], device=DEVICE),
+                            },
+                            batch_size=[1],
+                            device=DEVICE,
+                        )
+                    )
+                    input_cond[f"{cue_txt}-{(x_v,y_v)}-{direction_v}°"] = (
+                        current_state.float()
+                    )
 
     # Get the number of neurons in the layer inspected
     layer = list(net.mlp.children())[6]
