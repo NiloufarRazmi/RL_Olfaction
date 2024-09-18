@@ -2,9 +2,13 @@
 
 import itertools
 import shutil
+from collections import OrderedDict
+from functools import partial
 
 import matplotlib as mpl
+import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -12,6 +16,7 @@ import torch
 
 # from curlyBrace import curlyBrace
 from imojify import imojify
+from matplotlib.gridspec import GridSpec
 from matplotlib.offsetbox import AnnotationBbox, OffsetImage
 
 # from utils import get_location_count
@@ -110,35 +115,35 @@ def qtable_directions_map(qtable, rows, cols):
     return qtable_val_max, qtable_directions
 
 
-def plot_q_values_map(qtable, rows, cols):
-    """
-    Plot the heatmap of the Q-values.
+# def plot_q_values_map(qtable, rows, cols):
+#     """
+#     Plot the heatmap of the Q-values.
 
-    Also plot the best action's direction with arrows.
-    """
-    # TODO: Remove function as it doesn't seem to be used anymore?
-    qtable_val_max, qtable_directions = qtable_directions_map(qtable, rows, cols)
+#     Also plot the best action's direction with arrows.
+#     """
+#     # TODO: Remove function as it doesn't seem to be used anymore?
+#     qtable_val_max, qtable_directions = qtable_directions_map(qtable, rows, cols)
 
-    # font_name = "DejaVu Math TeX Gyre"
-    # mpl.rcParams["font.family"] = font_name
-    f, ax = plt.subplots()
-    sns.heatmap(
-        qtable_val_max,
-        annot=qtable_directions,
-        fmt="",
-        ax=ax,
-        cmap=sns.color_palette("Blues", as_cmap=True),
-        linewidths=0.7,
-        linecolor="black",
-        xticklabels=[],
-        yticklabels=[],
-        annot_kws={"fontsize": "xx-large"},
-    ).set(title="Learned Q-values\nArrows represent best action")
-    for _, spine in ax.spines.items():
-        spine.set_visible(True)
-        spine.set_linewidth(0.7)
-        spine.set_color("black")
-    plt.show()
+#     # font_name = "DejaVu Math TeX Gyre"
+#     # mpl.rcParams["font.family"] = font_name
+#     f, ax = plt.subplots()
+#     sns.heatmap(
+#         qtable_val_max,
+#         annot=qtable_directions,
+#         fmt="",
+#         ax=ax,
+#         cmap=sns.color_palette("Blues", as_cmap=True),
+#         linewidths=0.7,
+#         linecolor="black",
+#         xticklabels=[],
+#         yticklabels=[],
+#         annot_kws={"fontsize": "xx-large"},
+#     ).set(title="Learned Q-values\nArrows represent best action")
+#     for _, spine in ax.spines.items():
+#         spine.set_visible(True)
+#         spine.set_linewidth(0.7)
+#         spine.set_color("black")
+#     plt.show()
 
 
 # def plot_heatmap(matrix, title=None, xlabel=None, ylabel=None, braces=[]):
@@ -683,90 +688,90 @@ def plot_actions_distribution(actions, figpath=None, logger=None):
     # plt.show()
 
 
-def plot_policies(q_values, labels, n_rows, n_cols, figpath=None, logger=None):
-    """
-    Plot the heatmap of the Q-values.
+# def plot_policies(q_values, labels, n_rows, n_cols, figpath=None, logger=None):
+#     """
+#     Plot the heatmap of the Q-values.
 
-    Also plot the best action's direction with arrows.
-    """
-    fig, ax = plt.subplots(2, len(labels), figsize=(13, 8))
-    for tri_i, tri_v in enumerate(TriangleState):
-        for cue_i, cue_v in enumerate(labels):
-            qtable_val_max, qtable_directions = qtable_directions_map(
-                qtable=q_values[:, cue_i, :], rows=n_rows, cols=n_cols
-            )
-            if tri_v == TriangleState.upper:
-                qtable_val_max = torch.triu(qtable_val_max)
-                qtable_directions = np.triu(qtable_directions)
-            elif tri_v == TriangleState.lower:
-                qtable_val_max = torch.tril(qtable_val_max)
-                qtable_directions = np.tril(qtable_directions)
-            sns.heatmap(
-                qtable_val_max.cpu(),
-                annot=qtable_directions,
-                fmt="",
-                ax=ax[tri_i, cue_i],
-                cmap=sns.color_palette("Blues", as_cmap=True),
-                linewidths=0.7,
-                linecolor="black",
-                xticklabels=[],
-                yticklabels=[],
-                annot_kws={"fontsize": "xx-large"},
-                cbar_kws={"label": "Q-value"},
-            ).set(title=labels[cue_v])
-            for _, spine in ax[tri_i, cue_i].spines.items():
-                spine.set_visible(True)
-                spine.set_linewidth(0.7)
-                spine.set_color("black")
+#     Also plot the best action's direction with arrows.
+#     """
+#     fig, ax = plt.subplots(2, len(labels), figsize=(13, 8))
+#     for tri_i, tri_v in enumerate(TriangleState):
+#         for cue_i, cue_v in enumerate(labels):
+#             qtable_val_max, qtable_directions = qtable_directions_map(
+#                 qtable=q_values[:, cue_i, :], rows=n_rows, cols=n_cols
+#             )
+#             if tri_v == TriangleState.upper:
+#                 qtable_val_max = torch.triu(qtable_val_max)
+#                 qtable_directions = np.triu(qtable_directions)
+#             elif tri_v == TriangleState.lower:
+#                 qtable_val_max = torch.tril(qtable_val_max)
+#                 qtable_directions = np.tril(qtable_directions)
+#             sns.heatmap(
+#                 qtable_val_max.cpu(),
+#                 annot=qtable_directions,
+#                 fmt="",
+#                 ax=ax[tri_i, cue_i],
+#                 cmap=sns.color_palette("Blues", as_cmap=True),
+#                 linewidths=0.7,
+#                 linecolor="black",
+#                 xticklabels=[],
+#                 yticklabels=[],
+#                 annot_kws={"fontsize": "xx-large"},
+#                 cbar_kws={"label": "Q-value"},
+#             ).set(title=labels[cue_v])
+#             for _, spine in ax[tri_i, cue_i].spines.items():
+#                 spine.set_visible(True)
+#                 spine.set_linewidth(0.7)
+#                 spine.set_color("black")
 
-            # Annotate the ports names
-            bbox = {
-                "facecolor": "black",
-                "edgecolor": "none",
-                "boxstyle": "round",
-                "alpha": 0.1,
-            }
-            ax[tri_i, cue_i].text(
-                x=4.7,
-                y=0.3,
-                s="N",
-                bbox=bbox,
-                color="white",
-            )
-            ax[tri_i, cue_i].text(
-                x=0.05,
-                y=4.9,
-                s="S",
-                bbox=bbox,
-                color="white",
-            )
-            ax[tri_i, cue_i].text(
-                x=4.7,
-                y=4.9,
-                s="E",
-                bbox=bbox,
-                color="white",
-            )
-            ax[tri_i, cue_i].text(
-                x=0.05,
-                y=0.3,
-                s="W",
-                bbox=bbox,
-                color="white",
-            )
+#             # Annotate the ports names
+#             bbox = {
+#                 "facecolor": "black",
+#                 "edgecolor": "none",
+#                 "boxstyle": "round",
+#                 "alpha": 0.1,
+#             }
+#             ax[tri_i, cue_i].text(
+#                 x=4.7,
+#                 y=0.3,
+#                 s="N",
+#                 bbox=bbox,
+#                 color="white",
+#             )
+#             ax[tri_i, cue_i].text(
+#                 x=0.05,
+#                 y=4.9,
+#                 s="S",
+#                 bbox=bbox,
+#                 color="white",
+#             )
+#             ax[tri_i, cue_i].text(
+#                 x=4.7,
+#                 y=4.9,
+#                 s="E",
+#                 bbox=bbox,
+#                 color="white",
+#             )
+#             ax[tri_i, cue_i].text(
+#                 x=0.05,
+#                 y=0.3,
+#                 s="W",
+#                 bbox=bbox,
+#                 color="white",
+#             )
 
-    # Make background transparent
-    fig.patch.set_alpha(0)
-    fig.patch.set_facecolor("white")
-    fig.tight_layout()
-    if figpath:
-        figfullpath = figpath / "policy.png"
-        fig.savefig(figfullpath, bbox_inches="tight")
-        if logger:
-            msg = f"Saved figure to: {figfullpath.absolute()}"
-            print(msg)
-            logger.info(msg)
-    # plt.show()
+#     # Make background transparent
+#     fig.patch.set_alpha(0)
+#     fig.patch.set_facecolor("white")
+#     fig.tight_layout()
+#     if figpath:
+#         figfullpath = figpath / "policy.png"
+#         fig.savefig(figfullpath, bbox_inches="tight")
+#         if logger:
+#             msg = f"Saved figure to: {figfullpath.absolute()}"
+#             print(msg)
+#             logger.info(msg)
+#     # plt.show()
 
 
 def plot_weights_matrices(
@@ -878,6 +883,339 @@ def plot_activations(
     if figpath:
         figfullpath = figpath / "activations-learned.png"
         chart.savefig(figfullpath, bbox_inches="tight")
+        if logger:
+            msg = f"Saved figure to: {figfullpath.absolute()}"
+            print(msg)
+            logger.info(msg)
+    # plt.show()
+
+
+def arrow_right(x, y):
+    """Return relative coordinates for DOWN arrow in a dataframe."""
+    x_tail = x - 0.25 * 0.75
+    x_head = x + 0.25 * 0.75
+    y_tail = y
+    y_head = y
+    res = pd.DataFrame(
+        {
+            "x_tail": [x_tail],
+            "y_tail": [y_tail],
+            "x_head": [x_head],
+            "y_head": [y_head],
+        }
+    )
+    return res
+
+
+def arrow_down(x, y):
+    """Return relative coordinates for DOWN arrow in a dataframe."""
+    x_tail = x
+    x_head = x
+    y_tail = y + 0.25 * 0.75
+    y_head = y - 0.25 * 0.75
+    res = pd.DataFrame(
+        {
+            "x_tail": [x_tail],
+            "y_tail": [y_tail],
+            "x_head": [x_head],
+            "y_head": [y_head],
+        }
+    )
+    return res
+
+
+def arrow_up(x, y):
+    """Return relative coordinates for UP arrow in a dataframe."""
+    x_tail = x
+    x_head = x
+    y_tail = y - 0.25 * 0.75
+    y_head = y + 0.25 * 0.75
+    res = pd.DataFrame(
+        {
+            "x_tail": [x_tail],
+            "y_tail": [y_tail],
+            "x_head": [x_head],
+            "y_head": [y_head],
+        }
+    )
+    return res
+
+
+def arrow_left(x, y):
+    """Return relative coordinates for LEFT arrow in a dataframe."""
+    x_tail = x + 0.25 * 0.75
+    x_head = x - 0.25 * 0.75
+    y_tail = y
+    y_head = y
+    res = pd.DataFrame(
+        {
+            "x_tail": [x_tail],
+            "y_tail": [y_tail],
+            "x_head": [x_head],
+            "y_head": [y_head],
+        }
+    )
+    return res
+
+
+def map_action_to_direction(action, head_direction):
+    """Map action to its corresponding allocentric arrow direction."""
+    arrow_directions = {
+        "up": partial(arrow_up),
+        "down": partial(arrow_down),
+        "left": partial(arrow_left),
+        "right": partial(arrow_right),
+    }
+    direction = None
+    if head_direction == 0:
+        if action == Actions.forward:
+            direction = arrow_directions["up"]
+        elif action == Actions.right:
+            direction = arrow_directions["right"]
+        elif action == Actions.left:
+            direction = arrow_directions["left"]
+        elif action == Actions.backward:
+            direction = arrow_directions["down"]
+
+    elif head_direction == 90:
+        if action == Actions.forward:
+            direction = arrow_directions["right"]
+        elif action == Actions.right:
+            direction = arrow_directions["down"]
+        elif action == Actions.left:
+            direction = arrow_directions["up"]
+        elif action == Actions.backward:
+            direction = arrow_directions["left"]
+
+    elif head_direction == 180:
+        if action == Actions.forward:
+            direction = arrow_directions["down"]
+        elif action == Actions.right:
+            direction = arrow_directions["left"]
+        elif action == Actions.left:
+            direction = arrow_directions["right"]
+        elif action == Actions.backward:
+            direction = arrow_directions["up"]
+
+    elif head_direction == 270:
+        if action == Actions.forward:
+            direction = arrow_directions["left"]
+        elif action == Actions.right:
+            direction = arrow_directions["up"]
+        elif action == Actions.left:
+            direction = arrow_directions["down"]
+        elif action == Actions.backward:
+            direction = arrow_directions["right"]
+
+    if direction is None:
+        raise ValueError("Impossible action-head direction combination")
+    return direction
+
+
+def qvalues_directions_map(q_values, env, cues):
+    """Get the best learned action & map it to directions for arrows."""
+    q_val_best = OrderedDict()
+    for cue_i, cue_v in enumerate(cues):
+        q_val_best[cue_v] = OrderedDict()
+        for x_i, x_v in enumerate(env.tiles_locations["x"]):
+            x_v = x_v.item()
+            for y_i, y_v in enumerate(env.tiles_locations["y"]):
+                y_v = y_v.item()
+                q_val_best[cue_v][(x_v, y_v)] = OrderedDict()
+                for direction_i, direction_v in enumerate(env.head_angle_space):
+                    direction_v = direction_v.item()
+                    q_val_best[cue_v][(x_v, y_v)][direction_v] = OrderedDict()
+                    q_val_best[cue_v][(x_v, y_v)][direction_v]["q_max"] = q_values[
+                        cue_i, x_i, y_i, direction_i, :
+                    ].max()
+                    best_action = Actions(
+                        q_values[cue_i, x_i, y_i, direction_i, :].argmax().item()
+                    )
+                    q_val_best[cue_v][(x_v, y_v)][direction_v]["best_action"] = (
+                        map_action_to_direction(best_action, direction_v)
+                    )
+    return q_val_best
+
+
+def convert_row_origin(row, rows):
+    """
+    Convert row and column for plotting.
+
+    In the environment, row and col starts in the top left corner,
+    but for plotting the origin is in the bottom left corner.
+    """
+    max_row_idx = rows - 1
+    conv_row = max_row_idx - row
+    return conv_row
+
+
+def draw_single_tile_arrows(row, col, arrows_tile, ax):
+    """Plot arrows for all 4 angles for a single tile."""
+    coord_center_arrows = pd.DataFrame(
+        {
+            "x": [0.5 + col, 0.75 + col, 0.5 + col, 0.25 + col],
+            "y": [0.75 + row, 0.5 + row, 0.25 + row, 0.5 + row],
+            "angle": arrows_tile.keys(),
+        }
+    ).set_index("angle")
+
+    arrows_coords = pd.DataFrame(
+        {"x_tail": [], "y_tail": [], "x_head": [], "y_head": [], "angle": []}
+    )
+
+    for angle in arrows_tile:
+        direction = arrows_tile[angle]["direction"]  # Get the `partial` function
+        x = coord_center_arrows.loc[angle].x
+        y = coord_center_arrows.loc[angle].y
+        direction_df = direction(x, y)  # Apply the `partial` function
+        direction_df["angle"] = angle
+        arrows_coords = pd.concat(
+            [arrows_coords, direction_df],
+            ignore_index=True,
+        )
+    arrows_coords["angle"] = coord_center_arrows.index
+    arrows_coords.set_index("angle", inplace=True)
+
+    for angle, coord in arrows_coords.iterrows():
+        arrow = mpatches.FancyArrowPatch(
+            (coord.x_tail, coord.y_tail),
+            (coord.x_head, coord.y_head),
+            mutation_scale=10,
+            color=arrows_tile[angle]["color"],
+        )
+        ax.add_patch(arrow)
+
+
+def plot_policies_by_head_directions(
+    q_values, labels, env, cues, figpath=None, logger=None
+):
+    """
+    Plot the heatmap of the Q-values.
+
+    And plot the best action with arrows for each head direction.
+    """
+    q_val_best = qvalues_directions_map(q_values, env, cues)
+
+    cmap = mpl.colormaps["PuRd"]
+    norm = mpl.colors.Normalize(vmin=q_values.min(), vmax=q_values.max())
+
+    fig = plt.figure(figsize=(13, 8))
+    gs = GridSpec(len(TriangleState), len(labels) + 1, width_ratios=[10, 10, 10, 1])
+    ax = np.empty(gs.get_geometry(), dtype=object)
+    for idx in range(gs.get_geometry()[0]):
+        for jdx in range(gs.get_geometry()[1]):
+            ax[idx, jdx] = fig.add_subplot(gs[idx, jdx])
+    ax_clb = fig.add_subplot(gs[:, 3])  # Last column for the colorbar
+    # Remove ticks for the colorbar
+    for tri_i, _ in enumerate(TriangleState):
+        ax[tri_i, 3].axes.xaxis.set_ticklabels([])
+        ax[tri_i, 3].axes.yaxis.set_ticklabels([])
+
+    half_tile = env.tile_step / 2
+    for tri_i, tri_v in enumerate(TriangleState):
+        for cue_i, cue_v in enumerate(labels):
+            ax[tri_i, cue_i].set_yticks(
+                [env.rangeY["min"] - half_tile, env.rangeY["max"] + half_tile],
+                minor=True,
+            )
+            ax[tri_i, cue_i].set_xticks(
+                [env.rangeX["min"] - half_tile, env.rangeX["max"] + half_tile],
+                minor=True,
+            )
+            ax[tri_i, cue_i].xaxis.set_major_locator(
+                ticker.MultipleLocator(
+                    base=env.tile_step, offset=env.rangeX["min"] - half_tile
+                )
+            )
+            ax[tri_i, cue_i].yaxis.set_major_locator(
+                ticker.MultipleLocator(
+                    base=env.tile_step, offset=env.rangeY["min"] - half_tile
+                )
+            )
+            ax[tri_i, cue_i].yaxis.grid(True, which="major")
+            ax[tri_i, cue_i].xaxis.grid(True, which="major")
+            ax[tri_i, cue_i].axes.xaxis.set_ticklabels([])
+            ax[tri_i, cue_i].axes.yaxis.set_ticklabels([])
+            ax[tri_i, cue_i].set_title(labels[cue_v], pad=10)
+
+            for _, x_v in enumerate(env.tiles_locations["x"]):
+                x_v = x_v.item()
+                # conv_row = convert_row_origin(x_v, rows)
+                for _, y_v in enumerate(env.tiles_locations["y"]):
+                    y_v = y_v.item()
+
+                    if (
+                        tri_v == TriangleState.upper
+                        and x_v + y_v >= 0
+                        or tri_v == TriangleState.lower
+                        and x_v + y_v <= 0
+                    ):  # Plot only upper or lower triangle
+                        # Get the data to plot for each angle
+                        arrows_tile = OrderedDict()
+                        for _, angle in enumerate(env.head_angle_space):
+                            angle = angle.item()
+                            arrows_tile[angle] = {}
+                            arrows_tile[angle]["direction"] = q_val_best[cue_v][
+                                (x_v, y_v)
+                            ][angle]["best_action"]
+                            q_max = q_val_best[cue_v][(x_v, y_v)][angle]["q_max"]
+                            arrows_tile[angle]["color"] = cmap(norm(q_max))
+
+                        # Plot arrows for all 4 angles for a single tile
+                        draw_single_tile_arrows(
+                            # row=conv_row,
+                            row=y_v - half_tile,
+                            col=x_v - half_tile,
+                            arrows_tile=arrows_tile,
+                            ax=ax[tri_i, cue_i],
+                        )
+
+            # Annotate the ports names
+            bbox = {
+                "facecolor": "black",
+                "edgecolor": "none",
+                "boxstyle": "round",
+                "alpha": 0.1,
+            }
+            ax[tri_i, cue_i].text(
+                x=env.rangeX["max"] + half_tile - 0.3,
+                y=env.rangeY["min"] - half_tile,
+                s="E",
+                bbox=bbox,
+                color="white",
+            )
+            ax[tri_i, cue_i].text(
+                x=env.rangeX["min"] - half_tile + 0.05,
+                y=env.rangeY["max"] + half_tile - 0.1,
+                s="W",
+                bbox=bbox,
+                color="white",
+            )
+            ax[tri_i, cue_i].text(
+                x=env.rangeX["max"] + half_tile - 0.3,
+                y=env.rangeY["max"] + half_tile - 0.1,
+                s="N",
+                bbox=bbox,
+                color="white",
+            )
+            ax[tri_i, cue_i].text(
+                x=env.rangeX["min"] - half_tile + 0.05,
+                y=env.rangeY["min"] - half_tile,
+                s="S",
+                bbox=bbox,
+                color="white",
+            )
+
+    clb = fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap), cax=ax_clb)
+    clb.ax.set_title("Q-value", pad=10)
+
+    # Make background transparent
+    fig.patch.set_alpha(0)
+    fig.patch.set_facecolor("white")
+    fig.tight_layout()
+    if figpath:
+        figfullpath = figpath / "policy.png"
+        fig.savefig(figfullpath, bbox_inches="tight")
         if logger:
             msg = f"Saved figure to: {figfullpath.absolute()}"
             print(msg)

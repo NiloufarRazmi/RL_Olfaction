@@ -287,9 +287,7 @@ def visualization_plots(data_path, p, current_path, logger):
         episodes=episodes, n_runs=p.n_runs, rewards=rewards, steps=steps
     )
     loss_df = utils.postprocess_loss(losses=losses, window_size=1)
-    q_values = utils.get_q_values_by_states(
-        env=env, cues=Cues, n_actions=p.n_actions, net=net
-    )
+    q_values = utils.get_q_values_by_states(env=env, cues=Cues, net=net)
     weights_val_df = utils.postprocess_weights(weights["val"])
     biases_val_df = utils.postprocess_weights(biases["val"])
     weights_grad_df = utils.postprocess_weights(weights["grad"])
@@ -311,11 +309,11 @@ def visualization_plots(data_path, p, current_path, logger):
         rew_steps_df, n_runs=p.n_runs, figpath=current_path, logger=logger
     )
     viz.plot_loss(loss_df, n_runs=p.n_runs, figpath=current_path, logger=logger)
-    viz.plot_policies(
+    viz.plot_policies_by_head_directions(
         q_values=q_values,
+        env=env,
+        cues=Cues,
         labels=CONTEXTS_LABELS,
-        n_rows=env.rows,
-        n_cols=env.cols,
         figpath=current_path,
         logger=logger,
     )

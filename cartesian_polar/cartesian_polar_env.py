@@ -92,7 +92,20 @@ class Environment:
         self.head_angle_space = torch.tensor(
             [0, 90, 180, 270], device=DEVICE
         )  # In degrees, 0° being north
-        # self.tiles_locations = torch.arange(self.rows * self.cols, device=DEVICE)
+        self.tiles_locations = {
+            "x": torch.arange(
+                start=self.rangeX["min"],
+                end=self.rangeX["max"] + 1,
+                step=self.tile_step,
+                device=DEVICE,
+            ),
+            "y": torch.arange(
+                start=self.rangeY["min"],
+                end=self.rangeY["max"] + 1,
+                step=self.tile_step,
+                device=DEVICE,
+            ),
+        }
         # self.cues = [*LightCues, *OdorID]
 
         self.action_space = torch.tensor(

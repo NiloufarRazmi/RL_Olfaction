@@ -13,6 +13,7 @@ import numpy as np
 import pandas as pd
 import torch
 import torch.nn as nn
+from tensordict.tensordict import TensorDict
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -239,18 +240,40 @@ def postprocess_loss(losses, window_size=1):
     return loss_df
 
 
-def get_q_values_by_states(env, cues, n_actions, net):
+def get_q_values_by_states(env, cues, net):
     """Run the forward pass for all states."""
     with torch.no_grad():
         q_values = torch.nan * torch.empty(
-            (len(env.tiles_locations), len(cues), n_actions), device=DEVICE
+            (
+                len(cues),
+                len(env.tiles_locations["x"]),
+                len(env.tiles_locations["y"]),
+                len(env.head_angle_space),
+                len(env.action_space),
+            ),
+            device=DEVICE,
         )
-        for tile_i, tile_v in enumerate(env.tiles_locations):
-            for cue_i, cue_v in enumerate(cues):
-                state = torch.tensor([tile_v, cue_v.value], device=DEVICE).float()
-                if env.one_hot_state:
-                    state = env.to_one_hot(state).float()
-                q_values[tile_i, cue_i, :] = net(state).to(DEVICE)
+        for cue_i, cue_v in enumerate(cues):
+            for x_i, x_v in enumerate(env.tiles_locations["x"]):
+                for y_i, y_v in enumerate(env.tiles_locations["y"]):
+                    for direction_i, direction_v in enumerate(env.head_angle_space):
+                        state = env.conv_dict_to_flat_duplicated_coords(
+                            TensorDict(
+                                {
+                                    "cue": torch.tensor([cue_v.value], device=DEVICE),
+                                    "x": torch.tensor([x_v], device=DEVICE),
+                                    "y": torch.tensor([y_v], device=DEVICE),
+                                    "direction": torch.tensor(
+                                        [direction_v], device=DEVICE
+                                    ),
+                                },
+                                batch_size=[1],
+                                device=DEVICE,
+                            )
+                        )
+                        q_values[cue_i, x_i, y_i, direction_i, :] = net(state).to(
+                            DEVICE
+                        )
     return q_values
 
 
