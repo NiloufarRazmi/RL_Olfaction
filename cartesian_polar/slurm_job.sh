@@ -1,13 +1,13 @@
 #!/bin/bash
 
 # Run with:
-# export PARAMSFILE="TriangleTask/oscar/params.ini"; sbatch TriangleTask/oscar/slurm_job.sh
+# export PARAMSFILE="cartesian_polar/params.ini"; sbatch cartesian_polar/slurm_job.sh
 
 ########## Begin Slurm header ##########
 #SBATCH -p gpu --gres=gpu:1
 #SBATCH -N 1  # Number of node
 #SBATCH -n 2
-#SBATCH --mem=2G
+#SBATCH --mem=3G
 ##SBATCH -t 00:15:00
 #SBATCH -t 12:00:00
 ##SBATCH --partition=gpu-debug
