@@ -1159,7 +1159,7 @@ def plot_policies_by_head_directions(
                                 (x_v, y_v)
                             ][angle]["best_action"]
                             q_max = q_val_best[cue_v][(x_v, y_v)][angle]["q_max"]
-                            arrows_tile[angle]["color"] = cmap(norm(q_max))
+                            arrows_tile[angle]["color"] = cmap(norm(q_max.cpu()))
 
                         # Plot arrows for all 4 angles for a single tile
                         draw_single_tile_arrows(
