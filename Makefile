@@ -33,6 +33,6 @@ lint: ## Lint all files
 env-update: ## Update the Conda environment & install CLI
 	mamba env update -f environment.yml
 
+export PARAMSFILE := cartesian_polar/params.ini
 slurm: ## Run the simulation on Slurm cluster
-	PARAMSFILE="cartesian_polar/params.ini" && \
-		   sbatch cartesian_polar/slurm_job.sh
+	sbatch cartesian_polar/slurm_job.sh
