@@ -214,7 +214,7 @@ def training_loop(p, current_path, logger, generator=None):
             steps[episode, run] = step_count
             logger.info(
                 f"Run: {run+1}/{p.n_runs} - Episode: {episode+1}/{p.total_episodes} "
-                "- Steps: {step_count} - Loss: {loss.item()}"
+                f"- Steps: {step_count} - Loss: {loss.item()}"
             )
         weights_val_stats.set_index("Index", inplace=True)
         biases_val_stats.set_index("Index", inplace=True)
