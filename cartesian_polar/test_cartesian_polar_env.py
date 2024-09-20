@@ -23,7 +23,7 @@ def test_env_general_props():
     env = Environment()
     assert env
     state = env.reset()
-    assert env.numActions == 4
+    assert env.numActions == 3
     # assert len(state) == 9
     assert isinstance(state, TensorDict)
     assert state.shape == torch.Size([1])
@@ -209,16 +209,16 @@ def test_walls(
             1,
             90,
         ),
-        (
-            1,
-            1,
-            0,
-            TriangleState.upper,
-            Actions.backward.value,
-            1,
-            0,
-            0,
-        ),
+        # (
+        #     1,
+        #     1,
+        #     0,
+        #     TriangleState.upper,
+        #     Actions.backward.value,
+        #     1,
+        #     0,
+        #     0,
+        # ),
         (
             1,
             1,
@@ -249,16 +249,16 @@ def test_walls(
             -1,
             270,
         ),
-        (
-            -1,
-            -1,
-            180,
-            TriangleState.lower,
-            Actions.backward.value,
-            -1,
-            -0,
-            180,
-        ),
+        # (
+        #     -1,
+        #     -1,
+        #     180,
+        #     TriangleState.lower,
+        #     Actions.backward.value,
+        #     -1,
+        #     -0,
+        #     180,
+        # ),
         (
             -1,
             -1,

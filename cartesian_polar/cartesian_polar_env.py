@@ -45,7 +45,7 @@ class Actions(Enum):
     """List the possible actions."""
 
     forward = 0
-    backward = 1
+    # backward = 1
     left = 2
     right = 3
 
@@ -334,9 +334,9 @@ class Environment:
                 direction, x = RIGHT(x=x, y=y)
             elif action == Actions.forward.value:
                 direction, y = UP(x=x, y=y)
-            elif action == Actions.backward.value:
-                direction, y = DOWN(x=x, y=y)
-                direction = 0
+            # elif action == Actions.backward.value:
+            #     direction, y = DOWN(x=x, y=y)
+            #     direction = 0
 
         elif direction == 90:  # Facing east
             if action == Actions.left.value:
@@ -345,9 +345,9 @@ class Environment:
                 direction, y = DOWN(x=x, y=y)
             elif action == Actions.forward.value:
                 direction, x = RIGHT(x=x, y=y)
-            elif action == Actions.backward.value:
-                direction, x = LEFT(x=x, y=y)
-                direction = 90
+            # elif action == Actions.backward.value:
+            #     direction, x = LEFT(x=x, y=y)
+            #     direction = 90
 
         elif direction == 180:  # Facing south
             if action == Actions.left.value:
@@ -356,9 +356,9 @@ class Environment:
                 direction, x = LEFT(x=x, y=y)
             elif action == Actions.forward.value:
                 direction, y = DOWN(x=x, y=y)
-            elif action == Actions.backward.value:
-                direction, y = UP(x=x, y=y)
-                direction = 180
+            # elif action == Actions.backward.value:
+            #     direction, y = UP(x=x, y=y)
+            #     direction = 180
 
         elif direction == 270:  # Facing west
             if action == Actions.left.value:
@@ -367,9 +367,9 @@ class Environment:
                 direction, y = UP(x=x, y=y)
             elif action == Actions.forward.value:
                 direction, x = LEFT(x=x, y=y)
-            elif action == Actions.backward.value:
-                direction, x = RIGHT(x=x, y=y)
-                direction = 270
+            # elif action == Actions.backward.value:
+            #     direction, x = RIGHT(x=x, y=y)
+            #     direction = 270
 
         return torch.tensor([x, y, direction], device=DEVICE)
 

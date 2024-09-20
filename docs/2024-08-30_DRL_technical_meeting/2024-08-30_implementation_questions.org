@@ -76,3 +76,21 @@ Thanks!
 % End:
 
 * Feedback :noexport:
+** Arena state space
+** Action space
+** IDEA How this task structure might employ different representation/transformation of the action space
+** IDEA Hypothesis:
+- The network will use the most efficient info
+- Does changing the reward mapping/task make a change in the weights indicating the agent use only certain info?
+** TODO Direction replaced could be replaced by angle from the port
+** TODO Ports should be ego encoded
+** TODO Angle relative from the port
+Difference from the agent to the port
+** 2 units for head direction
+*** cos
+*** sin
+** 2 hidden layers
+** TODO head direction relative to the agent
+*** Need to keep a fixed internal direction?
+*** But feed a relative head direction to the network?
+** TODO Remove rounding, pass true floating value to the network?

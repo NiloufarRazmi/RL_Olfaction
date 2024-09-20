@@ -18,7 +18,7 @@
 *** DONE Save progressbar log in file
 *** Use an MLOps tool like MLFlow or AimStack to save everything?
 ** Implement resume training feature
-* TODO Viz
+* Viz
 ** DONE Improve loss plot?
 Make number of bins not relative to the numer of episodes?
 
@@ -158,10 +158,10 @@ def visualize_activations(model, color="C0", print_variance=False):
 [[https://lightning.ai/docs/pytorch/stable/notebooks/course_UvA-DL/03-initialization-and-optimization.html]]
 ** 2D Weights histogram?
 [[https://wandb.ai/sauravmaheshkar/initialization/reports/A-Gentle-Introduction-To-Weight-Initialization-for-Neural-Networks--Vmlldzo2ODExMTg#he-initialization-]]
-** TODO Plot policy animation
+** Plot policy animation
 ** DONE Divide policy plot in upper/lower triangle
-** TODO Plot clustermap before training?
-** TODO PCA of weights/activations?
+** Plot clustermap before training?
+** PCA of weights/activations?
 *** 10.48550/arXiv.2402.12067
 * XAI/Analysis ideas
 ** Frequency/FFT?
@@ -195,14 +195,21 @@ Should learn faster than agent trained only in the lower triangle
 ** KILL Memory in the environment + RNN?
 *** Only pass the odor information at the port, not at each time step
 ** TODO Polar/Cartesian experiment
-*** Code
-**** Merge action space for ego/allo
+*** TODO Code
+**** DONE Merge action space for ego/allo
 Allow moving backward?
 **** Make functions to compute polar and Cartesian coordinates from different landmarks
 **** Create function to switch between left/right & east/west task?
-*** TODO Baseline
-**** 2 Cartesian + 2 polar with symmetric orientation
-**** Coordinate systems at North and South for now
+**** TODO Remove rounding on input values, pass true floating value to the network?
+**** TODO Angle relative from the port
+- Difference from the agent to the port
+**** TODO head direction relative to the agent
+- Need to keep a fixed internal direction?
+- But feed a relative head direction to the network?
+**** DONE Remove ~backward~ action
+*** Baseline
+**** DONE 2 Cartesian + 2 polar with symmetric orientation
+**** DONE Coordinate systems at North and South for now
 **** Then discretized version
 *** Exp. 1: How the constraints of the task impact learning?
 **** Train left/right task
@@ -217,6 +224,10 @@ Allow moving backward?
 **** Train on the normal task, then after training feed incorrect polar angles, i.e. rotated by X degree
 - Same experiment also on incorrect Cartesian coordinates?
 - Both left/right and east/west task?
+*** TODO Analysis
+**** TODO Plot activation in the last layer
+**** TODO Find cartesian/polar neurons
+**** TODO Sort neurons by cartesian/polar
 * DONE Debug
 ** DONE Unit test env
 ** DONE Unit test one hot case
