@@ -5,7 +5,7 @@ import torch
 from tensordict.tensordict import TensorDict
 
 from .agent import EpsilonGreedy
-from .cartesian_polar_env import (
+from .environment import (
     Actions,
     Cues,
     DuplicatedCoordsEnv,

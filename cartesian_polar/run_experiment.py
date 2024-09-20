@@ -15,7 +15,7 @@ from tqdm import tqdm
 from . import plotting as viz
 from . import utils
 from .agent import EpsilonGreedy, neural_network
-from .cartesian_polar_env import CONTEXTS_LABELS, Actions, Cues, DuplicatedCoordsEnv
+from .environment import CONTEXTS_LABELS, Actions, Cues, DuplicatedCoordsEnv
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 

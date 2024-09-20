@@ -20,7 +20,7 @@ from matplotlib.gridspec import GridSpec
 from matplotlib.offsetbox import AnnotationBbox, OffsetImage
 
 # from utils import get_location_count
-from .cartesian_polar_env import Actions, TriangleState
+from .environment import Actions, TriangleState
 
 sns.set_theme(font_scale=1.5)
 # plt.style.use("ggplot")
