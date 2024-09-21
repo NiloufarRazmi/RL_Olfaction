@@ -366,7 +366,6 @@ def get_exp_params_from_config(config_path):
             "n_observations",
             "n_actions",
             "replay_buffer_max_size",
-            "batch_size",
             "target_net_update",
             "layer_inspected",
             "epsilon_warmup",
@@ -382,9 +381,12 @@ def get_exp_params_from_config(config_path):
             "tau",
         ]:
             params[key] = float(config["experiment"][key])
-        elif key == "n_hidden_units":
+        elif key in ["n_hidden_units", "batch_size"]:
+            # Strings that need to be evaluted first
             params[key] = int(eval(config["experiment"][key]))
         else:
             params[key] = config["experiment"][key]
+
+    params["experiment_tag"] = config_path.stem
     p = Params(**params)
     return p
