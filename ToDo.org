@@ -200,7 +200,7 @@ Should learn faster than agent trained only in the lower triangle
 Allow moving backward?
 **** Make functions to compute polar and Cartesian coordinates from different landmarks
 **** Create function to switch between left/right & east/west task?
-**** TODO Remove rounding on input values, pass true floating value to the network?
+**** DONE Remove rounding on input values, pass true floating value to the network?
 ***** DQN with continuous state space?
 Yes: neural network with enough capacity should appproximate the continuous function
 ***** DQN with continuous action space?

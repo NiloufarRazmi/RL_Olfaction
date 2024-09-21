@@ -189,9 +189,7 @@ class Environment:
                 and x_sampled + y_sampled <= 0
             ):
                 break
-        coords = torch.tensor(
-            [x_sampled.round(decimals=0), y_sampled.round(decimals=0)], device=DEVICE
-        )
+        coords = torch.tensor([x_sampled, y_sampled], device=DEVICE)
         return coords
 
     def is_terminated(self, state):
@@ -481,10 +479,8 @@ class DuplicatedCoordsEnv(Environment):
 
     def cartesian2polar(self, coords_orig):
         """Convert coordinates from Cartesian to polar."""
-        length = torch.sqrt(coords_orig[0] ** 2 + coords_orig[1] ** 2).round(decimals=1)
-        alpha = (
-            torch.atan2(input=coords_orig[1], other=coords_orig[0]) * 180 / math.pi
-        ).round()
+        length = torch.sqrt(coords_orig[0] ** 2 + coords_orig[1] ** 2)
+        alpha = torch.atan2(input=coords_orig[1], other=coords_orig[0]) * 180 / math.pi
         return torch.tensor([length, alpha], device=DEVICE)
 
     def conv2north_polar(self, coords_orig):
