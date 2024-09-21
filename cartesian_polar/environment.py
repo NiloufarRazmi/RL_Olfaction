@@ -45,9 +45,9 @@ class Actions(Enum):
     """List the possible actions."""
 
     forward = 0
-    # backward = 1
-    left = 2
-    right = 3
+    left = 1
+    right = 2
+    # backward = 3
 
 
 class TriangleState(Enum):
