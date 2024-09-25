@@ -18,7 +18,7 @@
 *** DONE Save progressbar log in file
 *** Use an MLOps tool like MLFlow or AimStack to save everything?
 ** Implement resume training feature
-* Viz
+* TODO Viz
 ** DONE Improve loss plot?
 Make number of bins not relative to the numer of episodes?
 
@@ -163,6 +163,7 @@ def visualize_activations(model, color="C0", print_variance=False):
 ** Plot clustermap before training?
 ** PCA of weights/activations?
 *** 10.48550/arXiv.2402.12067
+** TODO Log of the Q-value to get better color? Only for the colormap?
 * XAI/Analysis ideas
 ** Frequency/FFT?
 10.48550/arXiv.2403.02241
