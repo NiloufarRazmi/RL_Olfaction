@@ -206,7 +206,7 @@ Allow moving backward?
 Yes: neural network with enough capacity should appproximate the continuous function
 ***** DQN with continuous action space?
 No: ~argmax~ in the cost function, so better to have it discretized
-**** TODO Head direction angle relative from the port
+**** TODO Angle relative from the port
 - Difference from the agent to the port
 - 2x head direction angles for Cartesian coordinates + 2x head direction angles for polar coordinates +
 **** TODO head direction relative to the agent

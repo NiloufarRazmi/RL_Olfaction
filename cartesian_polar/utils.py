@@ -51,7 +51,7 @@ class Params:
     n_actions: Optional[int] = None
 
     replay_buffer_max_size: int = 1000
-    batch_size: int = 32
+    batch_size: int = 2**5
     target_net_update: int = 100
     tau: float = 0.005
 
@@ -382,11 +382,9 @@ def get_exp_params_from_config(config_path):
         ]:
             params[key] = float(config["experiment"][key])
         elif key in ["n_hidden_units", "batch_size"]:
-            # Strings that need to be evaluted first
+            # Strings that need to be evaluated first
             params[key] = int(eval(config["experiment"][key]))
         else:
             params[key] = config["experiment"][key]
-
-    params["experiment_tag"] = config_path.stem
     p = Params(**params)
     return p
