@@ -206,8 +206,9 @@ Allow moving backward?
 Yes: neural network with enough capacity should appproximate the continuous function
 ***** DQN with continuous action space?
 No: ~argmax~ in the cost function, so better to have it discretized
-**** TODO Angle relative from the port
+**** TODO Head direction angle relative from the port
 - Difference from the agent to the port
+- 2x head direction angles for Cartesian coordinates + 2x head direction angles for polar coordinates +
 **** TODO head direction relative to the agent
 - Need to keep a fixed internal direction?
 - But feed a relative head direction to the network?
@@ -246,7 +247,7 @@ No: ~argmax~ in the cost function, so better to have it discretized
 ** DONE One hot encoding of state inputs
 ** DONE Plot stats of weights and biases
 ** DONE Plot gradients
-* Improvements
+* TODO Improvements
 ** DONE Batches
 ** DONE Experience replay
 ** DONE Target network
@@ -280,6 +281,9 @@ No: ~argmax~ in the cost function, so better to have it discretized
 **** DONE Replace decaying \epsilon-greedy with my own
 ** Incrementally save after each run?
 ** DONE Save ~params.ini~ file
+** TODO Add task as boolean to be chosen in conf file
+** TODO Add task name in directory name
+** TODO Revert commit about experiment tag in conf name
 * Metrics
 ** DONE Reward histogram
 ** average entropy of action distribution
