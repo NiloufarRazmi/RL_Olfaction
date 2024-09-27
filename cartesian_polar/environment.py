@@ -77,7 +77,8 @@ DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 class Environment:
     """Environment logic."""
 
-    def __init__(self, seed=None):
+    def __init__(self, taskid, seed=None):
+        self.taskid = eval(f"TaskID.{taskid}")
         if seed:
             self.generator = make_deterministic(seed=seed)
         else:
@@ -165,12 +166,12 @@ class Environment:
                 generator=self.generator,
             ).item()
         )
-        self.TaskID = TaskID(
-            random_choice(
-                torch.tensor([item.value for item in TaskID], device=DEVICE),
-                generator=self.generator,
-            ).item()
-        )
+        # self.TaskID = TaskID(
+        #     random_choice(
+        #         torch.tensor([item.value for item in TaskID], device=DEVICE),
+        #         generator=self.generator,
+        #     ).item()
+        # )
         return start_state
 
     def sample_coord_position(self):
@@ -208,7 +209,7 @@ class Environment:
         """Observe the reward."""
         reward = 0
         if self.odor_condition == OdorCondition.post:
-            if self.TaskID == TaskID.EastWest:
+            if self.taskid == TaskID.EastWest:
                 if (
                     state["cue"] == Cues.OdorA.value
                     and (state["x"], state["y"]) == Ports.West.value
@@ -218,7 +219,7 @@ class Environment:
                     and state["direction"] in [90, 180]
                 ):
                     reward = 1
-            elif self.TaskID == TaskID.LeftRight:
+            elif self.taskid == TaskID.LeftRight:
                 if self.TriangleState == TriangleState.upper:
                     if (
                         state["cue"] == Cues.OdorA.value
@@ -405,9 +406,9 @@ class DuplicatedCoordsEnv(Environment):
     Results in numerical only state space
     """
 
-    def __init__(self, seed=None):
+    def __init__(self, taskid, seed=None):
         # Initialize the base class to get the base properties
-        super().__init__(seed=seed)
+        super().__init__(taskid=taskid, seed=seed)
         self.reset()
 
     def conv_dict_to_flat_duplicated_coords(self, state):

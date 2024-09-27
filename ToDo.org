@@ -247,7 +247,7 @@ No: ~argmax~ in the cost function, so better to have it discretized
 ** DONE One hot encoding of state inputs
 ** DONE Plot stats of weights and biases
 ** DONE Plot gradients
-* TODO Improvements
+* Improvements
 ** DONE Batches
 ** DONE Experience replay
 ** DONE Target network
@@ -281,9 +281,9 @@ No: ~argmax~ in the cost function, so better to have it discretized
 **** DONE Replace decaying \epsilon-greedy with my own
 ** Incrementally save after each run?
 ** DONE Save ~params.ini~ file
-** TODO Add task as boolean to be chosen in conf file
-** TODO Add task name in directory name
-** TODO Revert commit about experiment tag in conf name
+** DONE Add task as boolean to be chosen in conf file
+** DONE Add task name in directory name
+** DONE Revert commit about experiment tag in conf name
 * Metrics
 ** DONE Reward histogram
 ** average entropy of action distribution

@@ -14,13 +14,24 @@ from .environment import (
     TaskID,
     TriangleState,
 )
+from .utils import random_choice
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 
+def TaskIDrand():
+    """Get a random task."""
+    taskid = TaskID(
+        random_choice(
+            torch.tensor([item.value for item in TaskID], device=DEVICE),
+        ).item()
+    ).name
+    return taskid
+
+
 def test_env_general_props():
     """Test general properties of the environment."""
-    env = Environment()
+    env = Environment(taskid=TaskIDrand())
     assert env
     state = env.reset()
     assert env.numActions == 3
@@ -36,7 +47,7 @@ def test_env_general_props():
 
 def test_starting_point_coords():
     """Test that the starting points are in the allwed boundaries of the arena."""
-    env = Environment()
+    env = Environment(taskid=TaskIDrand())
     for _ in range(100):
         agent_coords = env.sample_coord_position()
         assert agent_coords[0] >= env.rangeX["min"]
@@ -158,7 +169,7 @@ def test_walls(
     direction_expect,
 ):
     """Test moves against walls."""
-    env = Environment()
+    env = Environment(taskid=TaskIDrand())
     env.TriangleState = TriangleState
     state_orig = TensorDict(
         {
@@ -282,7 +293,7 @@ def test_basic_moves(
     direction_expect,
 ):
     """Test basic moves."""
-    env = Environment()
+    env = Environment(taskid=TaskIDrand())
     env.TriangleState = TriangleState
     state_orig = TensorDict(
         {
@@ -366,9 +377,9 @@ def test_basic_moves(
 )
 def test_env_logic(task, triangle, expected_reward):
     """Test environment logic."""
-    env = Environment()
+    env = Environment(taskid=TaskIDrand())
     env.reset()
-    env.TaskID = task
+    env.taskid = task
     env.TriangleState = triangle
     assert env.odor_condition == OdorCondition.pre
 
@@ -552,7 +563,7 @@ def test_coords_convertions(
     coords_south_polar,
 ):
     """Test the conversion routines."""
-    env = DuplicatedCoordsEnv()
+    env = DuplicatedCoordsEnv(taskid=TaskIDrand())
     assert torch.equal(
         input=env.conv2north_cartesian(coords_orig), other=coords_north_cart
     )
@@ -636,9 +647,9 @@ def test_coords_convertions(
 )
 def test_DuplicatedCoordsEnv_logic(task, triangle, expected_reward):
     """Test environment logic."""
-    env = DuplicatedCoordsEnv()
+    env = DuplicatedCoordsEnv(taskid=TaskIDrand())
     env.reset()
-    env.TaskID = task
+    env.taskid = task
     env.TriangleState = triangle
     assert env.odor_condition == OdorCondition.pre
 
@@ -750,7 +761,7 @@ def test_DuplicatedCoordsEnv_logic(task, triangle, expected_reward):
 def test_random_policy():
     """Test that using a random policy ends up in 50%-50% solved/unsolved task."""
     total_ep = 100
-    env = DuplicatedCoordsEnv()
+    env = DuplicatedCoordsEnv(taskid=TaskIDrand())
     episodes = torch.arange(total_ep, device=DEVICE)
     explorer = EpsilonGreedy(epsilon=1)
     rewards = torch.empty_like(episodes) * torch.nan

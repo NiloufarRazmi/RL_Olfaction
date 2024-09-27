@@ -35,7 +35,7 @@ def training_loop(p, current_path, logger, generator=None):
 
     for run in range(p.n_runs):  # Run several times to account for stochasticity
         # Get the number of states and actions from the environment
-        env = DuplicatedCoordsEnv(seed=p.seed)
+        env = DuplicatedCoordsEnv(taskid=p.taskid, seed=p.seed)
         state = env.reset()
         p.n_actions = env.numActions
         p.n_observations = len(state)
@@ -380,7 +380,9 @@ def cli(paramsfile):
     """Run the main command-line function."""
     paramsfile = Path(paramsfile)
     p = utils.get_exp_params_from_config(config_path=paramsfile)
-    current_path = utils.create_save_path(p.experiment_tag)
+    current_path = utils.create_save_path(
+        task=p.taskid, experiment_tag=p.experiment_tag
+    )
     shutil.copyfile(src=paramsfile, dst=current_path / paramsfile.name)
     logger = utils.get_logger(current_path=current_path)
     generator = utils.make_deterministic(seed=p.seed)

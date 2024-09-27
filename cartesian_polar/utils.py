@@ -56,6 +56,7 @@ class Params:
     tau: float = 0.005
 
     experiment_tag: str = ""
+    taskid: str = ""
     layer_inspected: int = None
 
 
@@ -138,12 +139,12 @@ def get_logger(current_path):
     return logger
 
 
-def create_save_path(experiment_tag):
+def create_save_path(task, experiment_tag):
     """Make saving directory for the experiment results."""
     now = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     root_path = Path("env").parent
     save_path = root_path / "save"
-    folder = f"{now}_{experiment_tag}" if experiment_tag else now
+    folder = f"{now}_{task}_{experiment_tag}" if experiment_tag else now
     current_path = save_path / folder
     current_path.mkdir(parents=True, exist_ok=True)  # Create the tree of directories
     print(f"Current path: {current_path.absolute()}")
