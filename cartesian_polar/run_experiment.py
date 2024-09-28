@@ -330,6 +330,7 @@ def visualization_plots(data_path, p, current_path, logger):
         labels=CONTEXTS_LABELS,
         layer_inspected=p.layer_inspected,
         figpath=current_path,
+        logger=logger,
     )
     viz.plot_weights_biases_distributions(
         weights_val_df,

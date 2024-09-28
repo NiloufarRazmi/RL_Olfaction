@@ -232,8 +232,22 @@ No: ~argmax~ in the cost function, so better to have it discretized
 - Both left/right and east/west task?
 *** TODO Analysis
 **** TODO Plot activation in the last layer
-**** TODO Find cartesian/polar neurons
-**** TODO Sort neurons by cartesian/polar
+***** [?] Last layer before or after activation, i.e. layer 6 or 7?
+DQN(
+  (mlp): Sequential(
+    (0): Linear(in_features=10, out_features=512, bias=True)
+    (1): ReLU()
+    (2): Linear(in_features=512, out_features=512, bias=True)
+    (3): ReLU()
+    (4): Linear(in_features=512, out_features=512, bias=True)
+    (5): ReLU()
+    (6): Linear(in_features=512, out_features=512, bias=True)
+    (7): ReLU()
+    (8): Linear(in_features=512, out_features=3, bias=True)
+  )
+)
+**** TODO Find Cartesian/polar neurons
+**** TODO Sort neurons by Cartesian/polar
 * DONE Debug
 ** DONE Unit test env
 ** DONE Unit test one hot case

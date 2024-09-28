@@ -861,7 +861,7 @@ def plot_activations(
     # cluster_palette = sns.color_palette("Pastel2")
     cluster_palette = sns.color_palette("Accent")
     cluster_colors = dict(zip(list(labels.values()), cluster_palette))
-    row_colors = [cluster_colors[cond.split("-")[1]] for cond in input_cond]
+    row_colors = [cluster_colors[cond.split(" | ")[0]] for cond in input_cond]
     row_colors_serie = pd.Series(row_colors)
     row_colors_serie = row_colors_serie.set_axis(list(input_cond.keys()))
 
@@ -870,7 +870,7 @@ def plot_activations(
     # cmap = "magma"
     cmap = "viridis"
     chart = sns.clustermap(activations_layer_df, cmap=cmap, row_colors=row_colors_serie)
-    chart.ax_heatmap.set_xlabel(f"Neurons activations in layer {layer_inspected + 1}")
+    chart.ax_heatmap.set_xlabel(f"Neurons activations in layer {layer_inspected}")
 
     for label, col_val in cluster_colors.items():
         chart.ax_col_dendrogram.bar(0, 0, color=col_val, label=label, linewidth=0)

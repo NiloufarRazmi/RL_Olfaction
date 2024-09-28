@@ -295,7 +295,26 @@ def postprocess_weights(weights):
 
 
 def get_activations_learned(net, env, layer_inspected, contexts_labels):
-    """Extract activations learned from the network."""
+    """
+    Extract activations learned from the network.
+
+    The `layer_inspected` should be the index of one of the sequential layers, e.g.:
+    ```
+    DQN(
+      (mlp): Sequential(
+        (0): Linear(in_features=10, out_features=512, bias=True)
+        (1): ReLU()
+        (2): Linear(in_features=512, out_features=512, bias=True)
+        (3): ReLU()
+        (4): Linear(in_features=512, out_features=512, bias=True)
+        (5): ReLU()
+        (6): Linear(in_features=512, out_features=512, bias=True)
+        (7): ReLU()
+        (8): Linear(in_features=512, out_features=3, bias=True)
+      )
+    )
+    ```
+    """
     activations = {}
 
     def get_activations_hook(name):
@@ -328,12 +347,12 @@ def get_activations_learned(net, env, layer_inspected, contexts_labels):
                             device=DEVICE,
                         )
                     )
-                    input_cond[f"{cue_txt}-{(x_v,y_v)}-{direction_v}°"] = (
-                        current_state.float()
-                    )
+                    input_cond[
+                        f"{cue_txt} | {(x_v.item(), y_v.item())} | {direction_v}°"
+                    ] = current_state.float()
 
     # Get the number of neurons in the layer inspected
-    layer = list(net.mlp.children())[6]
+    layer = list(net.mlp.children())[layer_inspected]
     parameters = list(layer.named_parameters())
     weights = [params[1] for params in parameters if params[0] == "weight"][0]
     neurons_num = weights.shape[1]
