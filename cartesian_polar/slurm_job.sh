@@ -9,7 +9,7 @@
 #SBATCH -n 2
 #SBATCH --mem=3G
 ##SBATCH -t 00:15:00
-#SBATCH -t 12:00:00
+#SBATCH -t 20:00:00
 ##SBATCH --partition=gpu-debug
 #SBATCH --account=carney-afleisc2-condo
 #SBATCH --mail-type=begin       # send email when job begins

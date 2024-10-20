@@ -164,13 +164,12 @@ def visualize_activations(model, color="C0", print_variance=False):
 ** PCA of weights/activations?
 *** 10.48550/arXiv.2402.12067
 ** TODO Log of the Q-value to get better color? Only for the colormap?
+** TODO Plot 3 activations matrices (by condition)?
 * XAI/Analysis ideas
 ** Frequency/FFT?
 10.48550/arXiv.2403.02241
 ** https://www.astralcodexten.com/p/god-help-us-lets-try-to-understand
 ** SHAP values/LIME?
-* DONE Model doesn't converge
-** DONE Try to apply on simple MDP
 * TODO Experiments
 ** Representations
 *** Look at the last layer
@@ -196,7 +195,7 @@ Should learn faster than agent trained only in the lower triangle
 ** KILL Memory in the environment + RNN?
 *** Only pass the odor information at the port, not at each time step
 ** TODO Polar/Cartesian experiment
-*** TODO Code
+*** DONE Code
 **** DONE Merge action space for ego/allo
 Allow moving backward?
 **** Make functions to compute polar and Cartesian coordinates from different landmarks
@@ -206,14 +205,14 @@ Allow moving backward?
 Yes: neural network with enough capacity should appproximate the continuous function
 ***** DQN with continuous action space?
 No: ~argmax~ in the cost function, so better to have it discretized
-**** TODO Angle relative from the port
+**** DONE Angle relative from the port
 - Difference from the agent to the port
 - 2x head direction angles for Cartesian coordinates + 2x head direction angles for polar coordinates +
-**** TODO head direction relative to the agent
+**** DONE head direction relative to the agent
 - Need to keep a fixed internal direction?
 - But feed a relative head direction to the network?
 **** DONE Remove ~backward~ action
-*** Baseline
+*** DONE Baseline
 **** DONE 2 Cartesian + 2 polar with symmetric orientation
 **** DONE Coordinate systems at North and South for now
 **** Then discretized version
@@ -231,8 +230,8 @@ No: ~argmax~ in the cost function, so better to have it discretized
 - Same experiment also on incorrect Cartesian coordinates?
 - Both left/right and east/west task?
 *** TODO Analysis
-**** TODO Plot activation in the last layer
-***** [?] Last layer before or after activation, i.e. layer 6 or 7?
+**** DONE Plot activation in the last layer
+***** DONE Last layer before or after activation, i.e. layer 6 or 7?
 DQN(
   (mlp): Sequential(
     (0): Linear(in_features=10, out_features=512, bias=True)
@@ -246,6 +245,8 @@ DQN(
     (8): Linear(in_features=512, out_features=3, bias=True)
   )
 )
+\to Layer 6 as there are no parameters in ReLU
+**** TODO Plot the activations on tile/coordinates map
 **** TODO Find Cartesian/polar neurons
 **** TODO Sort neurons by Cartesian/polar
 * DONE Debug
