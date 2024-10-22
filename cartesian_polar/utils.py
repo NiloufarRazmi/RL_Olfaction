@@ -222,7 +222,7 @@ def postprocess_rewards_steps(episodes, n_runs, rewards, steps):
 def postprocess_loss(losses, window_size=1):
     """Convert losses to dataframe."""
     for idx, loss in enumerate(losses):
-        current_loss = torch.tensor(loss, device=DEVICE)
+        current_loss = torch.tensor(loss.astype(float), device=DEVICE)
         losses_rolling_avg = nn.functional.avg_pool1d(
             current_loss.view(1, 1, -1), kernel_size=window_size
         ).squeeze()
