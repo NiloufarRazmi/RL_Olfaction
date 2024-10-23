@@ -1,0 +1,80 @@
+
+#+startup: beamer
+#+LaTeX_CLASS: beamer
+#+LaTeX_CLASS_OPTIONS: [bigger]
+#+OPTIONS: H:2 num:t toc:t
+#+LATEX_COMPILER: lualatex
+# #+PROPERTY: header-args:R :session *R* :results value :cache yes :tangle yes :exports code :eval yes
+# #+COLUMNS: %40ITEM %10BEAMER_env(Env) %9BEAMER_envargs(Env Args) %4BEAMER_col(Col) %10BEAMER_extra(Extra)
+# #+COLUMNS: %45ITEM %10BEAMER_env(Env) %10BEAMER_act(Act) %4BEAMER_col(Col) %8BEAMER_opt(Opt)
+# #+BEAMER_HEADER: \institute{Brown University}
+# #+BEAMER_HEADER:\titlegraphic{\hfill\includegraphics[height=1.5cm]{img/Brown Logo_2016_2 Color Process ST_1300.png}}
+#+LATEX_HEADER: \usetheme[progressbar=foot, sectionpage=none, numbering=fraction]{metropolis}
+#+LaTeX_HEADER: \usepackage{tikz}
+#+LaTeX_HEADER: \usepackage{booktabs}
+#+LaTeX_HEADER: \usepackage{adjustbox}
+#+LaTeX_HEADER: \usepackage{diagbox}
+#+LaTeX_HEADER: \usepackage{latexcolors}
+#+LaTeX_HEADER: \usetikzlibrary{automata, positioning, arrows, arrows.meta}
+#+LaTeX_HEADER: \usepackage{diagbox}
+#+LaTeX_HEADER: \usepackage{dsfont}
+#+LaTeX_HEADER: \usepackage{amsmath}
+#+LaTeX_HEADER: \usepackage{fontawesome}
+#+LaTeX_HEADER: \usepackage{pgfgantt}
+#+LaTeX_HEADER: \usepackage[ruled]{algorithm2e}
+# #+LaTeX_HEADER: \usepackage[absolute, overlay, showboxes]{textpos}
+#+LaTeX_HEADER: \usepackage[absolute, overlay]{textpos}
+# #+LaTeX_HEADER: \usepackage{ctable}
+# #+LaTeX_HEADER: \usepackage{emoji}
+#+BEAMER_HEADER: \setbeamercovered{transparent=10}
+
+# Show section number in the table of contents
+#+BEAMER_HEADER: \setbeamertemplate{section in toc}[sections numbered]
+# Show table of content between each section, do not increment the frame numbering and do not show the footer
+#+BEAMER_HEADER: \AtBeginSection[]{\begin{frame}[plain, noframenumbering]{Outline}    \setbeamertemplate{section in toc}[sections numbered]\setbeamertemplate{subsection in toc}[subsections numbered]\tableofcontents[currentsection, currentsubsection]\end{frame}}
+#+BEAMER_HEADER: \AtBeginSubsection[]{\begin{frame}[plain, noframenumbering]{Outline}\setbeamertemplate{section in toc}[sections numbered]\setbeamertemplate{subsection in toc}[subsections numbered]\tableofcontents[currentsection,currentsubsection]\end{frame}}
+
+# Color styling
+#+LaTeX_HEADER: \usepackage{xcolor}
+#+LaTeX_HEADER: \definecolor{UmlBlue}{HTML}{0067b1} \setbeamercolor{progress bar}{fg=UmlBlue} \setbeamercolor{title separator}{fg=UmlBlue}
+#+LaTeX_HEADER: \setbeamercolor{progress bar in head/foot}{fg=UmlBlue} \setbeamercolor{progress bar in section page}{fg=UmlBlue} \setbeamercolor{alerted text}{fg=UmlBlue}
+# # To modify the title style
+# #+BEAMER_HEADER: \setbeamercolor{frametitle}{bg=black}
+
+# #+LaTeX_HEADER: \makeatletter\patchcmd{\beamer@sectionintoc}{\vfill}{\vskip\itemsep}{}{}\makeatother
+#+LaTeX_HEADER: \pretocmd{\tableofcontents}{\thispagestyle{empty}}{}{}
+# #+LaTeX_HEADER: \addtocounter{framenumber}{-1}
+# #+LaTeX_HEADER: \addtocontents{toc}{\vspace{2em}}
+
+
+# # Source Code Listings
+# #+LaTeX_HEADER: \usepackage{listings}
+# #+LaTeX_HEADER: \definecolor{codegreen}{rgb}{0,0.6,0}
+# #+LaTeX_HEADER: \definecolor{codegray}{rgb}{0.5,0.5,0.5}
+# #+LaTeX_HEADER: \definecolor{codepurple}{rgb}{0.58,0,0.82}
+# #+LaTeX_HEADER: \definecolor{backcolour}{HTML}{f0f0f0}
+# #+LaTeX_HEADER: \lstdefinestyle{mystyle}{
+# #+LaTeX_HEADER:     backgroundcolor=\color{backcolour},
+# #+LaTeX_HEADER:     commentstyle=\color{codegreen},
+# #+LaTeX_HEADER:     keywordstyle=\color{magenta},
+# #+LaTeX_HEADER:     numberstyle=\tiny\color{codegray},
+# #+LaTeX_HEADER:     stringstyle=\color{codepurple},
+# #+LaTeX_HEADER:     basicstyle=\ttfamily,
+# #+LaTeX_HEADER:     breakatwhitespace=false,
+# #+LaTeX_HEADER:     breaklines=true,
+# #+LaTeX_HEADER:     captionpos=b,
+# #+LaTeX_HEADER:     keepspaces=true,
+# #+LaTeX_HEADER:     numbers=none,
+# #+LaTeX_HEADER:     numbersep=5pt,
+# #+LaTeX_HEADER:     showspaces=false,
+# #+LaTeX_HEADER:     showstringspaces=false,
+# #+LaTeX_HEADER:     showtabs=false,
+# #+LaTeX_HEADER:     tabsize=2
+# #+LaTeX_HEADER: }
+# #+LaTeX_HEADER: \lstset{style=mystyle}
+
+#+BEAMER_HEADER: \definecolor{headercolor}{HTML}{232323}
+#+BEAMER_HEADER: \setbeamercolor{normal text}{%
+#+BEAMER_HEADER:     % bg=,
+#+BEAMER_HEADER:     fg=headercolor
+#+BEAMER_HEADER: }

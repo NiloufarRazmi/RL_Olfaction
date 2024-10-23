@@ -1,0 +1,87 @@
+#+TITLE: DRL project status
+#+SUBTITLE: Cartesian/polar duplicated coordinates experiment
+#+author: Andrea Pierré
+#+date: October 23, 2024
+* HEADER :noexport:
+#+SETUPFILE: ./style.org
+
+* Current status
+** Current status
+#+begin_export latex
+\centering
+\includegraphics[height=0.55\textheight, trim=3cm 3cm 3cm 3cm, clip=true]{img/RL_env-cartesian-polar.drawio.pdf}
+#+end_export
+- Environment: done
+- Training: WIP
+- Visualization: to be improved/discussed
+- Progress are slow as my bandwidth has become very limited
+** State space & network architecture
+#+begin_export latex
+\centering
+\includegraphics[width=\textwidth, trim=9cm 3cm 10cm 3cm, clip=true]{img/state-space-nn.png}
+\tiny
+#+end_export
+- 13 inputs + ReLU \to 512 units  + ReLU \to 512 units  + ReLU \to 512 units  + ReLU \to 3 outputs
+** Training
+#+ATTR_LaTeX: :width \textwidth
+[[file:img/steps-and-rewards.png]]
+- 8 hours of training for a single agent on the East/West task
+** Training checks
+*** Left
+:PROPERTIES:
+:BEAMER_col: 0.5
+:BEAMER_opt: [c]
+:END:
+#+ATTR_LaTeX: :width 0.8\textwidth
+[[file:img/exploration-rate.png]]
+#+ATTR_LaTeX: :width 0.8\textwidth
+[[file:img/loss.png]]
+*** Right
+:PROPERTIES:
+:BEAMER_col: 0.5
+:BEAMER_opt: [c]
+:END:
+#+ATTR_LaTeX: :width 0.65\textwidth
+[[file:img/actions-distribution.png]]
+#+ATTR_LaTeX: :width \textwidth
+[[file:img/steps-and-rewards-distrib.png]]
+* How to visualize the results?
+** Policy learned
+[[file:img/policy.png]]
+** Weights learned
+#+ATTR_LaTeX: :height 0.9\textheight
+[[file:img/weights-matrices.png]]
+** Activations learned
+#+ATTR_LaTeX: :height 0.9\textheight
+[[file:img/activations-learned.png]]
+** \nbsp{}
+:PROPERTIES:
+:BEAMER_opt: standout
+:END:
+Thanks!
+
+* COMMENT Add plain option to Beamer TOC
+% Local variables:
+% org-beamer-outline-frame-options: "plain"
+% End:
+
+* Feedback :noexport:
+** IDEA How this task structure might employ different representation/transformation of the action space
+** IDEA Hypothesis:
+- The network will use the most efficient info
+- Does changing the reward mapping/task make a change in the weights indicating the agent use only certain info?
+
+** [?] Remove ReLU on input layer?
+** direction vector
+3 angles
+- sin
+- cos
+- tan
+** Angular activatino funct
+** Most likely head directions instead of everything
+** Look sampled trials behavior
+** Does the agent look
+** Plot trajectoies/state occupancy
+** Try other left/right task
+*** And compare activations with east/west
+** Tuning curve to identify cart/polar neurons
