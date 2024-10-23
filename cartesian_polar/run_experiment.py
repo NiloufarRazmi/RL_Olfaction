@@ -41,6 +41,7 @@ def training_loop(p, current_path, logger, generator=None):
         p.n_observations = len(state)
         logger.info(f"Number of actions: {p.n_actions}")
         logger.info(f"Number of observations: {p.n_observations}")
+        logger.info(f"Number of hidden units in the network: {p.n_hidden_units}")
 
         # Reset everything
         net, target_net = neural_network(
@@ -48,6 +49,7 @@ def training_loop(p, current_path, logger, generator=None):
             n_actions=p.n_actions,
             nHiddenUnits=p.n_hidden_units,
         )  # Reset weights
+        logger.info(f"Network architecture:\n{net}")
         optimizer = optim.AdamW(net.parameters(), lr=p.alpha, amsgrad=True)
         explorer = EpsilonGreedy(
             epsilon=p.epsilon_max,
@@ -302,7 +304,10 @@ def visualization_plots(data_path, p, current_path, logger):
 
     # Plots
     viz.plot_exploration_rate(
-        epsilons, xlabel="Steps", figpath=current_path, logger=logger
+        epsilons=epsilons,
+        steps=steps,
+        figpath=current_path,
+        logger=logger,
     )
     viz.plot_actions_distribution(all_actions, figpath=current_path, logger=logger)
     viz.plot_steps_and_rewards_dist(rew_steps_df, figpath=current_path, logger=logger)

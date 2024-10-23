@@ -645,13 +645,21 @@ def plot_loss(loss_df, n_runs=1, figpath=None, logger=None):
     # plt.show()
 
 
-def plot_exploration_rate(epsilons, xlabel="", figpath=None, logger=None):
+def plot_exploration_rate(epsilons, steps, figpath=None, logger=None):
     """Plot the exploration rate."""
     fig, ax = plt.subplots()
     sns.lineplot(epsilons, color="black")
     ax.set(ylabel="Epsilon")
-    if xlabel:
-        ax.set(xlabel=xlabel)
+    ax.set(xlabel="Steps")
+
+    # Second x axis
+    sec_x = ax.secondary_xaxis(location="top")
+    sec_x.set(xlabel="Episodes")
+    cumsteps = steps.flatten().cumsum()
+    # qindex = np.quantile(index, np.array([1/4, 1/2, 3/4, 1]))
+    qindex = np.percentile(cumsteps, np.arange(0, 100, 10))
+    sec_x.xaxis.set_major_locator(ticker.FixedLocator(qindex))
+
     ax.set_facecolor("0.9")
     fig.tight_layout()
     fig.patch.set_alpha(0)
