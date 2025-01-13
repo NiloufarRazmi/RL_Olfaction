@@ -76,7 +76,6 @@ class DQN(nn.Module):
         super().__init__()
         self.mlp = nn.Sequential(
             nn.Linear(n_observations, n_units),
-            nn.ReLU(),
             nn.Linear(n_units, n_units),
             nn.ReLU(),
             nn.Linear(n_units, n_units),

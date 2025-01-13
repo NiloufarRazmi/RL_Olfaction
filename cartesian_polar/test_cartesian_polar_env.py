@@ -1,5 +1,8 @@
 """Tests on the environment."""
 
+import math
+
+import numpy as np
 import pytest
 import torch
 from tensordict.tensordict import TensorDict
@@ -492,115 +495,427 @@ def test_env_logic(task, triangle, expected_reward):
     [
         (
             torch.tensor([0, 0, 0]),
-            torch.tensor([2, 2, 270]),
-            torch.tensor([2, 2, 90]),
-            torch.tensor([2.8284270763, 45, 270 - 45]),
-            torch.tensor([2.8284270763, 45, 90 - 45]),
+            torch.tensor([2, 2, 0, -1]),
+            torch.tensor([2, 2, 0, 1]),
+            torch.tensor(
+                [
+                    2.8284270763,
+                    np.cos(45 * math.pi / 180),
+                    np.sin(45 * math.pi / 180),
+                    np.cos((270 - 45) * math.pi / 180),
+                    np.sin((270 - 45) * math.pi / 180),
+                ]
+            ),
+            torch.tensor(
+                [
+                    2.8284270763,
+                    np.cos(45 * math.pi / 180),
+                    np.sin(45 * math.pi / 180),
+                    np.cos((90 - 45) * math.pi / 180),
+                    np.sin((90 - 45) * math.pi / 180),
+                ]
+            ),
         ),
         (
             torch.tensor([2, 2, 0]),
-            torch.tensor([0, 0, 270]),
-            torch.tensor([4, 4, 90]),
-            torch.tensor([0, 0, 270]).to(torch.float32),
-            torch.tensor([5.6568541527, 45, 90 - 45]),
+            torch.tensor([0, 0, 0, -1]),
+            torch.tensor([4, 4, 0, 1]),
+            torch.tensor(
+                [
+                    0,
+                    np.cos(0 * math.pi / 180),
+                    np.sin(0 * math.pi / 180),
+                    np.cos(270 * math.pi / 180),
+                    np.sin(270 * math.pi / 180),
+                ]
+            ),
+            torch.tensor(
+                [
+                    5.6568541527,
+                    np.cos(45 * math.pi / 180),
+                    np.sin(45 * math.pi / 180),
+                    np.cos((90 - 45) * math.pi / 180),
+                    np.sin((90 - 45) * math.pi / 180),
+                ]
+            ),
         ),
         (
             torch.tensor([-2, -2, 0]),
-            torch.tensor([4, 4, 270]),
-            torch.tensor([0, 0, 90]),
-            torch.tensor([5.6568541527, 45, 270 - 45]),
-            torch.tensor([0, 0, 90]).to(torch.float32),
+            torch.tensor([4, 4, 0, -1]),
+            torch.tensor([0, 0, 0, 1]),
+            torch.tensor(
+                [
+                    5.6568541527,
+                    np.cos(45 * math.pi / 180),
+                    np.sin(45 * math.pi / 180),
+                    np.cos((270 - 45) * math.pi / 180),
+                    np.sin((270 - 45) * math.pi / 180),
+                ]
+            ),
+            torch.tensor(
+                [
+                    0,
+                    np.cos(0 * math.pi / 180),
+                    np.sin(0 * math.pi / 180),
+                    np.cos(90 * math.pi / 180),
+                    np.sin(90 * math.pi / 180),
+                ]
+            ),
         ),
         (
             torch.tensor([2, -2, 0]),
-            torch.tensor([0, 4, 270]),
-            torch.tensor([4, 0, 90]),
-            torch.tensor([4, 90, 270 - 90]).to(torch.float32),
-            torch.tensor([4, 0, 90]).to(torch.float32),
+            torch.tensor([0, 4, 0, -1]),
+            torch.tensor([4, 0, 0, 1]),
+            torch.tensor(
+                [
+                    4,
+                    np.cos(90 * math.pi / 180),
+                    np.sin(90 * math.pi / 180),
+                    np.cos((270 - 90) * math.pi / 180),
+                    np.sin((270 - 90) * math.pi / 180),
+                ]
+            ),
+            torch.tensor(
+                [
+                    4,
+                    np.cos(0 * math.pi / 180),
+                    np.sin(0 * math.pi / 180),
+                    np.cos(90 * math.pi / 180),
+                    np.sin(90 * math.pi / 180),
+                ]
+            ),
         ),
         (
             torch.tensor([2, -2, 90]),
-            torch.tensor([0, 4, 180]),
-            torch.tensor([4, 0, 0]),
-            torch.tensor([4, 90, 180 - 90]).to(torch.float32),
-            torch.tensor([4, 0, -0]).to(torch.float32),
+            torch.tensor([0, 4, -1, 0]),
+            torch.tensor([4, 0, 1, 0]),
+            torch.tensor(
+                [
+                    4,
+                    np.cos(90 * math.pi / 180),
+                    np.sin(90 * math.pi / 180),
+                    np.cos((180 - 90) * math.pi / 180),
+                    np.sin((180 - 90) * math.pi / 180),
+                ]
+            ),
+            torch.tensor(
+                [
+                    4,
+                    np.cos(0 * math.pi / 180),
+                    np.sin(0 * math.pi / 180),
+                    np.cos(-0 * math.pi / 180),
+                    np.sin(-0 * math.pi / 180),
+                ]
+            ),
         ),
         (
             torch.tensor([2, -2, 180]),
-            torch.tensor([0, 4, 90]),
-            torch.tensor([4, 0, 270]),
-            torch.tensor([4, 90, 0]).to(torch.float32),
-            torch.tensor([4, 0, -90]).to(torch.float32),
+            torch.tensor([0, 4, 0, 1]),
+            torch.tensor([4, 0, 0, -1]),
+            torch.tensor(
+                [
+                    4,
+                    np.cos(90 * math.pi / 180),
+                    np.sin(90 * math.pi / 180),
+                    np.cos(0 * math.pi / 180),
+                    np.sin(0 * math.pi / 180),
+                ]
+            ),
+            torch.tensor(
+                [
+                    4,
+                    np.cos(0 * math.pi / 180),
+                    np.sin(0 * math.pi / 180),
+                    np.cos(-90 * math.pi / 180),
+                    np.sin(-90 * math.pi / 180),
+                ]
+            ),
         ),
         (
             torch.tensor([2, -2, 270]),
-            torch.tensor([0, 4, 0]),
-            torch.tensor([4, 0, 180]),
-            torch.tensor([4, 90, -90]).to(torch.float32),
-            torch.tensor([4, 0, 180]).to(torch.float32),
+            torch.tensor([0, 4, 1, 0]),
+            torch.tensor([4, 0, -1, 0]),
+            torch.tensor(
+                [
+                    4,
+                    np.cos(90 * math.pi / 180),
+                    np.sin(90 * math.pi / 180),
+                    np.cos(-90 * math.pi / 180),
+                    np.sin(-90 * math.pi / 180),
+                ]
+            ),
+            torch.tensor(
+                [
+                    4,
+                    np.cos(0 * math.pi / 180),
+                    np.sin(0 * math.pi / 180),
+                    np.cos(180 * math.pi / 180),
+                    np.sin(180 * math.pi / 180),
+                ]
+            ),
         ),
         (
             torch.tensor([-2, 2, 0]),
-            torch.tensor([4, 0, 270]),
-            torch.tensor([0, 4, 90]),
-            torch.tensor([4, 0, 270]).to(torch.float32),
-            torch.tensor([4, 90, 0]).to(torch.float32),
+            torch.tensor([4, 0, 0, -1]),
+            torch.tensor([0, 4, 0, 1]),
+            torch.tensor(
+                [
+                    4,
+                    np.cos(0 * math.pi / 180),
+                    np.sin(0 * math.pi / 180),
+                    np.cos(270 * math.pi / 180),
+                    np.sin(270 * math.pi / 180),
+                ]
+            ),
+            torch.tensor(
+                [
+                    4,
+                    np.cos(90 * math.pi / 180),
+                    np.sin(90 * math.pi / 180),
+                    np.cos(0 * math.pi / 180),
+                    np.sin(0 * math.pi / 180),
+                ]
+            ),
         ),
         (
             torch.tensor([3, 3, 0]),
-            torch.tensor([-1, -1, 270]),
-            torch.tensor([5, 5, 90]),
-            torch.tensor([1.4142135382, -135, 135 - 90]),
-            torch.tensor([7.0710678101, 45, 90 - 45]),
+            torch.tensor([-1, -1, 0, -1]),
+            torch.tensor([5, 5, 0, 1]),
+            torch.tensor(
+                [
+                    1.4142135382,
+                    np.cos(-135 * math.pi / 180),
+                    np.sin(-135 * math.pi / 180),
+                    np.cos((135 - 90) * math.pi / 180),
+                    np.sin((135 - 90) * math.pi / 180),
+                ]
+            ),
+            torch.tensor(
+                [
+                    7.0710678101,
+                    np.cos(45 * math.pi / 180),
+                    np.sin(45 * math.pi / 180),
+                    np.cos((90 - 45) * math.pi / 180),
+                    np.sin((90 - 45) * math.pi / 180),
+                ]
+            ),
         ),
         (
             torch.tensor([-3, -3, 0]),
-            torch.tensor([5, 5, 270]),
-            torch.tensor([-1, -1, 90]),
-            torch.tensor([7.0710678101, 45, 270 - 45]),
-            torch.tensor([1.4142135382, -135, 90 + 135]),
+            torch.tensor([5, 5, 0, -1]),
+            torch.tensor([-1, -1, 0, 1]),
+            torch.tensor(
+                [
+                    7.0710678101,
+                    np.cos(45 * math.pi / 180),
+                    np.sin(45 * math.pi / 180),
+                    np.cos((270 - 45) * math.pi / 180),
+                    np.sin((270 - 45) * math.pi / 180),
+                ]
+            ),
+            torch.tensor(
+                [
+                    1.4142135382,
+                    np.cos(-135 * math.pi / 180),
+                    np.sin(-135 * math.pi / 180),
+                    np.cos((90 + 135) * math.pi / 180),
+                    np.sin((90 + 135) * math.pi / 180),
+                ]
+            ),
         ),
         (
             torch.tensor([1, -1, 0]),
-            torch.tensor([1, 3, 270]),
-            torch.tensor([3, 1, 90]),
-            torch.tensor([3.1622776985, 71.5650482178, 270 - 71.5650482178]),
-            torch.tensor([3.1622776985, 18.4349479675, 90 - 18.4349479675]),
+            torch.tensor([1, 3, 0, -1]),
+            torch.tensor([3, 1, 0, 1]),
+            torch.tensor(
+                [
+                    3.1622776985,
+                    np.cos(71.5650482178 * math.pi / 180),
+                    np.sin(71.5650482178 * math.pi / 180),
+                    np.cos((270 - 71.5650482178) * math.pi / 180),
+                    np.sin((270 - 71.5650482178) * math.pi / 180),
+                ]
+            ),
+            torch.tensor(
+                [
+                    3.1622776985,
+                    np.cos(18.4349479675 * math.pi / 180),
+                    np.sin(18.4349479675 * math.pi / 180),
+                    np.cos((90 - 18.4349479675) * math.pi / 180),
+                    np.sin((90 - 18.4349479675) * math.pi / 180),
+                ]
+            ),
         ),
         (
             torch.tensor([-1, 1, 0]),
-            torch.tensor([3, 1, 270]),
-            torch.tensor([1, 3, 90]),
-            torch.tensor([3.1622776985, 18.4349479675, 270 - 18.4349479675]),
-            torch.tensor([3.1622776985, 71.5650482178, 90 - 71.5650482178]),
+            torch.tensor([3, 1, 0, -1]),
+            torch.tensor([1, 3, 0, 1]),
+            torch.tensor(
+                [
+                    3.1622776985,
+                    np.cos(18.4349479675 * math.pi / 180),
+                    np.sin(18.4349479675 * math.pi / 180),
+                    np.cos((270 - 18.4349479675) * math.pi / 180),
+                    np.sin((270 - 18.4349479675) * math.pi / 180),
+                ]
+            ),
+            torch.tensor(
+                [
+                    3.1622776985,
+                    np.cos(71.5650482178 * math.pi / 180),
+                    np.sin(71.5650482178 * math.pi / 180),
+                    np.cos((90 - 71.5650482178) * math.pi / 180),
+                    np.sin((90 - 71.5650482178) * math.pi / 180),
+                ]
+            ),
         ),
         (
             torch.tensor([0, 0, 30]),
-            torch.tensor([2, 2, 270 - 30]),
-            torch.tensor([2, 2, 90 - 30]),
-            torch.tensor([2.8284270763, 45, 270 - 30 - 45]),
-            torch.tensor([2.8284270763, 45, 90 - 30 - 45]),
+            torch.tensor(
+                [
+                    2,
+                    2,
+                    np.cos((270 - 30) * math.pi / 180),
+                    np.sin((270 - 30) * math.pi / 180),
+                ]
+            ),
+            torch.tensor(
+                [
+                    2,
+                    2,
+                    np.cos((90 - 30) * math.pi / 180),
+                    np.sin((90 - 30) * math.pi / 180),
+                ]
+            ),
+            torch.tensor(
+                [
+                    2.8284270763,
+                    np.cos(45 * math.pi / 180),
+                    np.sin(45 * math.pi / 180),
+                    np.cos((270 - 30 - 45) * math.pi / 180),
+                    np.sin((270 - 30 - 45) * math.pi / 180),
+                ]
+            ),
+            torch.tensor(
+                [
+                    2.8284270763,
+                    np.cos(45 * math.pi / 180),
+                    np.sin(45 * math.pi / 180),
+                    np.cos((90 - 30 - 45) * math.pi / 180),
+                    np.sin((90 - 30 - 45) * math.pi / 180),
+                ]
+            ),
         ),
         (
             torch.tensor([0, 0, 100]),
-            torch.tensor([2, 2, 180 - 100 + 90]),
-            torch.tensor([2, 2, 360 - (100 - 90)]),
-            torch.tensor([2.8284270763, 45, 180 - 100 + 90 - 45]),
-            torch.tensor([2.8284270763, 45, -(100 - 45)]),
+            torch.tensor(
+                [
+                    2,
+                    2,
+                    np.cos((180 - 100 + 90) * math.pi / 180),
+                    np.sin((180 - 100 + 90) * math.pi / 180),
+                ]
+            ),
+            torch.tensor(
+                [
+                    2,
+                    2,
+                    np.cos((360 - (100 - 90)) * math.pi / 180),
+                    np.sin((360 - (100 - 90)) * math.pi / 180),
+                ]
+            ),
+            torch.tensor(
+                [
+                    2.8284270763,
+                    np.cos(45 * math.pi / 180),
+                    np.sin(45 * math.pi / 180),
+                    np.cos((180 - 100 + 90 - 45) * math.pi / 180),
+                    np.sin((180 - 100 + 90 - 45) * math.pi / 180),
+                ]
+            ),
+            torch.tensor(
+                [
+                    2.8284270763,
+                    np.cos(45 * math.pi / 180),
+                    np.sin(45 * math.pi / 180),
+                    np.cos(-(100 - 45) * math.pi / 180),
+                    np.sin(-(100 - 45) * math.pi / 180),
+                ]
+            ),
         ),
         (
             torch.tensor([0, 0, 200]),
-            torch.tensor([2, 2, 90 - (200 - 180)]),
-            torch.tensor([2, 2, 270 - (200 - 180)]),
-            torch.tensor([2.8284270763, 45, 90 - (200 - 180) - 45]),
-            torch.tensor([2.8284270763, 45, -(200 - (90 - 45))]),
+            torch.tensor(
+                [
+                    2,
+                    2,
+                    np.cos((90 - (200 - 180)) * math.pi / 180),
+                    np.sin((90 - (200 - 180)) * math.pi / 180),
+                ]
+            ),
+            torch.tensor(
+                [
+                    2,
+                    2,
+                    np.cos((270 - (200 - 180)) * math.pi / 180),
+                    np.sin((270 - (200 - 180)) * math.pi / 180),
+                ]
+            ),
+            torch.tensor(
+                [
+                    2.8284270763,
+                    np.cos(45 * math.pi / 180),
+                    np.sin(45 * math.pi / 180),
+                    np.cos(((90 - (200 - 180)) - 45) * math.pi / 180),
+                    np.sin(((90 - (200 - 180)) - 45) * math.pi / 180),
+                ]
+            ),
+            torch.tensor(
+                [
+                    2.8284270763,
+                    np.cos(45 * math.pi / 180),
+                    np.sin(45 * math.pi / 180),
+                    np.cos(-(200 - (90 - 45)) * math.pi / 180),
+                    np.sin(-(200 - (90 - 45)) * math.pi / 180),
+                ]
+            ),
         ),
         (
             torch.tensor([0, 0, 300]),
-            torch.tensor([2, 2, 270 + 360 - 300]),
-            torch.tensor([2, 2, 90 + 360 - 300]),
-            torch.tensor([2.8284270763, 45, -(300 - 270 + 45)]),
-            torch.tensor([2.8284270763, 45, 360 - 300 + 90 - 45]),
+            torch.tensor(
+                [
+                    2,
+                    2,
+                    np.cos((270 + 360 - 300) * math.pi / 180),
+                    np.sin((270 + 360 - 300) * math.pi / 180),
+                ]
+            ),
+            torch.tensor(
+                [
+                    2,
+                    2,
+                    np.cos((90 + 360 - 300) * math.pi / 180),
+                    np.sin((90 + 360 - 300) * math.pi / 180),
+                ]
+            ),
+            torch.tensor(
+                [
+                    2.8284270763,
+                    np.cos(45 * math.pi / 180),
+                    np.sin(45 * math.pi / 180),
+                    np.cos(-(300 - 270 + 45) * math.pi / 180),
+                    np.sin(-(300 - 270 + 45) * math.pi / 180),
+                ]
+            ),
+            torch.tensor(
+                [
+                    2.8284270763,
+                    np.cos(45 * math.pi / 180),
+                    np.sin(45 * math.pi / 180),
+                    np.cos((360 - 300 + 90 - 45) * math.pi / 180),
+                    np.sin((360 - 300 + 90 - 45) * math.pi / 180),
+                ]
+            ),
         ),
     ],
 )
@@ -613,29 +928,31 @@ def test_coords_convertions(
 ):
     """Test the conversion routines."""
     env = DuplicatedCoordsEnv(taskid=TaskIDrand())
-    assert torch.equal(
-        input=env.conv2north_cartesian(coords_orig), other=coords_north_cart
+    torch.testing.assert_close(
+        actual=env.conv2north_cartesian(coords_orig),
+        expected=coords_north_cart.to(torch.float32),
     )
-    assert torch.equal(
-        input=env.conv2south_cartesian(coords_orig), other=coords_south_cart
+    torch.testing.assert_close(
+        actual=env.conv2south_cartesian(coords_orig),
+        expected=coords_south_cart.to(torch.float32),
     )
     torch.testing.assert_close(
         actual=env.conv2north_polar(coords_orig),
-        expected=coords_north_polar,
+        expected=coords_north_polar.to(torch.float32),
         # atol=5e-5,
         # rtol=1e-5,
     )
     torch.testing.assert_close(
         actual=env.conv2south_polar(coords_orig),
-        expected=coords_south_polar,
+        expected=coords_south_polar.to(torch.float32),
         # atol=5e-2,
         # rtol=2e-2,
     )
 
     # Test round trip conversion
-    assert torch.equal(
-        input=env.conv_north_cartesian2orig(env.conv2north_cartesian(coords_orig)),
-        other=coords_orig,
+    torch.testing.assert_close(
+        actual=env.conv_north_cartesian2orig(env.conv2north_cartesian(coords_orig)),
+        expected=coords_orig.to(torch.float32),
     )
 
 

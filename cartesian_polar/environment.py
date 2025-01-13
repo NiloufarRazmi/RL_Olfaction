@@ -4,6 +4,7 @@ import math
 from collections import OrderedDict
 from enum import Enum
 
+import numpy as np
 import torch
 from tensordict.tensordict import TensorDict
 
@@ -434,7 +435,7 @@ class DuplicatedCoordsEnv(Environment):
 
     def conv_flat_duplicated_coords_to_dict(self, state):
         """Convert back tensor state to original composite state."""
-        coords_orig = self.conv_north_cartesian2orig(state[1:4])
+        coords_orig = self.conv_north_cartesian2orig(state[1:5])
         conv_state = TensorDict(
             {
                 "cue": torch.tensor([state[0]], device=DEVICE),
@@ -470,79 +471,118 @@ class DuplicatedCoordsEnv(Environment):
         """Convert origin (0, 0) coords to Cartesian coords from the North port."""
         new_x = -coords_orig[0] + 2
         new_y = -coords_orig[1] + 2
-        direction_orig = coords_orig[2].item()
-        if 0 <= direction_orig < 270:
-            new_absolute_direction = 270 - direction_orig
-        elif 270 <= direction_orig < 360:
-            new_absolute_direction = 270 + 360 - direction_orig
-        else:
-            raise ValueError("Impossible angular value")
-        new_absolute_direction = (
-            0 if new_absolute_direction == 360 else new_absolute_direction
-        )
-        return torch.tensor([new_x, new_y, new_absolute_direction], device=DEVICE)
+        # direction_orig = coords_orig[2].item()
+        # if 0 <= direction_orig < 270:
+        #     new_absolute_direction = 270 - direction_orig
+        # elif 270 <= direction_orig < 360:
+        #     new_absolute_direction = 270 + 360 - direction_orig
+        # else:
+        #     raise ValueError("Impossible angular value")
+        # new_absolute_direction = (
+        #     0 if new_absolute_direction == 360 else new_absolute_direction
+        # )
+        _, _, south_cos, south_sin = self.conv2south_cartesian(coords_orig)
+        cos_dir = -south_cos
+        sin_dir = -south_sin
+        return torch.tensor([new_x, new_y, cos_dir, sin_dir], device=DEVICE)
 
     def conv2south_cartesian(self, coords_orig):
         """Convert origin (0, 0) coords to Cartesian coords from the South port."""
         new_x = coords_orig[0] + 2
         new_y = coords_orig[1] + 2
-        direction_orig = coords_orig[2].item()
-        if 0 <= direction_orig <= 90:
-            new_absolute_direction = 90 - direction_orig
-        else:
-            new_absolute_direction = 450 - direction_orig
-        return torch.tensor([new_x, new_y, new_absolute_direction], device=DEVICE)
+        # direction_orig = coords_orig[2].item()
+        direction_orig = coords_orig[2]
+        # if 0 <= direction_orig <= 90:
+        #     new_absolute_direction = 90 - direction_orig
+        # else:
+        #     new_absolute_direction = 450 - direction_orig
+
+        # cos and sin are switch beacuse `direction_orig` is taken from the north port
+        cos_dir = torch.sin(direction_orig * math.pi / 180)
+        sin_dir = torch.cos(direction_orig * math.pi / 180)
+        return torch.tensor([new_x, new_y, cos_dir, sin_dir], device=DEVICE)
 
     def cartesian2polar(self, coords_orig):
         """Convert coordinates from Cartesian to polar."""
         length = torch.sqrt(coords_orig[0] ** 2 + coords_orig[1] ** 2)
-        alpha = torch.atan2(input=coords_orig[1], other=coords_orig[0]) * 180 / math.pi
-        return length, alpha
+        alpha = torch.atan2(
+            input=coords_orig[1], other=coords_orig[0]
+        )  # * 180 / math.pi
+        cos_alpha = torch.cos(alpha)
+        sin_alpha = torch.sin(alpha)
+
+        # Head direction
+        cos_orig = coords_orig[2]
+        sin_orig = coords_orig[3]
+        direction = torch.atan2(input=sin_orig, other=cos_orig)
+        if np.sign(alpha) == np.sign(direction):
+            angle_diff = direction - alpha
+        else:
+            # angles = [alpha, direction]
+            # angle_sign = np.sign(angles[np.argmax(np.abs(angles))])
+            # angle_diff = angle_sign*(abs(direction)+abs(alpha))
+            angle_diff = np.sign(direction) * (abs(direction) + abs(alpha))
+        cos_dir = torch.cos(angle_diff)
+        sin_dir = torch.sin(angle_diff)
+        return length, cos_alpha, sin_alpha, cos_dir, sin_dir
 
     def conv2north_polar(self, coords_orig):
         """Convert from origin (0, 0) coords to polar coords from the North port."""
         north_coords = self.conv2north_cartesian(coords_orig)
-        length, alpha = self.cartesian2polar(north_coords)
-        direction_orig = coords_orig[2].item()
-        if 0 <= direction_orig <= 180:
-            new_relative_direction = 270 - alpha - direction_orig
-        elif 180 < direction_orig <= 270:
-            if direction_orig + alpha - 180 <= 90:
-                new_relative_direction = 270 - alpha - direction_orig
-            else:
-                new_relative_direction = -(alpha - (270 - direction_orig))
-        elif 270 < direction_orig < 360:
-            new_relative_direction = -(direction_orig - 270 + alpha)
-        else:
-            raise ValueError("Impossible angular value")
-        if abs(new_relative_direction) > 180:
-            new_relative_direction = new_relative_direction % 360
+        # length, alpha = self.cartesian2polar(north_coords)
+        length, cos_dir, sin_dir, cos_alpha, sin_alpha = self.cartesian2polar(
+            north_coords
+        )
+        # direction_orig = coords_orig[2].item()
+        # if 0 <= direction_orig <= 180:
+        #     new_relative_direction = 270 - alpha - direction_orig
+        # elif 180 < direction_orig <= 270:
+        #     if direction_orig + alpha - 180 <= 90:
+        #         new_relative_direction = 270 - alpha - direction_orig
+        #     else:
+        #         new_relative_direction = -(alpha - (270 - direction_orig))
+        # elif 270 < direction_orig < 360:
+        #     new_relative_direction = -(direction_orig - 270 + alpha)
+        # else:
+        #     raise ValueError("Impossible angular value")
+        # if abs(new_relative_direction) > 180:
+        #     new_relative_direction = new_relative_direction % 360
+        # north_polar = torch.tensor(
+        #     [length, alpha, new_relative_direction], device=DEVICE
+        # )
+        # cos_dir = torch.cos(new_relative_direction*math.pi/180)
+        # sin_dir = torch.sin(new_relative_direction*math.pi/180)
         north_polar = torch.tensor(
-            [length, alpha, new_relative_direction], device=DEVICE
+            [length, cos_dir, sin_dir, cos_alpha, sin_alpha], device=DEVICE
         )
         return north_polar
 
     def conv2south_polar(self, coords_orig):
         """Convert from origin (0, 0) coords to polar coords from the South port."""
         south_coords = self.conv2south_cartesian(coords_orig)
-        length, alpha = self.cartesian2polar(south_coords)
-        direction_orig = coords_orig[2].item()
-        if 0 <= direction_orig <= 90:
-            if direction_orig + alpha <= 90:
-                new_relative_direction = 90 - alpha - direction_orig
-            else:
-                new_relative_direction = -abs(90 - alpha - direction_orig)
-        else:
-            new_relative_direction = -(direction_orig - 90 + alpha)
-        new_relative_direction = (
-            abs(new_relative_direction)
-            if new_relative_direction == -180
-            else new_relative_direction
+        # length, alpha = self.cartesian2polar(south_coords)
+        length, cos_dir, sin_dir, cos_alpha, sin_alpha = self.cartesian2polar(
+            south_coords
         )
-        if abs(new_relative_direction) > 180:
-            new_relative_direction = new_relative_direction % 360
+        # direction_orig = coords_orig[2].item()
+        # if 0 <= direction_orig <= 90:
+        #     if direction_orig + alpha <= 90:
+        #         new_relative_direction = 90 - alpha - direction_orig
+        #     else:
+        #         new_relative_direction = -abs(90 - alpha - direction_orig)
+        # else:
+        #     new_relative_direction = -(direction_orig - 90 + alpha)
+        # new_relative_direction = (
+        #     abs(new_relative_direction)
+        #     if new_relative_direction == -180
+        #     else new_relative_direction
+        # )
+        # if abs(new_relative_direction) > 180:
+        #     new_relative_direction = new_relative_direction % 360
+        # cos_dir = torch.cos(new_relative_direction*math.pi/180)
+        # sin_dir = torch.sin(new_relative_direction*math.pi/180)
         south_polar = torch.tensor(
-            [length, alpha, new_relative_direction], device=DEVICE
+            [length, cos_dir, sin_dir, cos_alpha, sin_alpha], device=DEVICE
         )
         return south_polar
 
@@ -550,24 +590,19 @@ class DuplicatedCoordsEnv(Environment):
         """Convert Cartesian coords from North port to origin (0, 0) coords."""
         new_x = -coords_orig[0] + 2
         new_y = -coords_orig[1] + 2
-        direction_orig = coords_orig[2].item()
-        if 0 <= direction_orig < 270:
-            new_absolute_direction = 270 - direction_orig
-        elif 270 <= direction_orig < 360:
-            new_absolute_direction = 270 + 360 - direction_orig
-        else:
-            raise ValueError("Impossible angular value")
-        new_absolute_direction = (
-            0 if new_absolute_direction == 360 else new_absolute_direction
-        )
-        return torch.tensor([new_x, new_y, new_absolute_direction], device=DEVICE)
 
-    # def conv_angle_north_orig(self, direction_orig):
-    #     """Convert absolute angle from North port to origin and vice versa."""
-    #     if 0 <= direction_orig < 270:
-    #         new_absolute_direction = 270 - direction_orig
-    #     elif 270 <= direction_orig < 360:
-    #         new_absolute_direction = 270 + 360 - direction_orig
-    #     else:
-    #         raise ValueError("Impossible angular value")
-    #     return new_absolute_direction
+        # cos and sin are switch beacuse `direction_orig` is taken from the north port
+        sin_dir = -coords_orig[2]
+        cos_dir = -coords_orig[3]
+        new_direction = torch.atan2(input=sin_dir, other=cos_dir) * 180 / math.pi
+        new_direction = new_direction % 360
+        # if 0 <= direction < 270:
+        #     new_direction = 270 - direction
+        # elif 270 <= direction < 360:
+        #     new_direction = 270 + 360 - direction
+        # else:
+        #     raise ValueError("Impossible angular value")
+        # new_direction = (
+        #     0 if new_direction == 360 else new_direction
+        # )
+        return torch.tensor([new_x, new_y, new_direction], device=DEVICE)

@@ -71,17 +71,20 @@ Thanks!
 - The network will use the most efficient info
 - Does changing the reward mapping/task make a change in the weights indicating the agent use only certain info?
 
-** [?] Remove ReLU on input layer?
-** direction vector
+** DONE Remove ReLU on input layer?
+** TODO direction vector
 3 angles
 - sin
 - cos
 - tan
-** Angular activatino funct
-** Most likely head directions instead of everything
-** Look sampled trials behavior
-** Does the agent look
-** Plot trajectoies/state occupancy
-** Try other left/right task
-*** And compare activations with east/west
-** Tuning curve to identify cart/polar neurons
+** Angular activation function instead of ReLUs?
+** Policy
+*** Most likely head directions instead of everything?
+** TODO Look at sampled trials behavior
+*** What does the agent behavior look?
+*** TODO Save all states
+*** Plot video of current run?
+*** TODO Plot trajectories/state occupancy
+** DONE Try other left/right task
+*** DONE And compare activations with east/west
+** Tuning curve to identify cart/polar neurons?
