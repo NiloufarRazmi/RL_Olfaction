@@ -4,7 +4,6 @@ import math
 from collections import OrderedDict
 from enum import Enum
 
-import numpy as np
 import torch
 from tensordict.tensordict import TensorDict
 
@@ -327,7 +326,7 @@ class Environment:
             angle = 0
             return angle, y
 
-        if direction == 0:  # Facing north
+        if direction.round() == 0:  # Facing north
             if action == Actions.left.value:
                 direction, x = LEFT(x=x, y=y)
             elif action == Actions.right.value:
@@ -338,7 +337,7 @@ class Environment:
             #     direction, y = DOWN(x=x, y=y)
             #     direction = 0
 
-        elif direction == 90:  # Facing east
+        elif direction.round() == 90:  # Facing east
             if action == Actions.left.value:
                 direction, y = UP(x=x, y=y)
             elif action == Actions.right.value:
@@ -349,7 +348,7 @@ class Environment:
             #     direction, x = LEFT(x=x, y=y)
             #     direction = 90
 
-        elif direction == 180:  # Facing south
+        elif direction.round() == 180:  # Facing south
             if action == Actions.left.value:
                 direction, x = RIGHT(x=x, y=y)
             elif action == Actions.right.value:
@@ -360,7 +359,7 @@ class Environment:
             #     direction, y = UP(x=x, y=y)
             #     direction = 180
 
-        elif direction == 270:  # Facing west
+        elif direction.round() == 270:  # Facing west
             if action == Actions.left.value:
                 direction, y = DOWN(x=x, y=y)
             elif action == Actions.right.value:
@@ -515,13 +514,13 @@ class DuplicatedCoordsEnv(Environment):
         cos_orig = coords_orig[2]
         sin_orig = coords_orig[3]
         direction = torch.atan2(input=sin_orig, other=cos_orig)
-        if np.sign(alpha) == np.sign(direction):
+        if alpha.sign() == direction.sign():
             angle_diff = direction - alpha
         else:
             # angles = [alpha, direction]
             # angle_sign = np.sign(angles[np.argmax(np.abs(angles))])
             # angle_diff = angle_sign*(abs(direction)+abs(alpha))
-            angle_diff = np.sign(direction) * (abs(direction) + abs(alpha))
+            angle_diff = direction.sign() * (abs(direction) + abs(alpha))
         cos_dir = torch.cos(angle_diff)
         sin_dir = torch.sin(angle_diff)
         return length, cos_alpha, sin_alpha, cos_dir, sin_dir
