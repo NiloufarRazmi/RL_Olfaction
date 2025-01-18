@@ -29,7 +29,7 @@ def training_loop(p, current_path, logger, generator=None):
     rewards = torch.zeros((p.total_episodes, p.n_runs), device=DEVICE)
     steps = torch.zeros((p.total_episodes, p.n_runs), device=DEVICE)
     episodes = torch.arange(p.total_episodes, device=DEVICE)
-    # all_states = []
+    all_states = []
     all_actions = []
     losses = [[] for _ in range(p.n_runs)]
 
@@ -84,8 +84,7 @@ def training_loop(p, current_path, logger, generator=None):
                 ).item()
 
                 # Record states and actions
-                # all_states.append(state)
-                # all_actions.append(Actions(action.item()).name)
+                all_states.append(state)
                 all_actions.append(Actions(action).name)
 
                 next_state, reward, done = env.step(action=action, current_state=state)
@@ -229,6 +228,7 @@ def training_loop(p, current_path, logger, generator=None):
         "rewards": rewards.cpu(),
         "steps": steps.cpu(),
         "episodes": episodes.cpu(),
+        "all_states": all_states,
         "all_actions": all_actions,
         "losses": np.array(losses, dtype=object),
         "p": p,
@@ -258,6 +258,7 @@ def visualization_plots(data_path, p, current_path, logger):
         steps = data_dict["steps"]
         episodes = data_dict["episodes"]
         all_actions = data_dict["all_actions"]
+        # all_states = data_dict["all_states"]
         losses = data_dict["losses"]
         p = data_dict["p"][()]
         epsilons = data_dict["epsilons"]

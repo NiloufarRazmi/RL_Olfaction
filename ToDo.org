@@ -163,14 +163,51 @@ def visualize_activations(model, color="C0", print_variance=False):
 ** Plot clustermap before training?
 ** PCA of weights/activations?
 *** 10.48550/arXiv.2402.12067
-** TODO Log of the Q-value to get better color? Only for the colormap?
-** TODO Plot 3 activations matrices (by condition)?
-* XAI/Analysis ideas
-** Frequency/FFT?
+** Log of the Q-value to get better color? Only for the colormap?
+** Plot 3 activations matrices (by condition)?
+** TODO Plot the activations on tile/coordinates map
+* TODO Analysis
+** XAI ideas
+*** Frequency/FFT?
 10.48550/arXiv.2403.02241
-** https://www.astralcodexten.com/p/god-help-us-lets-try-to-understand
-** SHAP values/LIME?
-* TODO Experiments
+*** https://www.astralcodexten.com/p/god-help-us-lets-try-to-understand
+*** SHAP values/LIME?
+** DONE Plot activation in the last layer
+*** DONE Last layer before or after activation, i.e. layer 6 or 7?
+DQN(
+  (mlp): Sequential(
+    (0): Linear(in_features=10, out_features=512, bias=True)
+    (1): ReLU()
+    (2): Linear(in_features=512, out_features=512, bias=True)
+    (3): ReLU()
+    (4): Linear(in_features=512, out_features=512, bias=True)
+    (5): ReLU()
+    (6): Linear(in_features=512, out_features=512, bias=True)
+    (7): ReLU()
+    (8): Linear(in_features=512, out_features=3, bias=True)
+  )
+)
+\to Layer 6 as there are no parameters in ReLU
+** Sort neurons by Cartesian/polar
+** Policy
+** TODO What does the agent behavior look like?
+*** TODO Save all states
+*** TODO Look at sampled trials behavior
+*** KILL Plot video of current run?
+*** TODO Plot state occupancy (of all agents + all states)
+*** TODO Plot trajectories of all agents on 2D map
+*** Plot most likely head directions (the one the agent is in most often) instead of all possible action x head direction
+Need to plot 2 info:
+1. the current head direction of the agent
+2. the best action (highest Q-value for that head direction)
+** TODO Identify Cartesian/polar neurons
+*** [?] Neuron in the last layer activated only when Cartesian/polar input but not in the other case?
+*** Silence Cartesian/polar part of the input on both taks + look at the behavior of the agent (x4 experiments)
+** Tuning curve to identify cart/polar neurons?
+*** Would be limited to {0, 90, 180, 270}, i.e. not continuous
+** [?] Results differences between both task?
+[[file:docs/expected cart-polar activations on both tasks.png]]
+* Experiments
 ** Representations
 *** Look at the last layer
 *** Split Hyp and olfactory cortex in 2 layers
@@ -185,7 +222,7 @@ def visualize_activations(model, color="C0", print_variance=False):
 Should learn faster than agent trained only in the lower triangle
 ** DONE Light cue in the state?
 ** DONE No ReLU at the last layer?
-** Normalizing states/actions?
+** [?] Normalizing states input def to the network??
 ** Reward at 1 instead of 10?
 ** DONE Start training when replay buffer is full?
 ** Minimum representations topic
@@ -194,7 +231,7 @@ Should learn faster than agent trained only in the lower triangle
 *** Check the neurons activity and compare to the normal/fully connected case
 ** KILL Memory in the environment + RNN?
 *** Only pass the odor information at the port, not at each time step
-** TODO Polar/Cartesian experiment
+** DONE Polar/Cartesian experiment
 *** DONE Code
 **** DONE Merge action space for ego/allo
 Allow moving backward?
@@ -229,26 +266,11 @@ No: ~argmax~ in the cost function, so better to have it discretized
 **** Train on the normal task, then after training feed incorrect polar angles, i.e. rotated by X degree
 - Same experiment also on incorrect Cartesian coordinates?
 - Both left/right and east/west task?
-*** TODO Analysis
-**** DONE Plot activation in the last layer
-***** DONE Last layer before or after activation, i.e. layer 6 or 7?
-DQN(
-  (mlp): Sequential(
-    (0): Linear(in_features=10, out_features=512, bias=True)
-    (1): ReLU()
-    (2): Linear(in_features=512, out_features=512, bias=True)
-    (3): ReLU()
-    (4): Linear(in_features=512, out_features=512, bias=True)
-    (5): ReLU()
-    (6): Linear(in_features=512, out_features=512, bias=True)
-    (7): ReLU()
-    (8): Linear(in_features=512, out_features=3, bias=True)
-  )
-)
-\to Layer 6 as there are no parameters in ReLU
-**** TODO Plot the activations on tile/coordinates map
-**** TODO Find Cartesian/polar neurons
-**** TODO Sort neurons by Cartesian/polar
+*** DONE direction vector
+3 angles
+- sin
+- cos
+- tan
 * DONE Debug
 ** DONE Unit test env
 ** DONE Unit test one hot case
@@ -305,6 +327,7 @@ DQN(
 ** DONE Add logging
 - [[https://mlflow.org/docs/latest/python_api/mlflow.pytorch.html]]
 - [[https://dvc.org/doc/dvclive/ml-frameworks/pytorch]]
-* TODO Questions
-** TODO Why bump in the number of steps?
+* Questions
+** Why bump in the number of steps?
 Bin distribution to understand if agent is exploiting/exploring
+
