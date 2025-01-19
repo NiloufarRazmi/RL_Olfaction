@@ -677,7 +677,7 @@ def plot_exploration_rate(epsilons, steps, figpath=None, logger=None):
 def plot_actions_distribution(actions, figpath=None, logger=None):
     """Plot the distributions of states and actions."""
     fig, ax = plt.subplots()
-    flatten_actions = flattenarray(actions)
+    flatten_actions = flattenarray(actions, dtype=str)
     sns.histplot(data=flatten_actions, ax=ax, color="black")
     ax.set_xticks(
         [item.value for item in Actions], labels=[item.name for item in Actions]
@@ -697,10 +697,10 @@ def plot_actions_distribution(actions, figpath=None, logger=None):
     # plt.show()
 
 
-def flattenarray(arr):
+def flattenarray(arr, dtype):
     """Flatten array of 1D lists into single 1D array."""
     flatten_length = np.sum([len(run) for run in arr])
-    res = np.empty(flatten_length) * np.nan
+    res = np.empty(flatten_length, dtype=dtype)
     for idx, val in enumerate(arr):
         if idx == 0:
             res[0 : len(val)] = val
