@@ -228,7 +228,7 @@ def training_loop(p, current_path, logger, generator=None):
         "rewards": rewards.cpu(),
         "steps": steps.cpu(),
         "episodes": episodes.cpu(),
-        "all_states": all_states,
+        "all_states": all_states.cpu(),
         "all_actions": all_actions,
         "losses": np.array(losses, dtype=object),
         "p": p,
