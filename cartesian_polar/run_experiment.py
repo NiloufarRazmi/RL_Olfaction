@@ -29,8 +29,8 @@ def training_loop(p, current_path, logger, generator=None):
     rewards = torch.zeros((p.total_episodes, p.n_runs), device=DEVICE)
     steps = torch.zeros((p.total_episodes, p.n_runs), device=DEVICE)
     episodes = torch.arange(p.total_episodes, device=DEVICE)
-    all_states = []
-    all_actions = []
+    all_states = [[] for _ in range(p.n_runs)]
+    all_actions = [[] for _ in range(p.n_runs)]
     losses = [[] for _ in range(p.n_runs)]
 
     for run in range(p.n_runs):  # Run several times to account for stochasticity
@@ -84,8 +84,8 @@ def training_loop(p, current_path, logger, generator=None):
                 ).item()
 
                 # Record states and actions
-                all_states.append(state.cpu())
-                all_actions.append(Actions(action).name)
+                all_states[run].append(state.cpu())
+                all_actions[run].append(Actions(action).name)
 
                 next_state, reward, done = env.step(action=action, current_state=state)
 
@@ -228,8 +228,8 @@ def training_loop(p, current_path, logger, generator=None):
         "rewards": rewards.cpu(),
         "steps": steps.cpu(),
         "episodes": episodes.cpu(),
-        "all_states": all_states,
-        "all_actions": all_actions,
+        "all_states": np.array(all_states, dtype=object),
+        "all_actions": np.array(all_actions, dtype=object),
         "losses": np.array(losses, dtype=object),
         "p": p,
         "epsilons": epsilons,
