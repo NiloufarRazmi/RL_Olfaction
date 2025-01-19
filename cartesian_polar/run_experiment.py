@@ -84,7 +84,7 @@ def training_loop(p, current_path, logger, generator=None):
                 ).item()
 
                 # Record states and actions
-                all_states.append(state)
+                all_states.append(state.cpu())
                 all_actions.append(Actions(action).name)
 
                 next_state, reward, done = env.step(action=action, current_state=state)
@@ -228,7 +228,7 @@ def training_loop(p, current_path, logger, generator=None):
         "rewards": rewards.cpu(),
         "steps": steps.cpu(),
         "episodes": episodes.cpu(),
-        "all_states": all_states.cpu(),
+        "all_states": all_states,
         "all_actions": all_actions,
         "losses": np.array(losses, dtype=object),
         "p": p,
