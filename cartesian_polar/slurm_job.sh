@@ -15,8 +15,8 @@
 #SBATCH --mail-type=begin       # send email when job begins
 #SBATCH --mail-type=end         # send email when job ends
 #SBATCH --mail-user=andrea_pierre@brown.edu
-#SBATCH -o save/stdout-%j.txt
-#SBATCH -e save/stderr-%j.txt
+#SBATCH -o slurm-logs/%j-stdout.txt
+#SBATCH -e slurm-logs/%j-stderr.txt
 ########### End Slurm header ##########
 
 # Load Slurm modules
