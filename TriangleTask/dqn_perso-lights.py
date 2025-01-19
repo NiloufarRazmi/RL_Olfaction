@@ -161,7 +161,6 @@ print(f"Number of observations: {p.n_observations}")
 # %% [markdown]
 # ### Network definition
 
-
 # %%
 class DQN(nn.Module):
     def __init__(self, n_observations, n_actions, n_units=16):
@@ -556,7 +555,6 @@ with open(data_path, "wb") as f:
 # %% [markdown]
 # ### Exploration rate
 
-
 # %%
 def plot_exploration_rate(epsilons, figpath=None):
     fig, ax = plt.subplots()
@@ -577,7 +575,6 @@ plot_exploration_rate(epsilons, figpath=CURRENT_PATH)
 
 # %% [markdown]
 # ### States & actions distributions
-
 
 # %%
 def postprocess(episodes, p, rewards, steps):
@@ -602,7 +599,6 @@ res
 # As a sanity check, we will plot the distributions of states and actions
 # with the following function:
 
-
 # %%
 def plot_actions_distribution(actions, figpath=None):
     """Plot the distributions of states and actions."""
@@ -626,7 +622,6 @@ plot_actions_distribution(all_actions, figpath=CURRENT_PATH)
 
 # %% [markdown]
 # ### Steps & rewards
-
 
 # %%
 def plot_steps_and_rewards(df, figpath=None):

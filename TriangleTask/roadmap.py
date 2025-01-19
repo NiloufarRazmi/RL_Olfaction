@@ -288,7 +288,6 @@ with plt.xkcd():
 # %% [markdown]
 # ## Weights
 
-
 # %%
 class Cues(Enum):
     NoOdor = 0

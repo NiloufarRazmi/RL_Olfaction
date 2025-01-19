@@ -19,7 +19,7 @@
 # %% [markdown]
 # 1. inputs need to reflect position in arena and odor (NOT CONJUNCTIONS)
 # 2. outputs need to reflect action values
-# 3. actions are selected via softmax on output neuron activity.
+# 3. actions are selected via softmax on output neuron activity. 
 # 4. RPE requires knowing value of new state
 #    -- so this will require a forward pass using "new state" inputs.
 

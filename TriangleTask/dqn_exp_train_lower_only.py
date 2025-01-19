@@ -168,7 +168,6 @@ print(f"Number of observations: {p.n_observations}")
 # %% [markdown]
 # ### Network definition
 
-
 # %%
 class DQN(nn.Module):
     def __init__(self, n_observations, n_actions, n_units=16):
@@ -579,7 +578,6 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
 # %% [markdown]
 # ### Exploration rate
 
-
 # %%
 def plot_exploration_rate(epsilons, figpath=None):
     fig, ax = plt.subplots()
@@ -600,7 +598,6 @@ plot_exploration_rate(epsilons, figpath=CURRENT_PATH)
 
 # %% [markdown]
 # ### States & actions distributions
-
 
 # %%
 def postprocess(episodes, p, rewards, steps):
@@ -625,7 +622,6 @@ res
 # As a sanity check, we will plot the distributions of states and actions
 # with the following function:
 
-
 # %%
 def plot_actions_distribution(actions, figpath=None):
     """Plot the distributions of states and actions."""
@@ -649,7 +645,6 @@ plot_actions_distribution(all_actions, figpath=CURRENT_PATH)
 
 # %% [markdown]
 # ### Steps & rewards
-
 
 # %%
 def plot_steps_and_rewards(df, figpath=None):
@@ -784,7 +779,6 @@ q_values.shape
 #                     state = env.to_one_hot(state).float()
 #                 q_values[tile_i, cue_i, :] = net(state).to(device)
 # q_values.shape
-
 
 # %%
 def qtable_directions_map(qtable, rows, cols):

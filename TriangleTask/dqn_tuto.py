@@ -50,10 +50,10 @@
 #
 # The CartPole task is designed so that the inputs to the agent are 4 real
 # values representing the environment state (position, velocity, etc.).
-# We take these 4 inputs without any scaling and pass them through a
-# small fully-connected network with 2 outputs, one for each action.
-# The network is trained to predict the expected value for each action,
-# given the input state. The action with the highest expected value is
+# We take these 4 inputs without any scaling and pass them through a 
+# small fully-connected network with 2 outputs, one for each action. 
+# The network is trained to predict the expected value for each action, 
+# given the input state. The action with the highest expected value is 
 # then chosen.
 #
 #
@@ -161,10 +161,10 @@ class ReplayMemory:
 # $R_{t_0} = \sum_{t=t_0}^{\infty} \gamma^{t - t_0} r_t$, where
 # $R_{t_0}$ is also known as the *return*. The discount,
 # $\gamma$, should be a constant between $0$ and $1$
-# that ensures the sum converges. A lower $\gamma$ makes
-# rewards from the uncertain far future less important for our agent
-# than the ones in the near future that it can be fairly confident
-# about. It also encourages agents to collect reward closer in time
+# that ensures the sum converges. A lower $\gamma$ makes 
+# rewards from the uncertain far future less important for our agent 
+# than the ones in the near future that it can be fairly confident 
+# about. It also encourages agents to collect reward closer in time 
 # than equivalent rewards that are temporally far away in the future.
 #
 # The main idea behind Q-learning is that if we had a function
@@ -216,7 +216,6 @@ class ReplayMemory:
 #
 #
 #
-
 
 # %%
 class DQN(nn.Module):
@@ -348,13 +347,12 @@ def plot_durations(show_result=False):
 # $V(s_{t+1}) = \max_a Q(s_{t+1}, a)$, and combines them into our
 # loss. By definition we set $V(s) = 0$ if $s$ is a terminal
 # state. We also use a target network to compute $V(s_{t+1})$ for
-# added stability. The target network is updated at every step with a
-# [soft update](https://arxiv.org/pdf/1509.02971.pdf)_ controlled by
+# added stability. The target network is updated at every step with a 
+# [soft update](https://arxiv.org/pdf/1509.02971.pdf)_ controlled by 
 # the hyperparameter ``TAU``, which was previously defined.
 #
 #
 #
-
 
 # %%
 def optimize_model():
@@ -413,10 +411,10 @@ def optimize_model():
 # 1), and optimize our model once. When the episode ends (our model
 # fails), we restart the loop.
 #
-# Below, `num_episodes` is set to 600 if a GPU is available, otherwise 50
-# episodes are scheduled so training does not take too long. However, 50
+# Below, `num_episodes` is set to 600 if a GPU is available, otherwise 50 
+# episodes are scheduled so training does not take too long. However, 50 
 # episodes is insufficient for to observe good performance on CartPole.
-# You should see the model constantly achieve 500 steps within 600 training
+# You should see the model constantly achieve 500 steps within 600 training 
 # episodes. Training RL agents can be a noisy process, so restarting training
 # can produce better results if convergence is not observed.
 #

@@ -129,7 +129,6 @@ print(f"Number of observations: {n_observations}")
 # %% [markdown]
 # ## Running the environment
 
-
 # %%
 class DQN(nn.Module):
     def __init__(self, n_observations, n_actions, n_units=16):
@@ -497,7 +496,6 @@ for run in range(p.n_runs):  # Run several times to account for stochasticity
 # %%
 # plot_gradients(grads_metrics)
 
-
 # %%
 def postprocess(episodes, p, rewards, steps):
     """Convert the results of the simulation in dataframes."""
@@ -520,7 +518,6 @@ res
 # %% [markdown]
 # As a sanity check, we will plot the distributions of states and actions
 # with the following function:
-
 
 # %%
 def plot_states_actions_distribution(states, actions):

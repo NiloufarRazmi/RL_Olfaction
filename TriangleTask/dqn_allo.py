@@ -247,13 +247,12 @@ DQN(n_observations, n_actions)
 # $V(s_{t+1}) = \max_a Q(s_{t+1}, a)$, and combines them into our
 # loss. By definition we set $V(s) = 0$ if $s$ is a terminal
 # state. We also use a target network to compute $V(s_{t+1})$ for
-# added stability. The target network is updated at every step with a
-# [soft update](https://arxiv.org/pdf/1509.02971.pdf)_ controlled by
+# added stability. The target network is updated at every step with a 
+# [soft update](https://arxiv.org/pdf/1509.02971.pdf)_ controlled by 
 # the hyperparameter ``TAU``, which was previously defined.
 #
 #
 #
-
 
 # %%
 def optimize_model():

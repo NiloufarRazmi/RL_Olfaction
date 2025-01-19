@@ -147,7 +147,6 @@ tmp1.shape
 
 # tmp2.shape
 
-
 # %%
 def ones_custom(total_rows, total_cols, pattern_rows, pattern_cols):
     ones_pattern = np.ones((pattern_rows, pattern_cols))
