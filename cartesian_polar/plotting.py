@@ -698,16 +698,19 @@ def plot_actions_distribution(actions, figpath=None, logger=None):
 
 
 def flattenarray(arr, dtype):
-    """Flatten array of 1D lists into single 1D array."""
-    flatten_length = np.sum([len(run) for run in arr])
-    res = np.empty(flatten_length, dtype=dtype)
-    for idx, val in enumerate(arr):
-        if idx == 0:
-            res[0 : len(val)] = val
-            previous_run_len = 0
-        else:
-            previous_run_len += len(arr[idx - 1])
-            res[previous_run_len : previous_run_len + len(val)] = val
+    """Flatten 2D array of 1D lists into flatenned 1D array."""
+    # flatten_length = np.sum([[len(ep) for ep in run] for run in arr])
+    # res = np.empty(flatten_length, dtype=dtype)
+    for run_i, run_val in enumerate(arr):
+        for ep_i, ep_val in enumerate(run_val):
+            if run_i == 0 and ep_i == 0:
+                # res[0 : len(ep_val)] = ep_val
+                # previous_run_len = 0
+                res = np.array(ep_val)
+            else:
+                # previous_run_len += len(arr[run_i][ep_i - 1])
+                # res[previous_run_len : previous_run_len + len(ep_val)] = ep_val
+                res = np.concat((res, np.array(ep_val)))
     return res
 
 

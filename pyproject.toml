@@ -24,6 +24,7 @@ dependencies = [
     "tensordict",
     # "hypothesis",
     "pytest",
+    "fastcluster",
 ]
 
 [build-system]
