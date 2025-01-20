@@ -710,7 +710,7 @@ def flattenarray(arr, dtype):
             else:
                 # previous_run_len += len(arr[run_i][ep_i - 1])
                 # res[previous_run_len : previous_run_len + len(ep_val)] = ep_val
-                res = np.concat((res, np.array(ep_val)))
+                res = np.concatenate((res, np.array(ep_val)))
     return res
 
 
