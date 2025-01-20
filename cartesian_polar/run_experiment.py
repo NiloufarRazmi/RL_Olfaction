@@ -211,6 +211,7 @@ def training_loop(p, current_path, logger, generator=None):
                 explorer.epsilon = explorer.update_epsilon(episode)
                 epsilons.append(explorer.epsilon)
 
+            all_states[run][episode].append(state.cpu())
             rewards[episode, run] = total_rewards
             steps[episode, run] = step_count
             logger.info(
