@@ -21,3 +21,4 @@ tmp/
 **/slurm-logs/*
 flycheck_*
 .direnv/*
+**/*.npz

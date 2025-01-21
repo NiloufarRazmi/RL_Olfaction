@@ -102,11 +102,11 @@ Left/Right
 - Silence the Cartesian/polar part of the input on a trained agent and look at how the agent behaves (x4 experiments)
 - Expectation:
   - Left/right task:
-    - With the Cartesian inputs silenced \to the agent can solve the task
-    - With the polar inputs silenced \to the agent struggle to solve the task
+    - With the *Cartesian* inputs silenced \to the agent can solve the task
+    - With the *polar* inputs silenced \to the agent struggle to solve the task
   - East/west task:
-    - With the Cartesian inputs silenced \to the agent can solve the task
-    - With the polar inputs silenced \to the agent struggle to solve the task
+    - With the *polar* inputs silenced \to the agent can solve the task
+    - With the *Cartesian* inputs silenced \to the agent struggle to solve the task
 - Any other approach we could use?
 ** Neural representations?
 [[file:~/Projects/RL_Olfaction/docs/expected cart-polar activations on both tasks.png]]
@@ -126,3 +126,34 @@ Left/Right
 - [[https://doi.org/10.1038/s42256-020-0218-x]]
 - [[https://doi.org/10.31235/osf.io/aeszf]]
 - [[https://github.com/kochbj/Deep-Learning-for-Causal-Inference]]
+
+** Ablation study
+*** Performance histogram
+*** Percent correct
+*** Shift in behavior
+*** Number of steps
+** Conflicting information
+*** 1 set of coord is right, the other is wrong
+*** See if the agent follow one or the other
+** Cosine input or x node
+*** What's the distrib coming on the sine
+*** Multidim problem
+*** Look for sensitivity coming in the first layer
+** Derive of any input wrt input
+*** Avg over playback of the agent
+*** How sensitive is the agent for this task
+** XAI
+*** Deepdream
+**** What input maximally drive a particular node
+** Other type of clustering?
+*** Not hierarchical clustering
+*** Fix some condition
+** Try to understand the weights more than the activations
+** Weights are the structure of the network
+** Target; E/W or L/R
+*** Supervised clustering
+*** Across all the layers
+** Cluster by action space
+** Cluster if moved the agent closer to goal or not
+*** Break by task phases
+*** before cue after cue

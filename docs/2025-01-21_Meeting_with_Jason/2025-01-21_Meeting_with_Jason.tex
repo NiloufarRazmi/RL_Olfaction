@@ -1,4 +1,4 @@
-% Created 2025-01-21 Tue 12:28
+% Created 2025-01-21 Tue 13:37
 % Intended LaTeX compiler: lualatex
 \documentclass[bigger]{beamer}
 \usepackage{amsmath}
@@ -57,8 +57,8 @@ fg=headercolor
 \end{frame}
 
 \section{Current status}
-\label{sec:org278a306}
-\begin{frame}[label={sec:orgafd0086}]{Current status}
+\label{sec:orgc6a9830}
+\begin{frame}[label={sec:org9693705}]{Current status}
 \begin{center}
 \includegraphics[height=0.6\textheight]{img/RL_env-cartesian-polar.drawio.png}
 \end{center}
@@ -68,12 +68,12 @@ fg=headercolor
 \item Analysis: WIP
 \end{itemize}
 \end{frame}
-\begin{frame}[label={sec:orgbaa7ef4}]{State space \& network architecture}
+\begin{frame}[label={sec:org09b5a7b}]{State space \& network architecture}
 \begin{center}
 \includegraphics[height=0.95\textheight]{img/state-space-nn.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:orgf41095c}]{Training}
+\begin{frame}[label={sec:org94113bf}]{Training}
 East/West
 \begin{center}
 \includegraphics[height=0.35\textheight]{img/steps-and-rewards-EastWest.png}
@@ -83,7 +83,7 @@ Left/Right
 \includegraphics[height=0.35\textheight]{img/steps-and-rewards-LeftRight.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:orga5fd31a}]{Training checks - East/West}
+\begin{frame}[label={sec:orga31f3f6}]{Training checks - East/West}
 \begin{center}
 \includegraphics[width=\textwidth]{img/steps-and-rewards-distrib-EastWest.png}
 \end{center}
@@ -100,7 +100,7 @@ Left/Right
 \end{column}
 \end{columns}
 \end{frame}
-\begin{frame}[label={sec:org82d34ea}]{Training checks - Left/Right}
+\begin{frame}[label={sec:orgf87327f}]{Training checks - Left/Right}
 \begin{center}
 \includegraphics[width=\textwidth]{img/steps-and-rewards-distrib-LeftRight.png}
 \end{center}
@@ -117,7 +117,7 @@ Left/Right
 \end{column}
 \end{columns}
 \end{frame}
-\begin{frame}[label={sec:org3d777c1}]{Agent behavior}
+\begin{frame}[label={sec:org89e314c}]{Agent behavior}
 \begin{columns}
 \begin{column}[c]{0.3\columnwidth}
 \begin{center}
@@ -152,37 +152,37 @@ Left/Right
 \end{columns}
 \end{frame}
 \section{How to get insights at what the network learn?}
-\label{sec:orge184218}
-\begin{frame}[label={sec:org0c72e93}]{Activations learned - East/West}
+\label{sec:org3ce42b2}
+\begin{frame}[label={sec:orgc837b1b}]{Activations learned - East/West}
 \begin{center}
 \includegraphics[height=0.9\textheight]{img/activations-learned-EastWest.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org3530d2a}]{Activations learned - Left/Right}
+\begin{frame}[label={sec:org0498e6c}]{Activations learned - Left/Right}
 \begin{center}
 \includegraphics[height=0.9\textheight]{img/activations-learned-LeftRight.png}
 \end{center}
 \end{frame}
-\begin{frame}[<+->][label={sec:orged4b1fd}]{Use the behavior as proxy}
+\begin{frame}[<+->][label={sec:orgbb633f5}]{Use the behavior as proxy}
 \begin{itemize}
 \item Silence the Cartesian/polar part of the input on a trained agent and look at how the agent behaves (x4 experiments)
 \item Expectation:
 \begin{itemize}
 \item Left/right task:
 \begin{itemize}
-\item With the Cartesian inputs silenced \(\to\) the agent can solve the task
-\item With the polar inputs silenced \(\to\) the agent struggle to solve the task
+\item With the \alert{Cartesian} inputs silenced \(\to\) the agent can solve the task
+\item With the \alert{polar} inputs silenced \(\to\) the agent struggle to solve the task
 \end{itemize}
 \item East/west task:
 \begin{itemize}
-\item With the Cartesian inputs silenced \(\to\) the agent can solve the task
-\item With the polar inputs silenced \(\to\) the agent struggle to solve the task
+\item With the \alert{polar} inputs silenced \(\to\) the agent can solve the task
+\item With the \alert{Cartesian} inputs silenced \(\to\) the agent struggle to solve the task
 \end{itemize}
 \end{itemize}
 \item Any other approach we could use?
 \end{itemize}
 \end{frame}
-\begin{frame}[label={sec:org75b43c3}]{Neural representations?}
+\begin{frame}[label={sec:org2d83024}]{Neural representations?}
 \begin{center}
 \includegraphics[width=.9\linewidth]{/home/kir0ul/Projects/RL_Olfaction/docs/expected cart-polar activations on both tasks.png}
 \end{center}
