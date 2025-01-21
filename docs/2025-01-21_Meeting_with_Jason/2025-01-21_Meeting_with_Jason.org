@@ -1,0 +1,75 @@
+#+TITLE: DRL project status
+#+SUBTITLE: Cartesian/polar duplicated coordinates experiment
+#+author: Andrea Pierré
+#+date: January 21, 2025
+* HEADER :noexport:
+#+SETUPFILE: ./style.org
+
+* Current status
+** Current status
+#+ATTR_LaTeX: :height 0.5\textheight
+[[file:img/RL_env-cartesian-polar.drawio.png]]
+- Environment: done
+- Training: WIP
+- Visualization: to be improved/discussed
+- Progress are slow as my bandwidth has become very limited
+** State space & network architecture
+#+ATTR_LaTeX: :height 0.95\textheight
+[[file:img/state-space-nn.png]]
+** Training
+#+ATTR_LaTeX: :width \textwidth
+[[file:img/steps-and-rewards.png]]
+- 8 hours of training for a single agent on the East/West task
+** Training checks
+*** Left
+:PROPERTIES:
+:BEAMER_col: 0.5
+:BEAMER_opt: [c]
+:END:
+#+ATTR_LaTeX: :width 0.8\textwidth
+[[file:img/exploration-rate.png]]
+#+ATTR_LaTeX: :width 0.8\textwidth
+[[file:img/loss.png]]
+*** Right
+:PROPERTIES:
+:BEAMER_col: 0.5
+:BEAMER_opt: [c]
+:END:
+#+ATTR_LaTeX: :width 0.65\textwidth
+[[file:img/actions-distribution.png]]
+#+ATTR_LaTeX: :width \textwidth
+[[file:img/steps-and-rewards-distrib.png]]
+** Policy learned
+# [[file:img/policy.png]]
+** Weights learned
+#+ATTR_LaTeX: :height 0.9\textheight
+# [[file:img/weights-matrices.png]]
+** Activations learned
+#+ATTR_LaTeX: :height 0.9\textheight
+# [[file:img/activations-learned.png]]
+* How to get insights at what the network learn?
+** Use the behavior as proxy
+:PROPERTIES:
+:BEAMER_act: [<+->]
+:END:
+- Silence the Cartesian/polar part of the input on a trained agent and look at how the agent behaves (x4 experiments)
+- Expectation:
+  - Left/right task:
+    - With the Cartesian inputs silenced \to the agent can solve the task
+    - With the polar inputs silenced \to the agent struggle to solve the task
+  - East/west task:
+    - With the Cartesian inputs silenced \to the agent can solve the task
+    - With the polar inputs silenced \to the agent struggle to solve the task
+- Any other approach we could use?
+** Neural representations?
+[[file:~/Projects/RL_Olfaction/docs/expected cart-polar activations on both tasks.png]]
+* COMMENT Add plain option to Beamer TOC
+% Local variables:
+% org-beamer-outline-frame-options: "plain"
+% End:
+
+* Feedback :noexport:
+** IDEA How this task structure might employ different representation/transformation of the action space
+** IDEA Hypothesis:
+- The network will use the most efficient info
+- Does changing the reward mapping/task make a change in the weights indicating the agent use only certain info?

@@ -177,12 +177,16 @@ class Environment:
     def sample_coord_position(self):
         """Sample coordinates X and Y until they fit the upper or lower triangle."""
         while True:
-            x_sampled = torch.distributions.Uniform(
-                self.rangeX["min"], self.rangeX["max"]
-            ).sample()
-            y_sampled = torch.distributions.Uniform(
-                self.rangeY["min"], self.rangeY["max"]
-            ).sample()
+            x_sampled = (
+                torch.distributions.Uniform(self.rangeX["min"], self.rangeX["max"])
+                .sample()
+                .round()
+            )
+            y_sampled = (
+                torch.distributions.Uniform(self.rangeY["min"], self.rangeY["max"])
+                .sample()
+                .round()
+            )
             if (
                 self.TriangleState == TriangleState.upper
                 and x_sampled + y_sampled >= 0

@@ -1,0 +1,137 @@
+% Created 2025-01-20 Mon 22:03
+% Intended LaTeX compiler: lualatex
+\documentclass[bigger]{beamer}
+\usepackage{amsmath}
+\usepackage{fontspec}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{wrapfig}
+\usepackage{rotating}
+\usepackage[normalem]{ulem}
+\usepackage{capt-of}
+\usepackage{hyperref}
+\usetheme[progressbar=foot, sectionpage=none, numbering=fraction]{metropolis}
+\usepackage{tikz}
+\usepackage{booktabs}
+\usepackage{adjustbox}
+\usepackage{diagbox}
+\usepackage{latexcolors}
+\usetikzlibrary{automata, positioning, arrows, arrows.meta}
+\usepackage{diagbox}
+\usepackage{dsfont}
+\usepackage{amsmath}
+\usepackage{fontawesome}
+\usepackage{pgfgantt}
+\usepackage[ruled]{algorithm2e}
+\usepackage[absolute, overlay]{textpos}
+\usepackage{xcolor}
+\definecolor{UmlBlue}{HTML}{0067b1} \setbeamercolor{progress bar}{fg=UmlBlue} \setbeamercolor{title separator}{fg=UmlBlue}
+\setbeamercolor{progress bar in head/foot}{fg=UmlBlue} \setbeamercolor{progress bar in section page}{fg=UmlBlue} \setbeamercolor{alerted text}{fg=UmlBlue}
+\pretocmd{\tableofcontents}{\thispagestyle{empty}}{}{}
+\usetheme{default}
+\author{Andrea Pierré}
+\date{January 21, 2025}
+\title{DRL project status}
+\subtitle{Cartesian/polar duplicated coordinates experiment}
+\setbeamercovered{transparent=10}
+\setbeamertemplate{section in toc}[sections numbered]
+\AtBeginSection[]{\begin{frame}[plain, noframenumbering]{Outline}    \setbeamertemplate{section in toc}[sections numbered]\setbeamertemplate{subsection in toc}[subsections numbered]\tableofcontents[currentsection, currentsubsection]\end{frame}}
+\AtBeginSubsection[]{\begin{frame}[plain, noframenumbering]{Outline}\setbeamertemplate{section in toc}[sections numbered]\setbeamertemplate{subsection in toc}[subsections numbered]\tableofcontents[currentsection,currentsubsection]\end{frame}}
+\definecolor{headercolor}{HTML}{232323}
+\setbeamercolor{normal text}{%
+% bg=,
+fg=headercolor
+}
+\hypersetup{
+ pdfauthor={Andrea Pierré},
+ pdftitle={DRL project status},
+ pdfkeywords={},
+ pdfsubject={},
+ pdfcreator={Emacs 29.4 (Org mode 9.7.19)}, 
+ pdflang={English}}
+\begin{document}
+
+\maketitle
+\begin{frame}[plain]{Outline}
+\tableofcontents
+\end{frame}
+
+\section{Current status}
+\label{sec:org49e7e10}
+\begin{frame}[label={sec:org3500662}]{Current status}
+\begin{center}
+\includegraphics[height=0.5\textheight]{img/RL_env-cartesian-polar.drawio.png}
+\end{center}
+\begin{itemize}
+\item Environment: done
+\item Training: WIP
+\item Visualization: to be improved/discussed
+\item Progress are slow as my bandwidth has become very limited
+\end{itemize}
+\end{frame}
+\begin{frame}[label={sec:orgb0b4077}]{State space \& network architecture}
+\begin{center}
+\includegraphics[height=0.95\textheight]{img/state-space-nn.png}
+\end{center}
+\end{frame}
+\begin{frame}[label={sec:orgbe74e7f}]{Training}
+\begin{center}
+\includegraphics[width=\textwidth]{img/steps-and-rewards.png}
+\end{center}
+\begin{itemize}
+\item 8 hours of training for a single agent on the East/West task
+\end{itemize}
+\end{frame}
+\begin{frame}[label={sec:org4244539}]{Training checks}
+\begin{columns}
+\begin{column}[c]{0.5\columnwidth}
+\begin{center}
+\includegraphics[width=0.8\textwidth]{img/exploration-rate.png}
+\end{center}
+\begin{center}
+\includegraphics[width=0.8\textwidth]{img/loss.png}
+\end{center}
+\end{column}
+\begin{column}[c]{0.5\columnwidth}
+\begin{center}
+\includegraphics[width=0.65\textwidth]{img/actions-distribution.png}
+\end{center}
+\begin{center}
+\includegraphics[width=\textwidth]{img/steps-and-rewards-distrib.png}
+\end{center}
+\end{column}
+\end{columns}
+\end{frame}
+\begin{frame}[label={sec:org59b6a3d}]{Policy learned}
+\end{frame}
+\begin{frame}[label={sec:org933e814}]{Weights learned}
+\end{frame}
+\begin{frame}[label={sec:org0697929}]{Activations learned}
+\end{frame}
+\section{How to get insights at what the network learn?}
+\label{sec:org3dc8f04}
+\begin{frame}[<+->][label={sec:orgdca0656}]{Use the behavior as proxy}
+\begin{itemize}
+\item Silence the Cartesian/polar part of the input on a trained agent and look at how the agent behaves (x4 experiments)
+\item Expectation:
+\begin{itemize}
+\item Left/right task:
+\begin{itemize}
+\item With the Cartesian inputs silenced \(\to\) the agent can solve the task
+\item With the polar inputs silenced \(\to\) the agent struggle to solve the task
+\end{itemize}
+\item East/west task:
+\begin{itemize}
+\item With the Cartesian inputs silenced \(\to\) the agent can solve the task
+\item With the polar inputs silenced \(\to\) the agent struggle to solve the task
+\end{itemize}
+\end{itemize}
+\item Any other approach we could use?
+\end{itemize}
+\end{frame}
+\begin{frame}[label={sec:org73f9e02}]{Neural representations?}
+\begin{center}
+\includegraphics[width=.9\linewidth]{/home/kir0ul/Projects/RL_Olfaction/docs/expected cart-polar activations on both tasks.png}
+\end{center}
+\end{frame}
+\end{document}
