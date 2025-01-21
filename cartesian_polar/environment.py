@@ -529,7 +529,7 @@ class DuplicatedCoordsEnv(Environment):
         """Convert from origin (0, 0) coords to polar coords from the North port."""
         north_coords = self.conv2north_cartesian(coords_orig)
         # length, alpha = self.cartesian2polar(north_coords)
-        length, cos_dir, sin_dir, cos_alpha, sin_alpha = self.cartesian2polar(
+        length, cos_alpha, sin_alpha, cos_dir, sin_dir = self.cartesian2polar(
             north_coords
         )
         # direction_orig = coords_orig[2].item()
@@ -552,7 +552,7 @@ class DuplicatedCoordsEnv(Environment):
         # cos_dir = torch.cos(new_relative_direction*math.pi/180)
         # sin_dir = torch.sin(new_relative_direction*math.pi/180)
         north_polar = torch.tensor(
-            [length, cos_dir, sin_dir, cos_alpha, sin_alpha], device=DEVICE
+            [length, cos_alpha, sin_alpha, cos_dir, sin_dir], device=DEVICE
         )
         return north_polar
 
@@ -560,7 +560,7 @@ class DuplicatedCoordsEnv(Environment):
         """Convert from origin (0, 0) coords to polar coords from the South port."""
         south_coords = self.conv2south_cartesian(coords_orig)
         # length, alpha = self.cartesian2polar(south_coords)
-        length, cos_dir, sin_dir, cos_alpha, sin_alpha = self.cartesian2polar(
+        length, cos_alpha, sin_alpha, cos_dir, sin_dir = self.cartesian2polar(
             south_coords
         )
         # direction_orig = coords_orig[2].item()
@@ -581,7 +581,7 @@ class DuplicatedCoordsEnv(Environment):
         # cos_dir = torch.cos(new_relative_direction*math.pi/180)
         # sin_dir = torch.sin(new_relative_direction*math.pi/180)
         south_polar = torch.tensor(
-            [length, cos_dir, sin_dir, cos_alpha, sin_alpha], device=DEVICE
+            [length, cos_alpha, sin_alpha, cos_dir, sin_dir], device=DEVICE
         )
         return south_polar
 
