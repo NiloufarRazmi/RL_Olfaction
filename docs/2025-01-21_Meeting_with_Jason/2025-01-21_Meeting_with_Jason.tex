@@ -1,4 +1,4 @@
-% Created 2025-01-20 Mon 22:03
+% Created 2025-01-21 Tue 12:28
 % Intended LaTeX compiler: lualatex
 \documentclass[bigger]{beamer}
 \usepackage{amsmath}
@@ -31,7 +31,7 @@
 \usetheme{default}
 \author{Andrea Pierré}
 \date{January 21, 2025}
-\title{DRL project status}
+\title{DRL project update}
 \subtitle{Cartesian/polar duplicated coordinates experiment}
 \setbeamercovered{transparent=10}
 \setbeamertemplate{section in toc}[sections numbered]
@@ -44,7 +44,7 @@ fg=headercolor
 }
 \hypersetup{
  pdfauthor={Andrea Pierré},
- pdftitle={DRL project status},
+ pdftitle={DRL project update},
  pdfkeywords={},
  pdfsubject={},
  pdfcreator={Emacs 29.4 (Org mode 9.7.19)}, 
@@ -57,60 +57,113 @@ fg=headercolor
 \end{frame}
 
 \section{Current status}
-\label{sec:org49e7e10}
-\begin{frame}[label={sec:org3500662}]{Current status}
+\label{sec:org278a306}
+\begin{frame}[label={sec:orgafd0086}]{Current status}
 \begin{center}
-\includegraphics[height=0.5\textheight]{img/RL_env-cartesian-polar.drawio.png}
+\includegraphics[height=0.6\textheight]{img/RL_env-cartesian-polar.drawio.png}
 \end{center}
 \begin{itemize}
-\item Environment: done
-\item Training: WIP
-\item Visualization: to be improved/discussed
-\item Progress are slow as my bandwidth has become very limited
+\item Environment rewrite: done
+\item Training: \textasciitilde{}4.5 hours to train 30 agents on both tasks on Oscar
+\item Analysis: WIP
 \end{itemize}
 \end{frame}
-\begin{frame}[label={sec:orgb0b4077}]{State space \& network architecture}
+\begin{frame}[label={sec:orgbaa7ef4}]{State space \& network architecture}
 \begin{center}
 \includegraphics[height=0.95\textheight]{img/state-space-nn.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:orgbe74e7f}]{Training}
+\begin{frame}[label={sec:orgf41095c}]{Training}
+East/West
 \begin{center}
-\includegraphics[width=\textwidth]{img/steps-and-rewards.png}
+\includegraphics[height=0.35\textheight]{img/steps-and-rewards-EastWest.png}
 \end{center}
-\begin{itemize}
-\item 8 hours of training for a single agent on the East/West task
-\end{itemize}
+Left/Right
+\begin{center}
+\includegraphics[height=0.35\textheight]{img/steps-and-rewards-LeftRight.png}
+\end{center}
 \end{frame}
-\begin{frame}[label={sec:org4244539}]{Training checks}
+\begin{frame}[label={sec:orga5fd31a}]{Training checks - East/West}
+\begin{center}
+\includegraphics[width=\textwidth]{img/steps-and-rewards-distrib-EastWest.png}
+\end{center}
 \begin{columns}
 \begin{column}[c]{0.5\columnwidth}
 \begin{center}
-\includegraphics[width=0.8\textwidth]{img/exploration-rate.png}
-\end{center}
-\begin{center}
-\includegraphics[width=0.8\textwidth]{img/loss.png}
+\includegraphics[width=0.8\textwidth]{img/loss-EastWest.png}
 \end{center}
 \end{column}
 \begin{column}[c]{0.5\columnwidth}
 \begin{center}
-\includegraphics[width=0.65\textwidth]{img/actions-distribution.png}
-\end{center}
-\begin{center}
-\includegraphics[width=\textwidth]{img/steps-and-rewards-distrib.png}
+\includegraphics[width=0.65\textwidth]{img/actions-distribution-EastWest.png}
 \end{center}
 \end{column}
 \end{columns}
 \end{frame}
-\begin{frame}[label={sec:org59b6a3d}]{Policy learned}
+\begin{frame}[label={sec:org82d34ea}]{Training checks - Left/Right}
+\begin{center}
+\includegraphics[width=\textwidth]{img/steps-and-rewards-distrib-LeftRight.png}
+\end{center}
+\begin{columns}
+\begin{column}[c]{0.5\columnwidth}
+\begin{center}
+\includegraphics[width=0.8\textwidth]{img/loss-LeftRight.png}
+\end{center}
+\end{column}
+\begin{column}[c]{0.5\columnwidth}
+\begin{center}
+\includegraphics[width=0.65\textwidth]{img/actions-distribution-LeftRight.png}
+\end{center}
+\end{column}
+\end{columns}
 \end{frame}
-\begin{frame}[label={sec:org933e814}]{Weights learned}
-\end{frame}
-\begin{frame}[label={sec:org0697929}]{Activations learned}
+\begin{frame}[label={sec:org3d777c1}]{Agent behavior}
+\begin{columns}
+\begin{column}[c]{0.3\columnwidth}
+\begin{center}
+\includegraphics[height=0.28\textheight]{img/trajectory-0-0-LeftRight.png}
+\end{center}
+\begin{center}
+\includegraphics[height=0.28\textheight]{img/trajectory-0-120-LeftRight.png}
+\end{center}
+\begin{center}
+\includegraphics[height=0.28\textheight]{img/trajectory-0-350-LeftRight.png}
+\end{center}
+\end{column}
+\begin{column}[c]{0.3\columnwidth}
+\begin{center}
+\includegraphics[height=0.28\textheight]{img/trajectory-0-0-EastWest.png}
+\end{center}
+\begin{center}
+\includegraphics[height=0.28\textheight]{img/trajectory-0-120-EastWest.png}
+\end{center}
+\begin{center}
+\includegraphics[height=0.28\textheight]{img/trajectory-0-350-EastWest.png}
+\end{center}
+\end{column}
+\begin{column}[c]{0.25\columnwidth}
+\begin{center}
+\includegraphics[width=\linewidth]{img/states-occupancy-EastWest.png}
+\end{center}
+\begin{center}
+\includegraphics[width=\linewidth]{img/states-occupancy-LefRight.png}
+\end{center}
+\end{column}
+\end{columns}
 \end{frame}
 \section{How to get insights at what the network learn?}
-\label{sec:org3dc8f04}
-\begin{frame}[<+->][label={sec:orgdca0656}]{Use the behavior as proxy}
+\label{sec:orge184218}
+\begin{frame}[label={sec:org0c72e93}]{Activations learned - East/West}
+\begin{center}
+\includegraphics[height=0.9\textheight]{img/activations-learned-EastWest.png}
+\end{center}
+\end{frame}
+\begin{frame}[label={sec:org3530d2a}]{Activations learned - Left/Right}
+\begin{center}
+\includegraphics[height=0.9\textheight]{img/activations-learned-LeftRight.png}
+\end{center}
+\end{frame}
+\begin{frame}[<+->][label={sec:orged4b1fd}]{Use the behavior as proxy}
 \begin{itemize}
 \item Silence the Cartesian/polar part of the input on a trained agent and look at how the agent behaves (x4 experiments)
 \item Expectation:
@@ -129,9 +182,12 @@ fg=headercolor
 \item Any other approach we could use?
 \end{itemize}
 \end{frame}
-\begin{frame}[label={sec:org73f9e02}]{Neural representations?}
+\begin{frame}[label={sec:org75b43c3}]{Neural representations?}
 \begin{center}
 \includegraphics[width=.9\linewidth]{/home/kir0ul/Projects/RL_Olfaction/docs/expected cart-polar activations on both tasks.png}
 \end{center}
+\begin{itemize}
+\item Need for some causal framework?
+\end{itemize}
 \end{frame}
 \end{document}

@@ -1,4 +1,4 @@
-#+TITLE: DRL project status
+#+TITLE: DRL project update
 #+SUBTITLE: Cartesian/polar duplicated coordinates experiment
 #+author: Andrea Pierré
 #+date: January 21, 2025
@@ -7,47 +7,94 @@
 
 * Current status
 ** Current status
-#+ATTR_LaTeX: :height 0.5\textheight
+#+ATTR_LaTeX: :height 0.6\textheight
 [[file:img/RL_env-cartesian-polar.drawio.png]]
-- Environment: done
-- Training: WIP
-- Visualization: to be improved/discussed
-- Progress are slow as my bandwidth has become very limited
+- Environment rewrite: done
+- Training: ~4.5 hours to train 30 agents on both tasks on Oscar
+- Analysis: WIP
 ** State space & network architecture
 #+ATTR_LaTeX: :height 0.95\textheight
 [[file:img/state-space-nn.png]]
 ** Training
+East/West
+#+ATTR_LaTeX: :height 0.35\textheight
+[[file:img/steps-and-rewards-EastWest.png]]
+Left/Right
+#+ATTR_LaTeX: :height 0.35\textheight
+[[file:img/steps-and-rewards-LeftRight.png]]
+** Training checks - East/West
 #+ATTR_LaTeX: :width \textwidth
-[[file:img/steps-and-rewards.png]]
-- 8 hours of training for a single agent on the East/West task
-** Training checks
+[[file:img/steps-and-rewards-distrib-EastWest.png]]
 *** Left
 :PROPERTIES:
 :BEAMER_col: 0.5
 :BEAMER_opt: [c]
 :END:
 #+ATTR_LaTeX: :width 0.8\textwidth
-[[file:img/exploration-rate.png]]
-#+ATTR_LaTeX: :width 0.8\textwidth
-[[file:img/loss.png]]
+[[file:img/loss-EastWest.png]]
 *** Right
 :PROPERTIES:
 :BEAMER_col: 0.5
 :BEAMER_opt: [c]
 :END:
 #+ATTR_LaTeX: :width 0.65\textwidth
-[[file:img/actions-distribution.png]]
+[[file:img/actions-distribution-EastWest.png]]
+** Training checks - Left/Right
 #+ATTR_LaTeX: :width \textwidth
-[[file:img/steps-and-rewards-distrib.png]]
-** Policy learned
-# [[file:img/policy.png]]
-** Weights learned
-#+ATTR_LaTeX: :height 0.9\textheight
-# [[file:img/weights-matrices.png]]
-** Activations learned
-#+ATTR_LaTeX: :height 0.9\textheight
-# [[file:img/activations-learned.png]]
+[[file:img/steps-and-rewards-distrib-LeftRight.png]]
+*** Left
+:PROPERTIES:
+:BEAMER_col: 0.5
+:BEAMER_opt: [c]
+:END:
+#+ATTR_LaTeX: :width 0.8\textwidth
+[[file:img/loss-LeftRight.png]]
+*** Right
+:PROPERTIES:
+:BEAMER_col: 0.5
+:BEAMER_opt: [c]
+:END:
+#+ATTR_LaTeX: :width 0.65\textwidth
+[[file:img/actions-distribution-LeftRight.png]]
+** Agent behavior
+*** Left
+:PROPERTIES:
+:BEAMER_col: 0.3
+:BEAMER_opt: [c]
+:END:
+#+ATTR_LaTeX: :height 0.28\textheight
+[[file:img/trajectory-0-0-LeftRight.png]]
+#+ATTR_LaTeX: :height 0.28\textheight
+[[file:img/trajectory-0-120-LeftRight.png]]
+#+ATTR_LaTeX: :height 0.28\textheight
+[[file:img/trajectory-0-350-LeftRight.png]]
+*** Center
+:PROPERTIES:
+:BEAMER_col: 0.3
+:BEAMER_opt: [c]
+:END:
+#+ATTR_LaTeX: :height 0.28\textheight
+[[file:img/trajectory-0-0-EastWest.png]]
+#+ATTR_LaTeX: :height 0.28\textheight
+[[file:img/trajectory-0-120-EastWest.png]]
+#+ATTR_LaTeX: :height 0.28\textheight
+[[file:img/trajectory-0-350-EastWest.png]]
+*** Right
+:PROPERTIES:
+:BEAMER_col: 0.25
+:BEAMER_opt: [c]
+:END:
+#+ATTR_LaTeX: :width \linewidth
+[[file:img/states-occupancy-EastWest.png]]
+#+ATTR_LaTeX: :width \linewidth
+[[file:img/states-occupancy-LefRight.png]]
 * How to get insights at what the network learn?
+** Activations learned - East/West
+#+ATTR_LaTeX: :height 0.9\textheight
+[[file:img/activations-learned-EastWest.png]]
+** Activations learned - Left/Right
+#+ATTR_LaTeX: :height 0.9\textheight
+[[file:img/activations-learned-LeftRight.png]]
 ** Use the behavior as proxy
 :PROPERTIES:
 :BEAMER_act: [<+->]
@@ -63,6 +110,7 @@
 - Any other approach we could use?
 ** Neural representations?
 [[file:~/Projects/RL_Olfaction/docs/expected cart-polar activations on both tasks.png]]
+- Need for some causal framework?
 * COMMENT Add plain option to Beamer TOC
 % Local variables:
 % org-beamer-outline-frame-options: "plain"
@@ -73,3 +121,8 @@
 ** IDEA Hypothesis:
 - The network will use the most efficient info
 - Does changing the reward mapping/task make a change in the weights indicating the agent use only certain info?
+
+** Need for some causal framework?
+- [[https://doi.org/10.1038/s42256-020-0218-x]]
+- [[https://doi.org/10.31235/osf.io/aeszf]]
+- [[https://github.com/kochbj/Deep-Learning-for-Causal-Inference]]
