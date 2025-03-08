@@ -211,7 +211,7 @@ def postprocess_rewards_steps(episodes, n_runs, rewards, steps):
     """Convert the results of the simulation in dataframes."""
     res = pd.DataFrame(
         data={
-            "Episodes": np.tile(episodes, n_runs),
+            "Episodes": np.tile(episodes.cpu(), n_runs),
             "Rewards": rewards.T.flatten(),
             "Steps": steps.T.flatten(),
         }
