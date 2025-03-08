@@ -8,8 +8,8 @@
 #SBATCH -N 1  # Number of node
 #SBATCH -n 2
 #SBATCH --mem=3G
-##SBATCH -t 00:15:00
-#SBATCH -t 04:00:00
+##SBATCH -t 01:00:00
+#SBATCH -t 03:00:00
 ##SBATCH --partition=gpu-debug
 #SBATCH --account=carney-afleisc2-condo
 #SBATCH --mail-type=begin       # send email when job begins
