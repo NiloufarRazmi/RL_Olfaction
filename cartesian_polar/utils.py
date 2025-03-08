@@ -212,8 +212,8 @@ def postprocess_rewards_steps(episodes, n_runs, rewards, steps):
     res = pd.DataFrame(
         data={
             "Episodes": np.tile(episodes.cpu(), n_runs),
-            "Rewards": rewards.T.flatten(),
-            "Steps": steps.T.flatten(),
+            "Rewards": rewards.cpu().T.flatten(),
+            "Steps": steps.cpu().T.flatten(),
         }
     )
     # res["cum_rewards"] = rewards.cumsum(axis=0).flatten(order="F")
