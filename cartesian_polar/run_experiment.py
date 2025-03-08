@@ -58,6 +58,8 @@ def training_loop(p, current_path, logger, generator=None):
             decay_rate=p.decay_rate,
             epsilon_warmup=p.epsilon_warmup,
         )
+        weights = None
+        biases = None
         weights_val_stats = None
         biases_val_stats = None
         weights_grad_stats = None
@@ -66,7 +68,7 @@ def training_loop(p, current_path, logger, generator=None):
         epsilons = []
 
         for episode in tqdm(
-            episodes, desc=f"Run {run+1}/{p.n_runs} - Episodes", leave=False
+            episodes, desc=f"Run {run + 1}/{p.n_runs} - Episodes", leave=False
         ):
             state = env.reset()  # Reset the environment
             state = state.clone().float().detach().to(DEVICE)
@@ -215,14 +217,25 @@ def training_loop(p, current_path, logger, generator=None):
             rewards[episode, run] = total_rewards
             steps[episode, run] = step_count
             logger.info(
-                f"Run: {run+1}/{p.n_runs} - Episode: {episode+1}/{p.total_episodes}"
+                f"Run: {run + 1}/{p.n_runs} - Episode: {episode + 1}/{p.total_episodes}"
                 f" - Steps: {step_count} - Loss: {loss.item()}"
                 f" - epsilon: {explorer.epsilon}"
             )
-        weights_val_stats.set_index("Index", inplace=True)
-        biases_val_stats.set_index("Index", inplace=True)
-        biases_grad_stats.set_index("Index", inplace=True)
-        weights_grad_stats.set_index("Index", inplace=True)
+        if weights_val_stats is not None and weights_val_stats.get("Index") is not None:
+            weights_val_stats.set_index("Index", inplace=True)
+        if biases_val_stats is not None and biases_val_stats.get("Index") is not None:
+            biases_val_stats.set_index("Index", inplace=True)
+        if biases_grad_stats is not None and biases_grad_stats.get("Index") is not None:
+            biases_grad_stats.set_index("Index", inplace=True)
+        if (
+            weights_grad_stats is not None
+            and weights_grad_stats.get("Index") is not None
+        ):
+            weights_grad_stats.set_index("Index", inplace=True)
+
+        # Save agent trained state
+        model_path = current_path / f"trained-agent-state-{run}.pt"
+        torch.save(net.state_dict(), model_path)
 
     # Save data to disk
     data_dict = {
@@ -234,8 +247,8 @@ def training_loop(p, current_path, logger, generator=None):
         "losses": np.array(losses, dtype=object),
         "p": p,
         "epsilons": epsilons,
-        "weights": weights,
-        "biases": biases,
+        # "weights": weights,
+        # "biases": biases,
         "weights_val_stats": weights_val_stats,
         "biases_val_stats": biases_val_stats,
         "weights_grad_stats": weights_grad_stats,
@@ -243,6 +256,9 @@ def training_loop(p, current_path, logger, generator=None):
         "net": net,
         "env": env,
     }
+    if weights is not None and biases is not None:
+        data_dict["weights"] = weights
+        data_dict["biases"] = biases
     data_path = utils.save_data(data_dict=data_dict, current_path=current_path)
     return data_path
 
@@ -250,35 +266,36 @@ def training_loop(p, current_path, logger, generator=None):
 def visualization_plots(data_path, p, current_path, logger):
     """Make all the plots."""
     # Load data from disk
-    with open(data_path, "rb") as fhd:
-        # Load the arrays from the .npz file
-        data_dict = np.load(fhd, allow_pickle=True)
+    data_dict = torch.load(data_path, weights_only=False, map_location=DEVICE)
+    # with open(data_path, "rb") as fhd:
+    #     # Load the arrays from the .npz file
+    #     data_dict = np.load(fhd, allow_pickle=True)
 
-        # Access individual arrays by their names
-        rewards = data_dict["rewards"]
-        steps = data_dict["steps"]
-        episodes = data_dict["episodes"]
-        all_actions = data_dict["all_actions"]
-        # all_states = data_dict["all_states"]
-        losses = data_dict["losses"]
-        p = data_dict["p"][()]
-        epsilons = data_dict["epsilons"]
-        weights = data_dict["weights"][()]
-        biases = data_dict["biases"][()]
-        weights_val_stats = pd.DataFrame(
-            data_dict["weights_val_stats"], columns=["Std", "Avg", "Layer"]
-        ).index.rename("Index", inplace=True)
-        biases_val_stats = pd.DataFrame(
-            data_dict["biases_val_stats"], columns=["Std", "Avg", "Layer"]
-        ).index.rename("Index", inplace=True)
-        weights_grad_stats = pd.DataFrame(
-            data_dict["weights_grad_stats"], columns=["Std", "Avg", "Layer"]
-        ).index.rename("Index", inplace=True)
-        biases_grad_stats = pd.DataFrame(
-            data_dict["biases_grad_stats"], columns=["Std", "Avg", "Layer"]
-        ).index.rename("Index", inplace=True)
-        env = data_dict["env"][()]
-        net = data_dict["net"][()]
+    # Access individual arrays by their names
+    rewards = data_dict["rewards"]
+    steps = data_dict["steps"]
+    episodes = data_dict["episodes"]
+    all_actions = data_dict["all_actions"]
+    # all_states = data_dict["all_states"]
+    losses = data_dict["losses"]
+    p = data_dict["p"]
+    epsilons = data_dict["epsilons"]
+    weights = data_dict["weights"]
+    biases = data_dict["biases"]
+    weights_val_stats = pd.DataFrame(
+        data_dict["weights_val_stats"], columns=["Std", "Avg", "Layer"]
+    ).index.rename("Index", inplace=True)
+    biases_val_stats = pd.DataFrame(
+        data_dict["biases_val_stats"], columns=["Std", "Avg", "Layer"]
+    ).index.rename("Index", inplace=True)
+    weights_grad_stats = pd.DataFrame(
+        data_dict["weights_grad_stats"], columns=["Std", "Avg", "Layer"]
+    ).index.rename("Index", inplace=True)
+    biases_grad_stats = pd.DataFrame(
+        data_dict["biases_grad_stats"], columns=["Std", "Avg", "Layer"]
+    ).index.rename("Index", inplace=True)
+    env = data_dict["env"]
+    net = data_dict["net"]
 
     untrained_net, _ = neural_network(
         n_observations=p.n_observations,

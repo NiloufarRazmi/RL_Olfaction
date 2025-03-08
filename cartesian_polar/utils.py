@@ -200,9 +200,10 @@ def params_df_stats(weights, key, current_df=None):
 
 def save_data(data_dict, current_path):
     """Save variables to disk."""
-    data_path = current_path / "data.npz"
-    with open(data_path, "wb") as fhd:
-        np.savez(fhd, **data_dict)
+    data_path = current_path / "data.tar"
+    # with open(data_path, "wb") as fhd:
+    #     np.savez(fhd, **data_dict)
+    torch.save(data_dict, data_path)
     return data_path
 
 

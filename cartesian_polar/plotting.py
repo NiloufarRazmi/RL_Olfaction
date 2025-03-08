@@ -655,7 +655,7 @@ def plot_exploration_rate(epsilons, steps, figpath=None, logger=None):
     # Second x axis
     sec_x = ax.secondary_xaxis(location="top")
     sec_x.set(xlabel="Episodes")
-    cumsteps = steps.flatten().cumsum()
+    cumsteps = steps.flatten().cumsum(0)
     # qindex = np.quantile(index, np.array([1/4, 1/2, 3/4, 1]))
     qindex = np.percentile(cumsteps, np.arange(0, 100, 10))
     sec_x.xaxis.set_major_locator(ticker.FixedLocator(qindex))

@@ -127,12 +127,12 @@ Left/Right
 - [[https://doi.org/10.31235/osf.io/aeszf]]
 - [[https://github.com/kochbj/Deep-Learning-for-Causal-Inference]]
 
-** Ablation study
+** TODO Metrics for ablation study
 *** Performance histogram
 *** Percent correct
 *** Shift in behavior
 *** Number of steps
-** Conflicting information
+** TODO Conflicting information
 *** 1 set of coord is right, the other is wrong
 *** See if the agent follow one or the other
 ** Cosine input or x node
@@ -145,15 +145,17 @@ Left/Right
 ** XAI
 *** Deepdream
 **** What input maximally drive a particular node
-** Other type of clustering?
-*** Not hierarchical clustering
-*** Fix some condition
 ** Try to understand the weights more than the activations
-** Weights are the structure of the network
-** Target; E/W or L/R
-*** Supervised clustering
-*** Across all the layers
-** Cluster by action space
-** Cluster if moved the agent closer to goal or not
-*** Break by task phases
-*** before cue after cue
+*** Weights are the structure of the network
+*** Cluster the weights of the network?
+** TODO Clustering
+*** Cluster by action space
+*** Cluster if moved the agent closer to goal or not
+**** Break by task phases
+**** before cue after cue
+*** Target: E/W or L/R
+**** Supervised clustering
+**** Across all the layers
+*** Other type of clustering?
+**** Not hierarchical clustering
+**** Fix some condition

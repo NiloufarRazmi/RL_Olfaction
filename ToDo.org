@@ -190,7 +190,7 @@ DQN(
 \to Layer 6 as there are no parameters in ReLU
 ** Sort neurons by Cartesian/polar
 ** Policy
-** TODO What does the agent behavior look like?
+** What does the agent behavior look like?
 *** DONE Save all states
 *** DONE Look at sampled trials behavior
 *** KILL Plot video of current run?
@@ -204,7 +204,8 @@ Need to plot 2 info:
 *** [?] Neuron in the last layer activated only when Cartesian/polar input but not in the other case?
 *** TODO Silence Cartesian/polar part of the input on both tasks + look at the behavior of the agent (x4 experiments)
 **** TODO Save all trained agents to ~checkpoint_model_i.pth~, not only the last one
-[[https://medium.com/@merilainen.vili/save-and-load-models-to-disk-in-pytorch-python-a-complete-guide-a667057b511c#60c6]]
+- [[https://medium.com/@merilainen.vili/save-and-load-models-to-disk-in-pytorch-python-a-complete-guide-a667057b511c#60c6]]
+- [[https://dnmtechs.com/fixing-runtimeerror-attempting-to-deserialize-object-on-a-cuda-device-in-python-3/]]
 ** Tuning curve to identify cart/polar neurons?
 *** Would be limited to {0, 90, 180, 270}, i.e. not continuous
 ** [?] Results differences between both task?
