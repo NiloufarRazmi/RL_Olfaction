@@ -78,3 +78,5 @@
 #+BEAMER_HEADER:     % bg=,
 #+BEAMER_HEADER:     fg=headercolor
 #+BEAMER_HEADER: }
+
+#+LaTeX_HEADER: \usepackage{multimedia}

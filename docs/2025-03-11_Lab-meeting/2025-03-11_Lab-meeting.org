@@ -22,7 +22,7 @@
 :BEAMER_col: 0.55
 :END:
 #+ATTR_LaTeX: :width \textwidth
-[[file:img/brain.png]]
+[[file:medias/brain.png]]
 
 #+begin_export latex
 \begin{textblock}{5}(0.5,14.5)%
@@ -40,7 +40,9 @@ Lee et al., 2021
 :BEAMER_opt: [c]
 :END:
 #+begin_export latex
-\includegraphics[width=\linewidth, keepaspectratio, trim={0cm 0cm 28cm 0cm}, clip]{img/video-picture.png}
+\begin{center}
+\movie{\includegraphics[width=\linewidth, keepaspectratio, trim={0cm 0cm 28cm 0cm}, clip]{medias/video-picture.png}}{medias/annotatedF03_d35_2022-11-15_15.41.mp4}
+\end{center}
 #+end_export
 *** Center
 :PROPERTIES:
@@ -48,7 +50,10 @@ Lee et al., 2021
 :BEAMER_opt: [c]
 :END:
 #+begin_export latex
-\includegraphics[width=0.9\linewidth, keepaspectratio, trim={11cm 18cm 40cm 13cm}, clip]{img/task-east-west.png}
+\begin{center}
+East/West task
+\includegraphics[width=0.9\linewidth, keepaspectratio, trim={11cm 18cm 40cm 13cm}, clip]{medias/task-east-west.png}
+\end{center}
 #+end_export
 *** Right
 :PROPERTIES:
@@ -56,15 +61,18 @@ Lee et al., 2021
 :BEAMER_opt: [c]
 :END:
 #+begin_export latex
-\includegraphics[width=0.9\linewidth, keepaspectratio, trim={3cm 2cm 4cm 4cm}, clip]{img/task-left-right.jpeg}
+\begin{center}
+Left/Right task
+\includegraphics[width=0.9\linewidth, keepaspectratio, trim={3cm 2cm 4cm 4cm}, clip]{medias/task-left-right.jpeg}
+\end{center}
 #+end_export
 
 ** Deep Reinforcement Learning model
 #+ATTR_LaTeX: :height 0.95\textheight
-[[file:img/nn.drawio.png]]
+[[file:medias/nn.drawio.png]]
 ** Cartesian/polar duplicated coordinates experiment
 #+ATTR_LaTeX: :height 0.6\textheight
-[[file:img/RL_env-cartesian-polar.drawio.png]]
+[[file:medias/RL_env-cartesian-polar.drawio.png]]
 #+begin_export latex
 \footnotesize
 \vspace{-1em}
@@ -94,60 +102,64 @@ Lee et al., 2021
 #+end_export
 
 ** Looking back$\dots$
+:PROPERTIES:
+:BEAMER_act: [<+->]
+:END:
 #+begin_export latex
 \footnotesize
 #+end_export
-#+ATTR_LaTeX: :height 0.5\textheight
-[[file:img/mdp.png]]
-1. Try to define the Olivia's experiment as a Markov Decision Process (MDP) in Julia
-2. 2D gridworld in Python/NumPy
-3. Duplicated coordinates in Python/PyTorch
+#+ATTR_LaTeX: :height 0.45\textheight
+[[file:medias/mdp.png]]
+1. First step trying to define Olivia's experiment as a Markov Decision Process (MDP) in Julia
+2. 2D tiles with tabular RL & function approximation in Python/NumPy
+2. 2D coordinate system in Python/PyTorch
+3. Duplicated coordinates experiment in Python/PyTorch
 
-* Cartesian/polar duplicated coordinates experiment
+* Simulated experiment
 ** State space & network architecture
-#+ATTR_LaTeX: :height 0.95\textheight
-[[file:img/state-space-nn.png]]
+#+ATTR_LaTeX: :height 0.97\textheight
+[[file:medias/state-space-nn.png]]
 ** Training
 East/West
 #+ATTR_LaTeX: :height 0.35\textheight
-[[file:img/steps-and-rewards-EastWest.png]]
+[[file:medias/steps-and-rewards-EastWest.png]]
 Left/Right
 #+ATTR_LaTeX: :height 0.35\textheight
-[[file:img/steps-and-rewards-LeftRight.png]]
-** Training checks - East/West
+[[file:medias/steps-and-rewards-LeftRight.png]]
+** Training checks -- East/West
 #+ATTR_LaTeX: :width \textwidth
-[[file:img/steps-and-rewards-distrib-EastWest.png]]
+[[file:medias/steps-and-rewards-distrib-EastWest.png]]
 *** Left
 :PROPERTIES:
 :BEAMER_col: 0.5
 :BEAMER_opt: [c]
 :END:
 #+ATTR_LaTeX: :width 0.8\textwidth
-[[file:img/loss-EastWest.png]]
+[[file:medias/loss-EastWest.png]]
 *** Right
 :PROPERTIES:
 :BEAMER_col: 0.5
 :BEAMER_opt: [c]
 :END:
 #+ATTR_LaTeX: :width 0.65\textwidth
-[[file:img/actions-distribution-EastWest.png]]
-** Training checks - Left/Right
+[[file:medias/actions-distribution-EastWest.png]]
+** Training checks -- Left/Right
 #+ATTR_LaTeX: :width \textwidth
-[[file:img/steps-and-rewards-distrib-LeftRight.png]]
+[[file:medias/steps-and-rewards-distrib-LeftRight.png]]
 *** Left
 :PROPERTIES:
 :BEAMER_col: 0.5
 :BEAMER_opt: [c]
 :END:
 #+ATTR_LaTeX: :width 0.8\textwidth
-[[file:img/loss-LeftRight.png]]
+[[file:medias/loss-LeftRight.png]]
 *** Right
 :PROPERTIES:
 :BEAMER_col: 0.5
 :BEAMER_opt: [c]
 :END:
 #+ATTR_LaTeX: :width 0.65\textwidth
-[[file:img/actions-distribution-LeftRight.png]]
+[[file:medias/actions-distribution-LeftRight.png]]
 ** Agent behavior
 *** Left
 :PROPERTIES:
@@ -155,36 +167,53 @@ Left/Right
 :BEAMER_opt: [c]
 :END:
 #+ATTR_LaTeX: :height 0.28\textheight
-[[file:img/trajectory-0-0-LeftRight.png]]
+[[file:medias/trajectory-0-0-LeftRight.png]]
 #+ATTR_LaTeX: :height 0.28\textheight
-[[file:img/trajectory-0-120-LeftRight.png]]
+[[file:medias/trajectory-0-120-LeftRight.png]]
 #+ATTR_LaTeX: :height 0.28\textheight
-[[file:img/trajectory-0-350-LeftRight.png]]
+[[file:medias/trajectory-0-350-LeftRight.png]]
 *** Right
 :PROPERTIES:
 :BEAMER_col: 0.3
 :BEAMER_opt: [c]
 :END:
 #+ATTR_LaTeX: :height 0.28\textheight
-[[file:img/trajectory-0-0-EastWest.png]]
+[[file:medias/trajectory-0-0-EastWest.png]]
 #+ATTR_LaTeX: :height 0.28\textheight
-[[file:img/trajectory-0-120-EastWest.png]]
+[[file:medias/trajectory-0-120-EastWest.png]]
 #+ATTR_LaTeX: :height 0.28\textheight
-[[file:img/trajectory-0-350-EastWest.png]]
+[[file:medias/trajectory-0-350-EastWest.png]]
 * What does the network learn?
-** Activations learned - East/West
+** Weights structure -- East/West
+#+ATTR_LaTeX: :height 0.96\textheight
+[[file:medias/weights-matrices-EastWest.png]]
+** Weights structure -- Left/Right
+#+ATTR_LaTeX: :height 0.96\textheight
+[[file:medias/weights-matrices-LeftRight.png]]
+** Weights clustering
+#+begin_export latex
+\begin{center}
+East/West
+\end{center}
+#+end_export
+[[file:medias/weights-tSNE-EastWest.png]]
+#+begin_export latex
+\begin{center}
+Left/Right
+\end{center}
+#+end_export
+[[file:medias/weights-tSNE-LeftRight.png]]
+** Activations learned -- East/West
 #+ATTR_LaTeX: :height 0.9\textheight
-[[file:img/activations-learned-EastWest.png]]
-** Activations learned - Left/Right
+[[file:medias/activations-learned-EastWest.png]]
+** Activations learned -- Left/Right
 #+ATTR_LaTeX: :height 0.9\textheight
-[[file:img/activations-learned-LeftRight.png]]
-** TODO Cluster by action space
-** TODO Other clustering method
-** TODO Use the behavior as proxy -- Perturbation experiment
+[[file:medias/activations-learned-LeftRight.png]]
+** Use the behavior as proxy -- Perturbation experiment
 :PROPERTIES:
 :BEAMER_act: [<+->]
 :END:
-- Perturb the Cartesian/polar part of the input on a trained agent and look at how the agent behaves (x4 experiments)
+- Perturb the Cartesian/polar part of the input on a trained agent and look at how the agent behaves
 - Expectation:
   - Left/right task:
     - With the *Cartesian* inputs perturbed \to agent's performance unchanged
@@ -192,14 +221,77 @@ Left/Right
   - East/west task:
     - With the *polar* inputs perturbed \to agent's performance unchanged
     - With the *Cartesian* inputs perturbed \to agent's performance degrades
-** TODO Use the behavior as proxy -- Perturbation experiment
+** Cartesian inputs unchanged -- polar input perturbed
+*** Left
+:PROPERTIES:
+:BEAMER_col: 0.5
+:BEAMER_opt: [c]
+:END:
+#+begin_export latex
+\begin{center}
+\small
+\textbf{East/West}\\
+\footnotesize
+Silencing inputs
+\end{center}
+#+end_export
+#+ATTR_LaTeX: :width \textwidth
+[[file:medias/steps-and-rewards-EastWest-perturb-silence.png]]
+#+begin_export latex
+\begin{center}
+\footnotesize
+Randomizing inputs
+\end{center}
+#+end_export
+#+ATTR_LaTeX: :width \textwidth
+[[file:medias/steps-and-rewards-EastWest-perturb-rand.png]]
+*** Right
+:PROPERTIES:
+:BEAMER_col: 0.5
+:BEAMER_opt: [c]
+:END:
+#+begin_export latex
+\begin{center}
+\small
+\textbf{Left/Right}\\
+\footnotesize
+Silencing inputs
+\end{center}
+#+end_export
+#+ATTR_LaTeX: :width \textwidth
+[[file:medias/steps-and-rewards-LeftRight-perturb-silence.png]]
+#+begin_export latex
+\begin{center}
+\footnotesize
+Randomizing inputs
+\end{center}
+#+end_export
+#+ATTR_LaTeX: :width \textwidth
+[[file:medias/steps-and-rewards-LeftRight-perturb-rand.png]]
+** Polar inputs unchanged -- Cartesian input perturbed
+- Simulation does not end
+
+  \to couldn't figure out why yet$\dots$
+* Conclusion
+** Partial conclusions
 :PROPERTIES:
 :BEAMER_act: [<+->]
 :END:
-- Cartesian perturbation
-- Polar perturbation
-  - Simulation does not end \to haven't figured out why yet
-** TODO Next steps
+- $\varnothing$ pattern on the weights
+- The *pre-odor activations* cluster together, but no other clear pattern seems to emerge
+- So far with this task setup, it seems *both types of coordinates information are required* to solve the task
+** Next steps
+:PROPERTIES:
+:BEAMER_act: [<+->]
+:END:
+- Perturbation experiment:
+  - Fix issue on Cartesian inputs
+  - Setup more metrics for the study: performance histogram, % correct, etc.
+- Need for some causal inference framework?
+- Use of techniques from explainable AI?
+- Study of the derivative of the output w.r.t. the inputs?
+- *Timeline:* wrap the project by end of August
+
 ** COMMENT Neural representations?
 [[file:~/Projects/DRL-olfaction/docs/expected cart-polar activations on both tasks.png]]
 - Need for some causal framework?
@@ -225,7 +317,7 @@ Questions ?
 *** Percent correct
 *** Shift in behavior
 *** Number of steps
-** TODO Conflicting information
+** Conflicting information
 *** 1 set of coord is right, the other is wrong
 *** See if the agent follow one or the other
 ** Cosine input or x node

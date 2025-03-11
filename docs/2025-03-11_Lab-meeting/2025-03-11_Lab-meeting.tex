@@ -1,4 +1,4 @@
-% Created 2025-03-10 Mon 01:56
+% Created 2025-03-11 Tue 02:53
 % Intended LaTeX compiler: lualatex
 \documentclass[bigger]{beamer}
 \usepackage{amsmath}
@@ -28,6 +28,7 @@
 \definecolor{UmlBlue}{HTML}{0067b1} \setbeamercolor{progress bar}{fg=UmlBlue} \setbeamercolor{title separator}{fg=UmlBlue}
 \setbeamercolor{progress bar in head/foot}{fg=UmlBlue} \setbeamercolor{progress bar in section page}{fg=UmlBlue} \setbeamercolor{alerted text}{fg=UmlBlue}
 \pretocmd{\tableofcontents}{\thispagestyle{empty}}{}{}
+\usepackage{multimedia}
 \usetheme{default}
 \author{Andrea Pierré}
 \date{March 11, 2025}
@@ -57,8 +58,8 @@ fg=headercolor
 \end{frame}
 
 \section{Project recap}
-\label{sec:org8c7a89d}
-\begin{frame}[label={sec:org05abde2}]{The LEC is key to sensory associations and spatial memory}
+\label{sec:orgb5cec76}
+\begin{frame}[label={sec:org57ce9e3}]{The LEC is key to sensory associations and spatial memory}
 \begin{columns}
 \begin{column}{0.45\columnwidth}
 \footnotesize
@@ -70,7 +71,7 @@ fg=headercolor
 \end{column}
 \begin{column}{0.55\columnwidth}
 \begin{center}
-\includegraphics[width=\textwidth]{img/brain.png}
+\includegraphics[width=\textwidth]{medias/brain.png}
 \end{center}
 
 \begin{textblock}{5}(0.5,14.5)%
@@ -82,27 +83,35 @@ Lee et al., 2021
 \end{column}
 \end{columns}
 \end{frame}
-\begin{frame}[label={sec:org2840a5c}]{Half triangle task for olfactory-spatial association learning}
+\begin{frame}[label={sec:org35743cf}]{Half triangle task for olfactory-spatial association learning}
 \begin{columns}
 \begin{column}[c]{0.33\columnwidth}
-\includegraphics[width=\linewidth, keepaspectratio, trim={0cm 0cm 28cm 0cm}, clip]{img/video-picture.png}
+\begin{center}
+\movie{\includegraphics[width=\linewidth, keepaspectratio, trim={0cm 0cm 28cm 0cm}, clip]{medias/video-picture.png}}{medias/annotatedF03_d35_2022-11-15_15.41.mp4}
+\end{center}
 \end{column}
 \begin{column}[c]{0.33\columnwidth}
-\includegraphics[width=0.9\linewidth, keepaspectratio, trim={11cm 18cm 40cm 13cm}, clip]{img/task-east-west.png}
+\begin{center}
+East/West task
+\includegraphics[width=0.9\linewidth, keepaspectratio, trim={11cm 18cm 40cm 13cm}, clip]{medias/task-east-west.png}
+\end{center}
 \end{column}
 \begin{column}[c]{0.33\columnwidth}
-\includegraphics[width=0.9\linewidth, keepaspectratio, trim={3cm 2cm 4cm 4cm}, clip]{img/task-left-right.jpeg}
+\begin{center}
+Left/Right task
+\includegraphics[width=0.9\linewidth, keepaspectratio, trim={3cm 2cm 4cm 4cm}, clip]{medias/task-left-right.jpeg}
+\end{center}
 \end{column}
 \end{columns}
 \end{frame}
-\begin{frame}[label={sec:org1e376a0}]{Deep Reinforcement Learning model}
+\begin{frame}[label={sec:orgc9f331d}]{Deep Reinforcement Learning model}
 \begin{center}
-\includegraphics[height=0.95\textheight]{img/nn.drawio.png}
+\includegraphics[height=0.95\textheight]{medias/nn.drawio.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:orgae968a5}]{Cartesian/polar duplicated coordinates experiment}
+\begin{frame}[label={sec:org47cf5a0}]{Cartesian/polar duplicated coordinates experiment}
 \begin{center}
-\includegraphics[height=0.6\textheight]{img/RL_env-cartesian-polar.drawio.png}
+\includegraphics[height=0.6\textheight]{medias/RL_env-cartesian-polar.drawio.png}
 \end{center}
 \footnotesize
 \vspace{-1em}
@@ -115,7 +124,7 @@ Lee et al., 2021
 \end{itemize}
 \end{itemize}
 \end{frame}
-\begin{frame}[label={sec:org8d59d68}]{Questions \& Hypothesis}
+\begin{frame}[label={sec:org1e748f3}]{Questions \& Hypothesis}
 \metroset{block=fill}
 \begin{exampleblock}{Questions}
 \begin{itemize}
@@ -133,113 +142,134 @@ Lee et al., 2021
 \end{itemize}
 \end{exampleblock}
 \end{frame}
-\begin{frame}[label={sec:org07ba994}]{Looking back\(\dots\)}
+\begin{frame}[<+->][label={sec:org72bea19}]{Looking back\(\dots\)}
 \footnotesize
 \begin{center}
-\includegraphics[height=0.5\textheight]{img/mdp.png}
+\includegraphics[height=0.45\textheight]{medias/mdp.png}
 \end{center}
 \begin{enumerate}
-\item Try to define the Olivia's experiment as a Markov Decision Process (MDP) in Julia
-\item 2D gridworld in Python/NumPy
-\item Duplicated coordinates in Python/PyTorch
+\item First step trying to define Olivia's experiment as a Markov Decision Process (MDP) in Julia
+\item 2D tiles with tabular RL \& function approximation in Python/NumPy
+\item 2D coordinate system in Python/PyTorch
+\item Duplicated coordinates experiment in Python/PyTorch
 \end{enumerate}
 \end{frame}
-\section{Cartesian/polar duplicated coordinates experiment}
-\label{sec:org1c6e01f}
-\begin{frame}[label={sec:org7bb1314}]{State space \& network architecture}
+\section{Simulated experiment}
+\label{sec:org910751d}
+\begin{frame}[label={sec:org5339384}]{State space \& network architecture}
 \begin{center}
-\includegraphics[height=0.95\textheight]{img/state-space-nn.png}
+\includegraphics[height=0.97\textheight]{medias/state-space-nn.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org93ab9d8}]{Training}
+\begin{frame}[label={sec:org91c2488}]{Training}
 East/West
 \begin{center}
-\includegraphics[height=0.35\textheight]{img/steps-and-rewards-EastWest.png}
+\includegraphics[height=0.35\textheight]{medias/steps-and-rewards-EastWest.png}
 \end{center}
 Left/Right
 \begin{center}
-\includegraphics[height=0.35\textheight]{img/steps-and-rewards-LeftRight.png}
+\includegraphics[height=0.35\textheight]{medias/steps-and-rewards-LeftRight.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:orgf839386}]{Training checks - East/West}
+\begin{frame}[label={sec:orgc1aa85e}]{Training checks -- East/West}
 \begin{center}
-\includegraphics[width=\textwidth]{img/steps-and-rewards-distrib-EastWest.png}
+\includegraphics[width=\textwidth]{medias/steps-and-rewards-distrib-EastWest.png}
 \end{center}
 \begin{columns}
 \begin{column}[c]{0.5\columnwidth}
 \begin{center}
-\includegraphics[width=0.8\textwidth]{img/loss-EastWest.png}
+\includegraphics[width=0.8\textwidth]{medias/loss-EastWest.png}
 \end{center}
 \end{column}
 \begin{column}[c]{0.5\columnwidth}
 \begin{center}
-\includegraphics[width=0.65\textwidth]{img/actions-distribution-EastWest.png}
+\includegraphics[width=0.65\textwidth]{medias/actions-distribution-EastWest.png}
 \end{center}
 \end{column}
 \end{columns}
 \end{frame}
-\begin{frame}[label={sec:org8c5ae25}]{Training checks - Left/Right}
+\begin{frame}[label={sec:org8e66f15}]{Training checks -- Left/Right}
 \begin{center}
-\includegraphics[width=\textwidth]{img/steps-and-rewards-distrib-LeftRight.png}
+\includegraphics[width=\textwidth]{medias/steps-and-rewards-distrib-LeftRight.png}
 \end{center}
 \begin{columns}
 \begin{column}[c]{0.5\columnwidth}
 \begin{center}
-\includegraphics[width=0.8\textwidth]{img/loss-LeftRight.png}
+\includegraphics[width=0.8\textwidth]{medias/loss-LeftRight.png}
 \end{center}
 \end{column}
 \begin{column}[c]{0.5\columnwidth}
 \begin{center}
-\includegraphics[width=0.65\textwidth]{img/actions-distribution-LeftRight.png}
+\includegraphics[width=0.65\textwidth]{medias/actions-distribution-LeftRight.png}
 \end{center}
 \end{column}
 \end{columns}
 \end{frame}
-\begin{frame}[label={sec:org9499775}]{Agent behavior}
+\begin{frame}[label={sec:org97f8fad}]{Agent behavior}
 \begin{columns}
 \begin{column}[c]{0.3\columnwidth}
 \begin{center}
-\includegraphics[height=0.28\textheight]{img/trajectory-0-0-LeftRight.png}
+\includegraphics[height=0.28\textheight]{medias/trajectory-0-0-LeftRight.png}
 \end{center}
 \begin{center}
-\includegraphics[height=0.28\textheight]{img/trajectory-0-120-LeftRight.png}
+\includegraphics[height=0.28\textheight]{medias/trajectory-0-120-LeftRight.png}
 \end{center}
 \begin{center}
-\includegraphics[height=0.28\textheight]{img/trajectory-0-350-LeftRight.png}
+\includegraphics[height=0.28\textheight]{medias/trajectory-0-350-LeftRight.png}
 \end{center}
 \end{column}
 \begin{column}[c]{0.3\columnwidth}
 \begin{center}
-\includegraphics[height=0.28\textheight]{img/trajectory-0-0-EastWest.png}
+\includegraphics[height=0.28\textheight]{medias/trajectory-0-0-EastWest.png}
 \end{center}
 \begin{center}
-\includegraphics[height=0.28\textheight]{img/trajectory-0-120-EastWest.png}
+\includegraphics[height=0.28\textheight]{medias/trajectory-0-120-EastWest.png}
 \end{center}
 \begin{center}
-\includegraphics[height=0.28\textheight]{img/trajectory-0-350-EastWest.png}
+\includegraphics[height=0.28\textheight]{medias/trajectory-0-350-EastWest.png}
 \end{center}
 \end{column}
 \end{columns}
 \end{frame}
 \section{What does the network learn?}
-\label{sec:org5fb47e4}
-\begin{frame}[label={sec:orgf9298d6}]{Activations learned - East/West}
+\label{sec:org46611d7}
+\begin{frame}[label={sec:orgaf62509}]{Weights structure -- East/West}
 \begin{center}
-\includegraphics[height=0.9\textheight]{img/activations-learned-EastWest.png}
+\includegraphics[height=0.96\textheight]{medias/weights-matrices-EastWest.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:orge4768e5}]{Activations learned - Left/Right}
+\begin{frame}[label={sec:org0f0c3d1}]{Weights structure -- Left/Right}
 \begin{center}
-\includegraphics[height=0.9\textheight]{img/activations-learned-LeftRight.png}
+\includegraphics[height=0.96\textheight]{medias/weights-matrices-LeftRight.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org83483aa}]{Cluster by action space}
+\begin{frame}[label={sec:org4c23b79}]{Weights clustering}
+\begin{center}
+East/West
+\end{center}
+\begin{center}
+\includegraphics[width=.9\linewidth]{medias/weights-tSNE-EastWest.png}
+\end{center}
+\begin{center}
+Left/Right
+\end{center}
+\begin{center}
+\includegraphics[width=.9\linewidth]{medias/weights-tSNE-LeftRight.png}
+\end{center}
 \end{frame}
-\begin{frame}[label={sec:org303b966}]{Other clustering method}
+\begin{frame}[label={sec:orgc7d7ca5}]{Activations learned -- East/West}
+\begin{center}
+\includegraphics[height=0.9\textheight]{medias/activations-learned-EastWest.png}
+\end{center}
 \end{frame}
-\begin{frame}[<+->][label={sec:org43cf319}]{Use the behavior as proxy -- Perturbation experiment}
+\begin{frame}[label={sec:orge9629c8}]{Activations learned -- Left/Right}
+\begin{center}
+\includegraphics[height=0.9\textheight]{medias/activations-learned-LeftRight.png}
+\end{center}
+\end{frame}
+\begin{frame}[<+->][label={sec:org5ec6eea}]{Use the behavior as proxy -- Perturbation experiment}
 \begin{itemize}
-\item Perturb the Cartesian/polar part of the input on a trained agent and look at how the agent behaves (x4 experiments)
+\item Perturb the Cartesian/polar part of the input on a trained agent and look at how the agent behaves
 \item Expectation:
 \begin{itemize}
 \item Left/right task:
@@ -255,18 +285,76 @@ Left/Right
 \end{itemize}
 \end{itemize}
 \end{frame}
-\begin{frame}[<+->][label={sec:org2ad9d53}]{Use the behavior as proxy -- Perturbation experiment}
+\begin{frame}[label={sec:org5cd39f8}]{Cartesian inputs unchanged -- polar input perturbed}
+\begin{columns}
+\begin{column}[c]{0.5\columnwidth}
+\begin{center}
+\small
+\textbf{East/West}\\
+\footnotesize
+Silencing inputs
+\end{center}
+\begin{center}
+\includegraphics[width=\textwidth]{medias/steps-and-rewards-EastWest-perturb-silence.png}
+\end{center}
+\begin{center}
+\footnotesize
+Randomizing inputs
+\end{center}
+\begin{center}
+\includegraphics[width=\textwidth]{medias/steps-and-rewards-EastWest-perturb-rand.png}
+\end{center}
+\end{column}
+\begin{column}[c]{0.5\columnwidth}
+\begin{center}
+\small
+\textbf{Left/Right}\\
+\footnotesize
+Silencing inputs
+\end{center}
+\begin{center}
+\includegraphics[width=\textwidth]{medias/steps-and-rewards-LeftRight-perturb-silence.png}
+\end{center}
+\begin{center}
+\footnotesize
+Randomizing inputs
+\end{center}
+\begin{center}
+\includegraphics[width=\textwidth]{medias/steps-and-rewards-LeftRight-perturb-rand.png}
+\end{center}
+\end{column}
+\end{columns}
+\end{frame}
+\begin{frame}[label={sec:org11b93ae}]{Polar inputs unchanged -- Cartesian input perturbed}
 \begin{itemize}
-\item Cartesian perturbation
-\item Polar perturbation
-\begin{itemize}
-\item Simulation does not end \(\to\) haven't figured out why yet
-\end{itemize}
+\item Simulation does not end
+
+\(\to\) couldn't figure out why yet\(\dots\)
 \end{itemize}
 \end{frame}
-\begin{frame}[label={sec:org993e633}]{Next steps}
+\section{Conclusion}
+\label{sec:org7945d9f}
+\begin{frame}[<+->][label={sec:orge5279fb}]{Partial conclusions}
+\begin{itemize}
+\item \(\varnothing\) pattern on the weights
+\item The \alert{pre-odor activations} cluster together, but no other clear pattern seems to emerge
+\item So far with this task setup, it seems \alert{both types of coordinates information are required} to solve the task
+\end{itemize}
 \end{frame}
-\begin{frame}[label={sec:org0f1a1d7},standout]{~}
+\begin{frame}[<+->][label={sec:org196d5ec}]{Next steps}
+\begin{itemize}
+\item Perturbation experiment:
+\begin{itemize}
+\item Fix issue on Cartesian inputs
+\item Setup more metrics for the study: performance histogram, \% correct, etc.
+\end{itemize}
+\item Need for some causal inference framework?
+\item Use of techniques from explainable AI?
+\item Study of the derivative of the output w.r.t. the inputs?
+\item \alert{Timeline:} wrap the project by end of August
+\end{itemize}
+\end{frame}
+\begin{frame}[label={sec:org6d5623c},standout]{~}
 Questions ?
 \end{frame}
 \end{document}
