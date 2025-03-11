@@ -115,7 +115,7 @@ Left/Right task
 2. 2D coordinate system in Python/PyTorch
 3. Duplicated coordinates experiment in Python/PyTorch
 
-* Simulated experiment
+* Modeling & Simulation
 ** State space & network architecture
 #+ATTR_LaTeX: :height 0.97\textheight
 [[file:medias/state-space-nn.png]]
@@ -333,7 +333,7 @@ Questions ?
 ** Try to understand the weights more than the activations
 *** Weights are the structure of the network
 *** Cluster the weights of the network?
-** TODO Clustering
+** Clustering
 *** Cluster by action space
 *** Cluster if moved the agent closer to goal or not
 **** Break by task phases
