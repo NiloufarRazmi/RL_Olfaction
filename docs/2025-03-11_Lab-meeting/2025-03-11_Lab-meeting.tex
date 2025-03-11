@@ -1,4 +1,4 @@
-% Created 2025-03-11 Tue 02:53
+% Created 2025-03-11 Tue 14:12
 % Intended LaTeX compiler: lualatex
 \documentclass[bigger]{beamer}
 \usepackage{amsmath}
@@ -58,8 +58,8 @@ fg=headercolor
 \end{frame}
 
 \section{Project recap}
-\label{sec:orgb5cec76}
-\begin{frame}[label={sec:org57ce9e3}]{The LEC is key to sensory associations and spatial memory}
+\label{sec:orga17910f}
+\begin{frame}[label={sec:org42b1bfa}]{The LEC is key to sensory associations and spatial memory}
 \begin{columns}
 \begin{column}{0.45\columnwidth}
 \footnotesize
@@ -83,7 +83,7 @@ Lee et al., 2021
 \end{column}
 \end{columns}
 \end{frame}
-\begin{frame}[label={sec:org35743cf}]{Half triangle task for olfactory-spatial association learning}
+\begin{frame}[label={sec:org4dd501f}]{Half triangle task for olfactory-spatial association learning}
 \begin{columns}
 \begin{column}[c]{0.33\columnwidth}
 \begin{center}
@@ -104,12 +104,12 @@ Left/Right task
 \end{column}
 \end{columns}
 \end{frame}
-\begin{frame}[label={sec:orgc9f331d}]{Deep Reinforcement Learning model}
+\begin{frame}[label={sec:org75cc8df}]{Deep Reinforcement Learning model}
 \begin{center}
 \includegraphics[height=0.95\textheight]{medias/nn.drawio.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org47cf5a0}]{Cartesian/polar duplicated coordinates experiment}
+\begin{frame}[label={sec:org7fb4784}]{Cartesian/polar duplicated coordinates experiment}
 \begin{center}
 \includegraphics[height=0.6\textheight]{medias/RL_env-cartesian-polar.drawio.png}
 \end{center}
@@ -124,7 +124,7 @@ Left/Right task
 \end{itemize}
 \end{itemize}
 \end{frame}
-\begin{frame}[label={sec:org1e748f3}]{Questions \& Hypothesis}
+\begin{frame}[label={sec:orgfb36001}]{Questions \& Hypothesis}
 \metroset{block=fill}
 \begin{exampleblock}{Questions}
 \begin{itemize}
@@ -142,7 +142,7 @@ Left/Right task
 \end{itemize}
 \end{exampleblock}
 \end{frame}
-\begin{frame}[<+->][label={sec:org72bea19}]{Looking back\(\dots\)}
+\begin{frame}[<+->][label={sec:orgc44fdba}]{Looking back\(\dots\)}
 \footnotesize
 \begin{center}
 \includegraphics[height=0.45\textheight]{medias/mdp.png}
@@ -155,13 +155,13 @@ Left/Right task
 \end{enumerate}
 \end{frame}
 \section{Simulated experiment}
-\label{sec:org910751d}
-\begin{frame}[label={sec:org5339384}]{State space \& network architecture}
+\label{sec:org387501f}
+\begin{frame}[label={sec:org1bfc512}]{State space \& network architecture}
 \begin{center}
 \includegraphics[height=0.97\textheight]{medias/state-space-nn.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org91c2488}]{Training}
+\begin{frame}[label={sec:org1562c1a}]{Training}
 East/West
 \begin{center}
 \includegraphics[height=0.35\textheight]{medias/steps-and-rewards-EastWest.png}
@@ -171,7 +171,7 @@ Left/Right
 \includegraphics[height=0.35\textheight]{medias/steps-and-rewards-LeftRight.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:orgc1aa85e}]{Training checks -- East/West}
+\begin{frame}[label={sec:org6cbf199}]{Training checks -- East/West}
 \begin{center}
 \includegraphics[width=\textwidth]{medias/steps-and-rewards-distrib-EastWest.png}
 \end{center}
@@ -188,7 +188,7 @@ Left/Right
 \end{column}
 \end{columns}
 \end{frame}
-\begin{frame}[label={sec:org8e66f15}]{Training checks -- Left/Right}
+\begin{frame}[label={sec:org8f40462}]{Training checks -- Left/Right}
 \begin{center}
 \includegraphics[width=\textwidth]{medias/steps-and-rewards-distrib-LeftRight.png}
 \end{center}
@@ -205,7 +205,7 @@ Left/Right
 \end{column}
 \end{columns}
 \end{frame}
-\begin{frame}[label={sec:org97f8fad}]{Agent behavior}
+\begin{frame}[label={sec:org918b4e8}]{Agent behavior}
 \begin{columns}
 \begin{column}[c]{0.3\columnwidth}
 \begin{center}
@@ -232,18 +232,18 @@ Left/Right
 \end{columns}
 \end{frame}
 \section{What does the network learn?}
-\label{sec:org46611d7}
-\begin{frame}[label={sec:orgaf62509}]{Weights structure -- East/West}
+\label{sec:org2a8eae5}
+\begin{frame}[label={sec:org73caaa5}]{Weights structure -- East/West}
 \begin{center}
 \includegraphics[height=0.96\textheight]{medias/weights-matrices-EastWest.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org0f0c3d1}]{Weights structure -- Left/Right}
+\begin{frame}[label={sec:orgac63de8}]{Weights structure -- Left/Right}
 \begin{center}
 \includegraphics[height=0.96\textheight]{medias/weights-matrices-LeftRight.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org4c23b79}]{Weights clustering}
+\begin{frame}[label={sec:org0c91526}]{Weights clustering}
 \begin{center}
 East/West
 \end{center}
@@ -257,17 +257,17 @@ Left/Right
 \includegraphics[width=.9\linewidth]{medias/weights-tSNE-LeftRight.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:orgc7d7ca5}]{Activations learned -- East/West}
+\begin{frame}[label={sec:orgb5e8183}]{Activations learned -- East/West}
 \begin{center}
 \includegraphics[height=0.9\textheight]{medias/activations-learned-EastWest.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:orge9629c8}]{Activations learned -- Left/Right}
+\begin{frame}[label={sec:org4071662}]{Activations learned -- Left/Right}
 \begin{center}
 \includegraphics[height=0.9\textheight]{medias/activations-learned-LeftRight.png}
 \end{center}
 \end{frame}
-\begin{frame}[<+->][label={sec:org5ec6eea}]{Use the behavior as proxy -- Perturbation experiment}
+\begin{frame}[<+->][label={sec:org9c5a78f}]{Use the behavior as proxy -- Perturbation experiment}
 \begin{itemize}
 \item Perturb the Cartesian/polar part of the input on a trained agent and look at how the agent behaves
 \item Expectation:
@@ -285,7 +285,7 @@ Left/Right
 \end{itemize}
 \end{itemize}
 \end{frame}
-\begin{frame}[label={sec:org5cd39f8}]{Cartesian inputs unchanged -- polar input perturbed}
+\begin{frame}[label={sec:orgf9e5974}]{Cartesian inputs unchanged -- polar inputs perturbed}
 \begin{columns}
 \begin{column}[c]{0.5\columnwidth}
 \begin{center}
@@ -325,7 +325,7 @@ Randomizing inputs
 \end{column}
 \end{columns}
 \end{frame}
-\begin{frame}[label={sec:org11b93ae}]{Polar inputs unchanged -- Cartesian input perturbed}
+\begin{frame}[label={sec:org91819a6}]{Polar inputs unchanged -- Cartesian inputs perturbed}
 \begin{itemize}
 \item Simulation does not end
 
@@ -333,15 +333,15 @@ Randomizing inputs
 \end{itemize}
 \end{frame}
 \section{Conclusion}
-\label{sec:org7945d9f}
-\begin{frame}[<+->][label={sec:orge5279fb}]{Partial conclusions}
+\label{sec:orgc7bbe05}
+\begin{frame}[<+->][label={sec:org8e24325}]{Partial conclusions so far}
 \begin{itemize}
 \item \(\varnothing\) pattern on the weights
 \item The \alert{pre-odor activations} cluster together, but no other clear pattern seems to emerge
 \item So far with this task setup, it seems \alert{both types of coordinates information are required} to solve the task
 \end{itemize}
 \end{frame}
-\begin{frame}[<+->][label={sec:org196d5ec}]{Next steps}
+\begin{frame}[<+->][label={sec:org6563e67}]{Next steps}
 \begin{itemize}
 \item Perturbation experiment:
 \begin{itemize}
@@ -354,7 +354,7 @@ Randomizing inputs
 \item \alert{Timeline:} wrap the project by end of August
 \end{itemize}
 \end{frame}
-\begin{frame}[label={sec:org6d5623c},standout]{~}
+\begin{frame}[label={sec:orgcdfedf1},standout]{~}
 Questions ?
 \end{frame}
 \end{document}

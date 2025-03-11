@@ -221,7 +221,7 @@ Left/Right
   - East/west task:
     - With the *polar* inputs perturbed \to agent's performance unchanged
     - With the *Cartesian* inputs perturbed \to agent's performance degrades
-** Cartesian inputs unchanged -- polar input perturbed
+** Cartesian inputs unchanged -- polar inputs perturbed
 *** Left
 :PROPERTIES:
 :BEAMER_col: 0.5
@@ -268,12 +268,12 @@ Randomizing inputs
 #+end_export
 #+ATTR_LaTeX: :width \textwidth
 [[file:medias/steps-and-rewards-LeftRight-perturb-rand.png]]
-** Polar inputs unchanged -- Cartesian input perturbed
+** Polar inputs unchanged -- Cartesian inputs perturbed
 - Simulation does not end
 
   \to couldn't figure out why yet$\dots$
 * Conclusion
-** Partial conclusions
+** Partial conclusions so far
 :PROPERTIES:
 :BEAMER_act: [<+->]
 :END:
