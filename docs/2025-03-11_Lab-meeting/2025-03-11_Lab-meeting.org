@@ -70,7 +70,7 @@ Left/Right task
 ** Deep Reinforcement Learning model
 #+ATTR_LaTeX: :height 0.95\textheight
 [[file:medias/nn.drawio.png]]
-** Cartesian/polar duplicated coordinates experiment
+** The environment
 #+ATTR_LaTeX: :height 0.6\textheight
 [[file:medias/RL_env-cartesian-polar.drawio.png]]
 #+begin_export latex
@@ -344,3 +344,40 @@ Questions ?
 *** Other type of clustering?
 **** Not hierarchical clustering
 **** Fix some condition
+** TODO Hot encode cue neuron
+** State occupancy
+** TODO Reorganize the weights matrices
+*** Clustering of the first layer of weights
+*** TODO Sort the rows
+*** TODO Sort last weight matrix with actions
+** TODO t-SNE
+*** TODO color
+*** TODO transpose matrix
+*** Plot evolution during training
+** Try other clustering methods
+*** MDS
+*** PCA
+*** Graph clustering?
+** Correlation only on a certain type of coords?
+** Activations
+*** Difference in activation if agent is close to wall?
+*** Diff if agent is a port
+*** Weight by the likelihoood a state will occur
+** Congunctive cells?
+** Pass Random
+** Correlation of input \to where it is initialized?
+** Add some learning and see how the agent recovers
+** Compare raw/step with normal agent
+** TODO Perturbation
+*** TODO 15 deg rotation
+*** Inject the expected mean
+*** Instead of randomize, just add some noise
+*** Check sensitivity of the input
+**** Translate a little bit the input until it doesn't work anymore
+** NO Network too big?
+** Sample all the states the agent have seen
+** Add some regularization during training?
+** regularization \to Dropout??
+*** L1/L2 regu
+*** Dropout
+** Try to understand the principle under the system
