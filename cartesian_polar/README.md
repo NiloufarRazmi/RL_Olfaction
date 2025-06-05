@@ -1,7 +1,8 @@
+# Cartesian/polar environment version of the task
 
-# Local setup 🚧
+## Local setup 🚧
 
-## Install
+### Install
 
 To setup the environment, run the following:
 ``` sh
@@ -12,7 +13,7 @@ source .venv/bin/activate
 pip install -Ue .
 ```
 
-## Run
+### Run
 
 Modify the `params.ini` config file, then run the following:
 ``` sh
@@ -20,22 +21,21 @@ runexp params.ini
 ```
 
 
-# Setup on Oscar ☁️
+## Setup on Oscar ☁️
 
-## Install
+### Install
 
 To setup the environment, run the following:
 ``` sh
 git clone git@github.com:NiloufarRazmi/RL_Olfaction.git
 cd RL_Olfaction/cartesian_polar
 module load python/3.11.0s-ixrhc3q
-module load texlive/20220321-pocclov
 python -m venv .venv
-source .venv/bin/activate
+. .venv/bin/activate
 ```
 Modify the line where the virtualenv is activated in `slurm_job.sh` with the path of your own virtualenv.  # TODO: This should be a variable.
 
-## Run
+### Run
 
 Modify the `params.ini` config file, then run the following:
 ``` sh
