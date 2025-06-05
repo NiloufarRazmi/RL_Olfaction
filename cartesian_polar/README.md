@@ -5,6 +5,8 @@
 
 To setup the environment, run the following:
 ``` sh
+git clone git@github.com:NiloufarRazmi/RL_Olfaction.git
+cd RL_Olfaction/cartesian_polar
 python -m venv .venv
 source .venv/bin/activate
 pip install -Ue .
@@ -24,6 +26,8 @@ runexp params.ini
 
 To setup the environment, run the following:
 ``` sh
+git clone git@github.com:NiloufarRazmi/RL_Olfaction.git
+cd RL_Olfaction/cartesian_polar
 module load python/3.11.0s-ixrhc3q
 module load texlive/20220321-pocclov
 python -m venv .venv
