@@ -20,6 +20,10 @@ class OdorCondition(Enum):
 class Cues(Enum):
     """List the possible cues conditions."""
 
+    """
+    NoOdor corresponds to when the agent has not reached an odor port yet
+    """
+
     NoOdor = 0
     OdorA = 1
     OdorB = 2
@@ -50,6 +54,9 @@ class Actions(Enum):
     # backward = 3
 
 
+"""
+!!! QUESTION !!! Is there overlap between the TriangleStates?
+"""
 class TriangleState(Enum):
     """Keeps track of which part of the arena the agent is located."""
 
@@ -79,7 +86,7 @@ class Environment:
 
     def __init__(self, taskid, seed=None):
         self.taskid = eval(f"TaskID.{taskid}")
-        if seed:
+        if seed: # If you have a seed, random number generator is deterministic
             self.generator = make_deterministic(seed=seed)
         else:
             self.generator = None
@@ -87,12 +94,24 @@ class Environment:
         # self.cols = 5
         # self.origX = 0
         # self.origY = 0
+        """
+        - The environment is a 5x5 2D grid, (X: -2 to 2, Y: -2 to 2)
+        - Grid spacing is 1 unit
+        - !!! QUESTION !!! The grid is always 5x5 right, it's never strictly divided into upper or lower triangles?
+        - But the agent is initialized in one of the triangles?
+
+        !!! POINT OF EXPERIMENTATION !!! What if we manipulate the environment? Make a larger grid, play around with grid spacing?
+        How can we make correspond to the physical experimental setup?
+        """
         self.tile_step = 1
         self.rangeX = {"min": -2, "max": 2}
         self.rangeY = {"min": -2, "max": 2}
-        self.head_angle_space = torch.tensor(
+        self.head_angle_space = torch.tensor( # Head orientation of the agent
             [0, 90, 180, 270], device=DEVICE
-        )  # In degrees, 0° being north
+        )  # In degrees, 0 DEGREES IS NORTH
+        """
+        Creating tensors for every possible tile coordinates
+        """
         self.tiles_locations = {
             "x": torch.arange(
                 start=self.rangeX["min"],
@@ -109,6 +128,11 @@ class Environment:
         }
         # self.cues = [*LightCues, *OdorID]
 
+        """
+        Defining the action space : set of all possible actions
+
+        !!! POINT OF EXPERIMENTATION !!! Playing around with the action space
+        """
         self.action_space = torch.tensor(
             [item.value for item in Actions], device=DEVICE
         )
@@ -124,8 +148,16 @@ class Environment:
         # self.numStates = tuple(len(item) for item in self.state_space.values())
         self.reset()
 
+    """
+    Initializing the environment
+    """
     def reset(self):
         """Reset the environment."""
+
+        """
+        Randomizes which triangle part of the arena the agent is located in
+        - corresponds to one of the two odor ports (N / S)
+        """
         self.TriangleState = TriangleState(
             random_choice(
                 torch.tensor([item.value for item in TriangleState], device=DEVICE),
@@ -142,13 +174,16 @@ class Environment:
         #         self.agent_coords,
         #     )
         # )
+        """
+        Randomizes agent position : agent starts on lower or upper triangle
+        """
         agent_coords = self.sample_coord_position()
         start_state = TensorDict(
             {
-                "cue": torch.tensor(Cues.NoOdor.value, device=DEVICE).unsqueeze(-1),
+                "cue": torch.tensor(Cues.NoOdor.value, device=DEVICE).unsqueeze(-1), # Cue always starts as NoOdor
                 "x": agent_coords[0].unsqueeze(-1),
                 "y": agent_coords[1].unsqueeze(-1),
-                "direction": random_choice(
+                "direction": random_choice( # Head direction is random
                     self.head_angle_space,
                     generator=self.generator,
                 ),
@@ -156,7 +191,10 @@ class Environment:
             batch_size=[1],
             device=DEVICE,
         )
-        self.odor_condition = OdorCondition.pre
+        self.odor_condition = OdorCondition.pre # At first, the agent is not exposed to the odor
+        """
+        The odor that is presented is random
+        """
         self.odor_ID = Cues(
             random_choice(
                 torch.tensor(
@@ -200,13 +238,14 @@ class Environment:
     def is_terminated(self, state):
         """Return if the episode is terminated or not."""
         is_terminated = False
-        if self.odor_condition == OdorCondition.post and (
+        if self.odor_condition == OdorCondition.post and ( # Agent has smelled the odor
+            # Checks if agent has gone to one of the reward ports
             (state["x"], state["y"]) == Ports.West.value
             and state["direction"] in [0, 270]
             or (state["x"], state["y"]) == Ports.East.value
             and state["direction"] in [90, 180]
         ):
-            is_terminated = True
+            is_terminated = True # Then terminates
         return is_terminated
 
     def reward(self, state):
@@ -214,16 +253,24 @@ class Environment:
         reward = 0
         if self.odor_condition == OdorCondition.post:
             if self.taskid == TaskID.EastWest:
+                """
+                - Checks if the agent is in the proper reward port for the cue
+                - Cue A always has reward in the West, Cue B in the East
+                - !!! QUESTION !!! The agent must be facing "towards" the reward to receive it? The range size is different for E/W
+                """
                 if (
                     state["cue"] == Cues.OdorA.value
                     and (state["x"], state["y"]) == Ports.West.value
-                    and state["direction"] in [0, 270]
+                    and state["direction"] in [0, 270] # Range is larger?
                     or state["cue"] == Cues.OdorB.value
                     and (state["x"], state["y"]) == Ports.East.value
-                    and state["direction"] in [90, 180]
+                    and state["direction"] in [90, 180] 
                 ):
                     reward = 1
             elif self.taskid == TaskID.LeftRight:
+                """
+                Checking for the TriangleState ensures that if the agent smells Odor A, it must always turn to the left, and vv
+                """
                 if self.TriangleState == TriangleState.upper:
                     if (
                         state["cue"] == Cues.OdorA.value
@@ -256,26 +303,27 @@ class Environment:
         """Take an action, observe reward and the next state."""
         new_state = TensorDict({}, batch_size=[1], device=DEVICE)
         new_state["cue"] = current_state["cue"]
-        new_agent_loc = self.move(
+        new_agent_loc = self.move( # Defines the new location of the agent
             x=current_state["x"],
             y=current_state["y"],
             direction=current_state["direction"],
             action=action,
             step=self.tile_step,
         )
+        # Update the location state of the agent
         new_state["x"] = new_agent_loc[0].unsqueeze(-1)
         new_state["y"] = new_agent_loc[1].unsqueeze(-1)
         new_state["direction"] = new_agent_loc[2].unsqueeze(-1)
 
         # Update internal states
-        if (new_state["x"].item(), new_state["y"].item()) in {
+        if (new_state["x"].item(), new_state["y"].item()) in { # Checking if the agent is now at one of the odor ports
             item.value for item in OdorPorts
         }:
-            self.odor_condition = OdorCondition.post
-            new_state["cue"] = torch.tensor([self.odor_ID.value], device=DEVICE)
+            self.odor_condition = OdorCondition.post # If so, the agent has smelled the odor
+            new_state["cue"] = torch.tensor([self.odor_ID.value], device=DEVICE) # Set the cue to the odor ID
 
-        reward = self.reward(new_state)
-        done = self.is_terminated(new_state)
+        reward = self.reward(new_state) # Checking if reward is received in the new state
+        done = self.is_terminated(new_state) # Checking if the task is complete in the new state
         return new_state, reward, done
 
     # def move(self, row, col, a):
@@ -294,13 +342,21 @@ class Environment:
     def move(self, x, y, direction, action, step=1):
         """Where the agent ends up on the map."""
 
+        """
+        - When the agent moves, head direction moves by 90 degrees as well
+
+        - When the agent is in the lower triangle, higher chance of having negative y value
+        - When the agent is in the upper triangle, higher chance of having positive y value
+
+        !!! POINT OF EXPERIMENTATION !!! Manipulate movement ability? How can we closer simulate the mouse? Full range of motion?
+        """
         def LEFT(x, y):
             """Move left in the allocentric sense."""
-            x_min = (
-                self.rangeX["min"] if self.TriangleState == TriangleState.lower else -y
+            x_min = ( # Defines the left boundary
+                self.rangeX["min"] if self.TriangleState == TriangleState.lower else -y # -y ensures we don't block movement except at leftmost border
             )
             x = max(x - step, x_min)
-            angle = 270
+            angle = 270 # 270 degrees defines west
             return angle, x
 
         def DOWN(x, y):
@@ -330,6 +386,9 @@ class Environment:
             angle = 0
             return angle, y
 
+        """
+        Depending on what direction the agent is facing, each action corresponds to a different relative egocentric movement
+        """
         if direction.round() == 0:  # Facing north
             if action == Actions.left.value:
                 direction, x = LEFT(x=x, y=y)
@@ -402,7 +461,11 @@ class Environment:
     #         raise ValueError("Impossible value, must be `upper` or `lower`")
     #     return (y, x)
 
-
+"""
+!!! QUESTION !!!
+When you say "Cartesian from North port," is that treating the North port as the origin (0, 0) ?
+Need to examine this class further
+"""
 class DuplicatedCoordsEnv(Environment):
     """
     Wrap the base Environment class.
@@ -425,6 +488,7 @@ class DuplicatedCoordsEnv(Environment):
         south_cart_coords = self.conv2south_cartesian(coords_orig)
         north_polar_coords = self.conv2north_polar(coords_orig)
         south_polar_coords = self.conv2south_polar(coords_orig)
+        # This tensor is the format for network inputs
         conv_state = torch.cat(
             (
                 cue,
@@ -454,7 +518,7 @@ class DuplicatedCoordsEnv(Environment):
     def step(self, action, current_state):
         """Wrap the base method."""
         current_conv_state = self.conv_flat_duplicated_coords_to_dict(current_state)
-        new_state, reward, done = super().step(action, current_conv_state)
+        new_state, reward, done = super().step(action, current_conv_state) # The step is done in the dict format
         new_state_conv = self.conv_dict_to_flat_duplicated_coords(new_state)
         reward = torch.tensor([reward], device=DEVICE).float()  # Convert to tensor
         new_state_conv = (
