@@ -20,37 +20,43 @@ from .environment import CONTEXTS_LABELS, Actions, Cues, DuplicatedCoordsEnv
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
+"""
+p : parameter object holding hyperparameters
+"""
 def training_loop(p, current_path, logger, generator=None):
     """Run the main training loop."""
-    Transition = namedtuple(
+    Transition = namedtuple( # This is a structure to hold a single transition, used later for replay buffer
         "Transition", ("state", "action", "reward", "next_state", "done")
     )
 
-    rewards = torch.zeros((p.total_episodes, p.n_runs), device=DEVICE)
-    steps = torch.zeros((p.total_episodes, p.n_runs), device=DEVICE)
-    episodes = torch.arange(p.total_episodes, device=DEVICE)
+    # Initialize variables to store training metrics
+    # Episode : a complete sequence of interactions, starting from initial state to terminal state (i.e. a game round)
+    rewards = torch.zeros((p.total_episodes, p.n_runs), device=DEVICE) # Total reward per episode per run
+    steps = torch.zeros((p.total_episodes, p.n_runs), device=DEVICE) # Num steps taken in each episode
+    episodes = torch.arange(p.total_episodes, device=DEVICE) # Episode indices
     all_states = [[[] for _ in range(p.total_episodes)] for _ in range(p.n_runs)]
-    all_actions = [[[] for _ in range(p.total_episodes)] for _ in range(p.n_runs)]
-    losses = [[] for _ in range(p.n_runs)]
+    all_actions = [[[] for _ in range(p.total_episodes)] for _ in range(p.n_runs)] 
+    losses = [[] for _ in range(p.n_runs)] 
 
     for run in range(p.n_runs):  # Run several times to account for stochasticity
         # Get the number of states and actions from the environment
-        env = DuplicatedCoordsEnv(taskid=p.taskid, seed=p.seed)
-        state = env.reset()
+        env = DuplicatedCoordsEnv(taskid=p.taskid, seed=p.seed) # Init environment
+        state = env.reset() 
         p.n_actions = env.numActions
-        p.n_observations = len(state)
+        p.n_observations = len(state) # Observations : input (cartesian/polar coords, head direction)
         logger.info(f"Number of actions: {p.n_actions}")
         logger.info(f"Number of observations: {p.n_observations}")
         logger.info(f"Number of hidden units in the network: {p.n_hidden_units}")
 
-        # Reset everything
+        # Reset everything : initialize the network
         net, target_net = neural_network(
-            n_observations=p.n_observations,
+            n_observations=p.n_observations, 
             n_actions=p.n_actions,
             nHiddenUnits=p.n_hidden_units,
         )  # Reset weights
         logger.info(f"Network architecture:\n{net}")
-        optimizer = optim.AdamW(net.parameters(), lr=p.alpha, amsgrad=True)
+        # Optimizer for weight updates
+        optimizer = optim.AdamW(net.parameters(), lr=p.alpha, amsgrad=True) # !!! QUESTION !!! Any merit in trying out different optimizers?
         explorer = EpsilonGreedy(
             epsilon=p.epsilon_max,
             epsilon_min=p.epsilon_min,
@@ -67,19 +73,22 @@ def training_loop(p, current_path, logger, generator=None):
         replay_buffer = deque([], maxlen=p.replay_buffer_max_size)
         epsilons = []
 
-        for episode in tqdm(
+        for episode in tqdm( # We are looping over episodes
             episodes, desc=f"Run {run + 1}/{p.n_runs} - Episodes", leave=False
         ):
-            state = env.reset()  # Reset the environment
+            state = env.reset()  # Reset the environment for the episode
             state = state.clone().float().detach().to(DEVICE)
+            
+            # Episode-specific tracking metrics
             step_count = 0
             done = False
             total_rewards = 0
             loss = torch.ones(1, device=DEVICE) * torch.nan
 
-            while not done:
-                state_action_values = net(state).to(DEVICE)  # Q(s_t)
-                action = explorer.choose_action(
+            while not done: # While the agent has not reached a reward port : core loop of episode
+                # net is a network that approximates the Q-function
+                state_action_values = net(state).to(DEVICE)  # Q(s_t) : the Q-values associated with each action
+                action = explorer.choose_action( # Agent selects an action based on Q-values, epsilon greedy
                     action_space=env.action_space,
                     state=state,
                     state_action_values=state_action_values,
@@ -89,12 +98,13 @@ def training_loop(p, current_path, logger, generator=None):
                 all_states[run][episode].append(state.cpu())
                 all_actions[run][episode].append(Actions(action).name)
 
-                next_state, reward, done = env.step(action=action, current_state=state)
+                next_state, reward, done = env.step(action=action, current_state=state) # Have the agent take a step based on selected action
 
-                # Store transition in replay buffer
+                # Store transition in replay buffer, which will later be used to train Q-network
                 # [current_state (2 or 28 x1), action (1x1), next_state (2 or 28 x1),
                 # reward (1x1), done (1x1 bool)]
                 done = torch.tensor(done, device=DEVICE).unsqueeze(-1)
+                # Saving one experience, containing all these values
                 replay_buffer.append(
                     Transition(
                         state,
@@ -105,15 +115,22 @@ def training_loop(p, current_path, logger, generator=None):
                     )
                 )
 
-                # Start training when `replay_buffer` is full
+                """
+                According to DQN learning structure, we store previous transitions in a replay buffer.
+                Once the replay buffer is full, we can sample random transitions from the buffer to input to the Q-function model during training.
+
+                DQN does not train after each step; rather, it uses these mini-batches of training data
+                """
+                # Start training when `replay_buffer` is full : don't want to train on sparse or unrepresenative data
                 if len(replay_buffer) == p.replay_buffer_max_size:
+                    # Selecting a random batch of transitions : random selection breaks correlation between consecutive states
                     transitions = utils.random_choice(
                         replay_buffer,
                         length=len(replay_buffer),
                         num_samples=p.batch_size,
                         generator=generator,
                     )
-                    batch = Transition(*zip(*transitions, strict=True))
+                    batch = Transition(*zip(*transitions, strict=True)) # Organizing batch into a single transition
                     state_batch = torch.stack(batch.state)
                     action_batch = torch.tensor(batch.action, device=DEVICE)
                     reward_batch = torch.cat(batch.reward)
@@ -121,25 +138,32 @@ def training_loop(p, current_path, logger, generator=None):
                     # done_batch = torch.cat(batch.done)
 
                     # See DQN paper for equations: https://doi.org/10.1038/nature14236
-                    state_action_values_sampled = net(state_batch).to(DEVICE)  # Q(s_t)
+                    
+                    # First we run network on all state_batch inputs to get predicted Q-values for ALL actions
+                    state_action_values_sampled = net(state_batch).to(DEVICE)
                     state_action_values = torch.gather(
                         input=state_action_values_sampled,
                         dim=1,
                         index=action_batch.unsqueeze(-1),
-                    ).squeeze()  # Q(s_t, a)
+                    ).squeeze()  # Using gather, we select Q-values for the actions that were actually taken
+                                 # - action_batch works as an index
 
                     # Compute a mask of non-final states and concatenate
                     # the batch elements
                     # (a final state would've been the one after which simulation ended)
-                    non_final_mask = torch.tensor(
+                    non_final_mask = torch.tensor( # Marking non-terminal transitions
                         tuple(map(lambda s: not s, batch.done)),
                         device=DEVICE,
                         dtype=torch.bool,
                     )
-                    non_final_next_states = torch.stack(
+                    non_final_next_states = torch.stack( # Extracts next_state tensors for non-terminal states only
                         [s[1] for s in zip(batch.done, batch.next_state) if not s[0]]
                     )
 
+                    """
+                    - We want to update the Q-network so that it better estimates the true expected future reward of taking actions
+                    - We do this by comparing the predicted Q-value with a target Q-value and minimizing the difference, (i.e. loss) 
+                    """
                     # Compute V(s_{t+1}) for all next states.
                     # Expected values of actions for non_final_next_states are computed
                     # based on the "older" target_net;
@@ -153,13 +177,13 @@ def training_loop(p, current_path, logger, generator=None):
                             next_state_values[non_final_mask] = (
                                 target_net(non_final_next_states).max(1).values
                             )
-                    # Compute the expected Q values
+                    # Compute the expected Q values based off Bellman equation : we treat this as "truth"
                     expected_state_action_values = reward_batch + (
                         next_state_values * p.gamma
                     )
 
-                    # Compute loss
-                    # criterion = nn.MSELoss()
+                    # Compute loss : this SmoothL1 loss function is common in DQN to stabilize training
+                    # criterion = nn.MSELoss() !!! POINT OF EXPERIMENTATION !!! Any merit in manipulating loss function?
                     criterion = nn.SmoothL1Loss()
                     loss = criterion(
                         input=state_action_values,  # prediction
@@ -167,19 +191,26 @@ def training_loop(p, current_path, logger, generator=None):
                     )  # TD update
 
                     # Optimize the model
-                    optimizer.zero_grad()
-                    loss.backward()
+                    optimizer.zero_grad() # Clear old gradients
+                    loss.backward() # Computing gradients via backprop
                     torch.nn.utils.clip_grad_value_(
                         net.parameters(), 100
-                    )  # In-place gradient clipping
-                    optimizer.step()
+                    )  # In-place gradient clipping ; for stabilization
+                    optimizer.step() # Updates weights to reduce loss
 
+                    """
+                    The target network is a copy of the main network, but copies the weights of the main network slowly.
+                    We use the target network for estimating Q-values of the next state using Bellman equation.
+                    The target net temporarily "freezes" the goal, so that the main network can learn.
+                    Otherwise, you have a constantly moving target.
+                    """
                     # # Reset the target network
                     # if step_count % p.target_net_update == 0:
                     #     target_net.load_state_dict(net.state_dict())
 
                     # Soft update of the target network's weights
                     # θ′ ← τ θ + (1 −τ )θ′
+                    # tau controls how slow/smooth the update is
                     target_net_state_dict = target_net.state_dict()
                     net_state_dict = net.state_dict()
                     for key in net_state_dict:
@@ -190,6 +221,7 @@ def training_loop(p, current_path, logger, generator=None):
 
                     losses[run].append(loss.item())
 
+                    # Logging weight and bias stats
                     weights, biases = utils.collect_weights_biases(net=net)
                     weights_val_stats = utils.params_df_stats(
                         weights, key="val", current_df=weights_grad_stats
@@ -204,12 +236,13 @@ def training_loop(p, current_path, logger, generator=None):
                         weights, key="grad", current_df=weights_val_stats
                     )
 
-                total_rewards += reward
+                total_rewards += reward # Accumulating reward
                 step_count += 1
 
                 # Move to the next state
                 state = next_state
 
+                # Update epsilon (exploration parameter)
                 explorer.epsilon = explorer.update_epsilon(episode)
                 epsilons.append(explorer.epsilon)
 
