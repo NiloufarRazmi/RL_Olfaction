@@ -14,7 +14,7 @@
 #SBATCH --account=carney-afleisc2-condo
 #SBATCH --mail-type=begin       # send email when job begins
 #SBATCH --mail-type=end         # send email when job ends
-#SBATCH --mail-user=andrea_pierre@brown.edu
+#SBATCH --mail-user=juan_mendez@brown.edu
 #SBATCH -o slurm-logs/%j-stdout.txt
 #SBATCH -e slurm-logs/%j-stderr.txt
 ########### End Slurm header ##########
@@ -24,7 +24,7 @@ module load python/3.11.0s-ixrhc3q
 module load texlive/20220321-pocclov
 
 # Run program
-. /users/apierre3/DRL-olfaction/.venv/bin/activate
+. /Users/juanmendez/fleischmann-research/RL_Olfaction/cartesian_polar/.venv/bin/activate
 pip install -Ue .
 # python ./TriangleTask/run_experiment.py
 runexp $PARAMSFILE
