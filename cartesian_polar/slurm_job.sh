@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Run with:
-# export PARAMSFILE="cartesian_polar/params.ini"; sbatch cartesian_polar/slurm_job.sh
+# export PARAMSFILE="params.ini"; sbatch slurm_job.sh
 
 ########## Begin Slurm header ##########
 #SBATCH -p gpu --gres=gpu:1
