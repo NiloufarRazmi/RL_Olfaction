@@ -25,7 +25,7 @@ module load texlive/20220321-pocclov
 
 # Run program
 . /users/jjmendez/data/jmendez/RL_Olfaction/cartesian_polar/.venv/bin/activate
-pip install -Ue .
+# pip install -Ue .
 # python ./TriangleTask/run_experiment.py
-# runexp $PARAMSFILE
-python run_experiment.py
+runexp $PARAMSFILE
+# python run_experiment.py
