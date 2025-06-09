@@ -7,8 +7,8 @@
 # interact -q gpu -g 1 
 
 ########## Begin Slurm header ##########
-##SBATCH -p gpu --gres=gpu:1
-#SBATCH --partition=gpu-debug
+#SBATCH -p gpu --gres=gpu:1
+##SBATCH --partition=gpu-debug
 #SBATCH -N 1  # Number of node
 #SBATCH -n 2
 #SBATCH --mem=3G
