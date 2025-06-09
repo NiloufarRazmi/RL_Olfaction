@@ -152,7 +152,8 @@ class Environment:
     Initializing the environment
     """
     def reset(self):
-        """Reset the environment.
+        """
+        Reset the environment.
 
         Randomizes which triangle part of the arena the agent is located in
         - corresponds to one of the two odor ports (N / S)
@@ -346,7 +347,8 @@ class Environment:
     #     return (row, col)
 
     def move(self, x, y, direction, action, step=1):
-        """Where the agent ends up on the map.
+        """
+        Where the agent ends up on the map.
 
         - When the agent moves, head direction moves by 90 degrees as well
 
