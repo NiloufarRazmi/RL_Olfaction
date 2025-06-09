@@ -226,7 +226,6 @@ def postprocess_loss(losses, window_size=1):
         current_loss = torch.tensor(
             loss.astype(float) if isinstance(loss, np.ndarray) else loss, device=DEVICE
         )
-        import ipdb; ipdb.set_trace()
         losses_rolling_avg = nn.functional.avg_pool1d(
             current_loss.view(1, 1, -1), kernel_size=window_size
         ).squeeze()
