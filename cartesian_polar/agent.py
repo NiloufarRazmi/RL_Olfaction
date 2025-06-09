@@ -61,23 +61,24 @@ class EpsilonGreedy:
         # Exploitation (taking the biggest Q-value for this state)
         else:
             # Break ties randomly
-            # If all actions have the same Q-values for this state we choose a random one
+            # Choose random action for same Q-value
             # (otherwise `argmax()` would always take the first one)
             if torch.all(state_action_values == state_action_values[0]):
                 action = sample(action_space)
             else:
-                action = torch.argmax(state_action_values) # Take action with highest Q-value
+                # Take action with highest Q-value
+                action = torch.argmax(state_action_values) 
         return action
 
     """
     Function to decay epsilon over time (episodes)
 
     epsilon_warmup : number of episodes to wait before beginning decay
-    epsilon_min : a floor to prevent the agent becoming fully greedy and getting stuck in local optima
+    epsilon_min : a floor to prevent fully greedy
 
     Decays according to classic exponential decay, a smooth reduction
 
-    !!! POINT OF EXPERIMENTATION !!! Play around with epsilon values and decay? What makes most sense for the mouse?
+    !!! POINT OF EXPERIMENTATION !!! 
     """
     def update_epsilon(self, ep):
         """Reduce epsilon after `ep` episodes."""
@@ -124,12 +125,12 @@ class DQN(nn.Module):
 
 
 def neural_network(n_observations, n_actions, nHiddenUnits):
-    """Define policy and target networks."""
-
     """
+    Define policy and target networks.
+
     Policy Network : network agent uses to interact with environment and learn
     Target Network : copy of policy, but updated less frequently
-                     - used to compute target Q-values, i.e. a stable snapshot I can use to estimate future rewards
+                     - used to compute target Q-values
                      - helps stabilize training
     """
     policy_net = DQN(

@@ -25,14 +25,18 @@ p : parameter object holding hyperparameters
 """
 def training_loop(p, current_path, logger, generator=None):
     """Run the main training loop."""
-    Transition = namedtuple( # This is a structure to hold a single transition, used later for replay buffer
+    # This is a structure to hold a single transition, used later for replay buffer
+    Transition = namedtuple( 
         "Transition", ("state", "action", "reward", "next_state", "done")
     )
 
     # Initialize variables to store training metrics
-    # Episode : a complete sequence of interactions, starting from initial state to terminal state (i.e. a game round)
-    rewards = torch.zeros((p.total_episodes, p.n_runs), device=DEVICE) # Total reward per episode per run
-    steps = torch.zeros((p.total_episodes, p.n_runs), device=DEVICE) # Num steps taken in each episode
+    # Episode : a complete sequence initial to terminal, i.e. game round
+
+    # Total reward per episode per run
+    rewards = torch.zeros((p.total_episodes, p.n_runs), device=DEVICE) 
+    # Num steps taken in each episode
+    steps = torch.zeros((p.total_episodes, p.n_runs), device=DEVICE) 
     episodes = torch.arange(p.total_episodes, device=DEVICE) # Episode indices
     all_states = [[[] for _ in range(p.total_episodes)] for _ in range(p.n_runs)]
     all_actions = [[[] for _ in range(p.total_episodes)] for _ in range(p.n_runs)] 
@@ -43,7 +47,8 @@ def training_loop(p, current_path, logger, generator=None):
         env = DuplicatedCoordsEnv(taskid=p.taskid, seed=p.seed) # Init environment
         state = env.reset() 
         p.n_actions = env.numActions
-        p.n_observations = len(state) # Observations : input (cartesian/polar coords, head direction)
+        # Observations : input (cartesian/polar coords, head direction)
+        p.n_observations = len(state) 
         logger.info(f"Number of actions: {p.n_actions}")
         logger.info(f"Number of observations: {p.n_observations}")
         logger.info(f"Number of hidden units in the network: {p.n_hidden_units}")
@@ -56,7 +61,8 @@ def training_loop(p, current_path, logger, generator=None):
         )  # Reset weights
         logger.info(f"Network architecture:\n{net}")
         # Optimizer for weight updates
-        optimizer = optim.AdamW(net.parameters(), lr=p.alpha, amsgrad=True) # !!! QUESTION !!! Any merit in trying out different optimizers?
+        # !!! QUESTION !!! Any merit in trying out different optimizers?
+        optimizer = optim.AdamW(net.parameters(), lr=p.alpha, amsgrad=True) 
         explorer = EpsilonGreedy(
             epsilon=p.epsilon_max,
             epsilon_min=p.epsilon_min,
@@ -85,10 +91,13 @@ def training_loop(p, current_path, logger, generator=None):
             total_rewards = 0
             loss = torch.ones(1, device=DEVICE) * torch.nan
 
-            while not done: # While the agent has not reached a reward port : core loop of episode
+            # While the agent has not reached a reward port : core loop of episode
+            while not done: 
                 # net is a network that approximates the Q-function
-                state_action_values = net(state).to(DEVICE)  # Q(s_t) : the Q-values associated with each action
-                action = explorer.choose_action( # Agent selects an action based on Q-values, epsilon greedy
+                # Q(s_t) : the Q-values associated with each action
+                state_action_values = net(state).to(DEVICE) # Q(s_t)
+                # Agent selects an action based on Q-values, epsilon greedy
+                action = explorer.choose_action( 
                     action_space=env.action_space,
                     state=state,
                     state_action_values=state_action_values,
@@ -98,9 +107,10 @@ def training_loop(p, current_path, logger, generator=None):
                 all_states[run][episode].append(state.cpu())
                 all_actions[run][episode].append(Actions(action).name)
 
-                next_state, reward, done = env.step(action=action, current_state=state) # Have the agent take a step based on selected action
+                # Have the agent take a step based on selected action
+                next_state, reward, done = env.step(action=action, current_state=state) 
 
-                # Store transition in replay buffer, which will later be used to train Q-network
+                # Store transition in replay buffer
                 # [current_state (2 or 28 x1), action (1x1), next_state (2 or 28 x1),
                 # reward (1x1), done (1x1 bool)]
                 done = torch.tensor(done, device=DEVICE).unsqueeze(-1)
@@ -116,21 +126,25 @@ def training_loop(p, current_path, logger, generator=None):
                 )
 
                 """
-                According to DQN learning structure, we store previous transitions in a replay buffer.
-                Once the replay buffer is full, we can sample random transitions from the buffer to input to the Q-function model during training.
+                We store previous transitions in a replay buffer.
 
-                DQN does not train after each step; rather, it uses these mini-batches of training data
+                Once the replay buffer is full, we can sample random 
+                transitions from the buffer to input to the model.
+
+                DQN uses these mini-batches of data to train
                 """
-                # Start training when `replay_buffer` is full : don't want to train on sparse or unrepresenative data
+                # Start training when `replay_buffer` is full 
                 if len(replay_buffer) == p.replay_buffer_max_size:
-                    # Selecting a random batch of transitions : random selection breaks correlation between consecutive states
+                    # Selecting a random batch of transitions 
+                    # random selection breaks correlation between consecutive states
                     transitions = utils.random_choice(
                         replay_buffer,
                         length=len(replay_buffer),
                         num_samples=p.batch_size,
                         generator=generator,
                     )
-                    batch = Transition(*zip(*transitions, strict=True)) # Organizing batch into a single transition
+                    # Organizing batch into a single transition
+                    batch = Transition(*zip(*transitions, strict=True)) 
                     state_batch = torch.stack(batch.state)
                     action_batch = torch.tensor(batch.action, device=DEVICE)
                     reward_batch = torch.cat(batch.reward)
@@ -139,13 +153,13 @@ def training_loop(p, current_path, logger, generator=None):
 
                     # See DQN paper for equations: https://doi.org/10.1038/nature14236
                     
-                    # First we run network on all state_batch inputs to get predicted Q-values for ALL actions
+                    # get predicted Q-values for ALL actions
                     state_action_values_sampled = net(state_batch).to(DEVICE)
                     state_action_values = torch.gather(
                         input=state_action_values_sampled,
                         dim=1,
                         index=action_batch.unsqueeze(-1),
-                    ).squeeze()  # Using gather, we select Q-values for the actions that were actually taken
+                    ).squeeze()  # Q-values for the actions that were actually taken
                                  # - action_batch works as an index
 
                     # Compute a mask of non-final states and concatenate
@@ -156,13 +170,17 @@ def training_loop(p, current_path, logger, generator=None):
                         device=DEVICE,
                         dtype=torch.bool,
                     )
-                    non_final_next_states = torch.stack( # Extracts next_state tensors for non-terminal states only
+                    # Extracts next_state tensors for non-terminal states only
+                    non_final_next_states = torch.stack( 
                         [s[1] for s in zip(batch.done, batch.next_state) if not s[0]]
                     )
 
                     """
-                    - We want to update the Q-network so that it better estimates the true expected future reward of taking actions
-                    - We do this by comparing the predicted Q-value with a target Q-value and minimizing the difference, (i.e. loss) 
+                    - We want to update the Q-network so that it better estimates 
+                    the true expected future reward of taking actions
+
+                    - We do this by comparing the predicted Q-value with a 
+                    target Q-value and minimizing the difference, (i.e. loss) 
                     """
                     # Compute V(s_{t+1}) for all next states.
                     # Expected values of actions for non_final_next_states are computed
@@ -177,13 +195,14 @@ def training_loop(p, current_path, logger, generator=None):
                             next_state_values[non_final_mask] = (
                                 target_net(non_final_next_states).max(1).values
                             )
-                    # Compute the expected Q values based off Bellman equation : we treat this as "truth"
+                    # Compute the expected Q values, i.e. "truth"
                     expected_state_action_values = reward_batch + (
                         next_state_values * p.gamma
                     )
 
-                    # Compute loss : this SmoothL1 loss function is common in DQN to stabilize training
-                    # criterion = nn.MSELoss() !!! POINT OF EXPERIMENTATION !!! Any merit in manipulating loss function?
+                    # SmoothL1 loss function is common to stabilize
+                    # criterion = nn.MSELoss() 
+                    # !!! POINT OF EXPERIMENTATION !!!
                     criterion = nn.SmoothL1Loss()
                     loss = criterion(
                         input=state_action_values,  # prediction
@@ -199,9 +218,14 @@ def training_loop(p, current_path, logger, generator=None):
                     optimizer.step() # Updates weights to reduce loss
 
                     """
-                    The target network is a copy of the main network, but copies the weights of the main network slowly.
-                    We use the target network for estimating Q-values of the next state using Bellman equation.
-                    The target net temporarily "freezes" the goal, so that the main network can learn.
+                    The target network is a copy of the main network, 
+                    but copies the weights of the main network slowly.
+
+                    We use the target network for estimating Q-values of the 
+                    next state using Bellman equation.
+
+                    The target net temporarily "freezes" the goal, so that the main 
+                    network can learn.
                     Otherwise, you have a constantly moving target.
                     """
                     # # Reset the target network

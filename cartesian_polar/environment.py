@@ -97,10 +97,10 @@ class Environment:
         """
         - The environment is a 5x5 2D grid, (X: -2 to 2, Y: -2 to 2)
         - Grid spacing is 1 unit
-        - !!! QUESTION !!! The grid is always 5x5 right, it's never strictly divided into upper or lower triangles?
+        - !!! QUESTION !!! 
         - But the agent is initialized in one of the triangles?
 
-        !!! POINT OF EXPERIMENTATION !!! What if we manipulate the environment? Make a larger grid, play around with grid spacing?
+        !!! POINT OF EXPERIMENTATION !!! 
         How can we make correspond to the physical experimental setup?
         """
         self.tile_step = 1
@@ -152,9 +152,8 @@ class Environment:
     Initializing the environment
     """
     def reset(self):
-        """Reset the environment."""
+        """Reset the environment.
 
-        """
         Randomizes which triangle part of the arena the agent is located in
         - corresponds to one of the two odor ports (N / S)
         """
@@ -180,7 +179,8 @@ class Environment:
         agent_coords = self.sample_coord_position()
         start_state = TensorDict(
             {
-                "cue": torch.tensor(Cues.NoOdor.value, device=DEVICE).unsqueeze(-1), # Cue always starts as NoOdor
+                # Cue always starts as NoOdor
+                "cue": torch.tensor(Cues.NoOdor.value, device=DEVICE).unsqueeze(-1), 
                 "x": agent_coords[0].unsqueeze(-1),
                 "y": agent_coords[1].unsqueeze(-1),
                 "direction": random_choice( # Head direction is random
@@ -191,7 +191,8 @@ class Environment:
             batch_size=[1],
             device=DEVICE,
         )
-        self.odor_condition = OdorCondition.pre # At first, the agent is not exposed to the odor
+        # At first, the agent is not exposed to the odor
+        self.odor_condition = OdorCondition.pre 
         """
         The odor that is presented is random
         """
@@ -256,7 +257,7 @@ class Environment:
                 """
                 - Checks if the agent is in the proper reward port for the cue
                 - Cue A always has reward in the West, Cue B in the East
-                - !!! QUESTION !!! The agent must be facing "towards" the reward to receive it? The range size is different for E/W
+                - !!! QUESTION !!!
                 """
                 if (
                     state["cue"] == Cues.OdorA.value
@@ -269,7 +270,7 @@ class Environment:
                     reward = 1
             elif self.taskid == TaskID.LeftRight:
                 """
-                Checking for the TriangleState ensures that if the agent smells Odor A, it must always turn to the left, and vv
+                If A, always turn to the left
                 """
                 if self.TriangleState == TriangleState.upper:
                     if (
@@ -316,14 +317,19 @@ class Environment:
         new_state["direction"] = new_agent_loc[2].unsqueeze(-1)
 
         # Update internal states
-        if (new_state["x"].item(), new_state["y"].item()) in { # Checking if the agent is now at one of the odor ports
+        # Checking if the agent is now at one of the odor ports
+        if (new_state["x"].item(), new_state["y"].item()) in { 
             item.value for item in OdorPorts
         }:
-            self.odor_condition = OdorCondition.post # If so, the agent has smelled the odor
-            new_state["cue"] = torch.tensor([self.odor_ID.value], device=DEVICE) # Set the cue to the odor ID
+            # If so, the agent has smelled the odor
+            self.odor_condition = OdorCondition.post
+            # Set the cue to the odor ID 
+            new_state["cue"] = torch.tensor([self.odor_ID.value], device=DEVICE) 
 
-        reward = self.reward(new_state) # Checking if reward is received in the new state
-        done = self.is_terminated(new_state) # Checking if the task is complete in the new state
+        # Checking if reward is received in the new state
+        reward = self.reward(new_state) 
+        # Checking if the task is complete in the new state
+        done = self.is_terminated(new_state) 
         return new_state, reward, done
 
     # def move(self, row, col, a):
@@ -340,20 +346,20 @@ class Environment:
     #     return (row, col)
 
     def move(self, x, y, direction, action, step=1):
-        """Where the agent ends up on the map."""
+        """Where the agent ends up on the map.
 
-        """
         - When the agent moves, head direction moves by 90 degrees as well
 
-        - When the agent is in the lower triangle, higher chance of having negative y value
-        - When the agent is in the upper triangle, higher chance of having positive y value
+        - lower triangle, higher chance of negative y value
+        - upper triangle, higher chance of positive y value
 
-        !!! POINT OF EXPERIMENTATION !!! Manipulate movement ability? How can we closer simulate the mouse? Full range of motion?
+        !!! POINT OF EXPERIMENTATION !!! 
         """
         def LEFT(x, y):
             """Move left in the allocentric sense."""
             x_min = ( # Defines the left boundary
-                self.rangeX["min"] if self.TriangleState == TriangleState.lower else -y # -y ensures we don't block movement except at leftmost border
+                # -y ensures we don't block movement except at leftmost border
+                self.rangeX["min"] if self.TriangleState == TriangleState.lower else -y 
             )
             x = max(x - step, x_min)
             angle = 270 # 270 degrees defines west
@@ -387,7 +393,8 @@ class Environment:
             return angle, y
 
         """
-        Depending on what direction the agent is facing, each action corresponds to a different relative egocentric movement
+        Depending on what direction the agent is facing, 
+        each action corresponds to a different relative egocentric movement
         """
         if direction.round() == 0:  # Facing north
             if action == Actions.left.value:
@@ -463,7 +470,6 @@ class Environment:
 
 """
 !!! QUESTION !!!
-When you say "Cartesian from North port," is that treating the North port as the origin (0, 0) ?
 Need to examine this class further
 """
 class DuplicatedCoordsEnv(Environment):
@@ -518,7 +524,8 @@ class DuplicatedCoordsEnv(Environment):
     def step(self, action, current_state):
         """Wrap the base method."""
         current_conv_state = self.conv_flat_duplicated_coords_to_dict(current_state)
-        new_state, reward, done = super().step(action, current_conv_state) # The step is done in the dict format
+        # The step is done in the dict format
+        new_state, reward, done = super().step(action, current_conv_state) 
         new_state_conv = self.conv_dict_to_flat_duplicated_coords(new_state)
         reward = torch.tensor([reward], device=DEVICE).float()  # Convert to tensor
         new_state_conv = (
