@@ -61,7 +61,6 @@ def training_loop(p, current_path, logger, generator=None):
         )  # Reset weights
         logger.info(f"Network architecture:\n{net}")
         # Optimizer for weight updates
-        # !!! QUESTION !!! Any merit in trying out different optimizers?
         optimizer = optim.AdamW(net.parameters(), lr=p.alpha, amsgrad=True) 
         explorer = EpsilonGreedy(
             epsilon=p.epsilon_max,

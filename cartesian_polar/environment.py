@@ -54,9 +54,6 @@ class Actions(Enum):
     # backward = 3
 
 
-"""
-!!! QUESTION !!! Is there overlap between the TriangleStates?
-"""
 class TriangleState(Enum):
     """Keeps track of which part of the arena the agent is located."""
 
@@ -97,11 +94,7 @@ class Environment:
         """
         - The environment is a 5x5 2D grid, (X: -2 to 2, Y: -2 to 2)
         - Grid spacing is 1 unit
-        - !!! QUESTION !!! 
-        - But the agent is initialized in one of the triangles?
-
-        !!! POINT OF EXPERIMENTATION !!! 
-        How can we make correspond to the physical experimental setup?
+        - Agent initialized in either lower or upper triangle
         """
         self.tile_step = 1
         self.rangeX = {"min": -2, "max": 2}
@@ -110,7 +103,7 @@ class Environment:
             [0, 90, 180, 270], device=DEVICE
         )  # In degrees, 0 DEGREES IS NORTH
         """
-        Creating tensors for every possible tile coordinates
+        Creating tensors for every possible tile coordinate
         """
         self.tiles_locations = {
             "x": torch.arange(
@@ -130,8 +123,6 @@ class Environment:
 
         """
         Defining the action space : set of all possible actions
-
-        !!! POINT OF EXPERIMENTATION !!! Playing around with the action space
         """
         self.action_space = torch.tensor(
             [item.value for item in Actions], device=DEVICE
@@ -258,12 +249,11 @@ class Environment:
                 """
                 - Checks if the agent is in the proper reward port for the cue
                 - Cue A always has reward in the West, Cue B in the East
-                - !!! QUESTION !!!
                 """
                 if (
                     state["cue"] == Cues.OdorA.value
                     and (state["x"], state["y"]) == Ports.West.value
-                    and state["direction"] in [0, 270] # Range is larger?
+                    and state["direction"] in [0, 270]
                     or state["cue"] == Cues.OdorB.value
                     and (state["x"], state["y"]) == Ports.East.value
                     and state["direction"] in [90, 180] 
@@ -351,16 +341,10 @@ class Environment:
         Where the agent ends up on the map.
 
         - When the agent moves, head direction moves by 90 degrees as well
-
-        - lower triangle, higher chance of negative y value
-        - upper triangle, higher chance of positive y value
-
-        !!! POINT OF EXPERIMENTATION !!! 
         """
         def LEFT(x, y):
             """Move left in the allocentric sense."""
             x_min = ( # Defines the left boundary
-                # -y ensures we don't block movement except at leftmost border
                 self.rangeX["min"] if self.TriangleState == TriangleState.lower else -y 
             )
             x = max(x - step, x_min)
@@ -470,15 +454,21 @@ class Environment:
     #         raise ValueError("Impossible value, must be `upper` or `lower`")
     #     return (y, x)
 
-"""
-!!! QUESTION !!!
-Need to examine this class further
-"""
 class DuplicatedCoordsEnv(Environment):
     """
     Wrap the base Environment class.
 
     Results in numerical only state space
+    - this is how we take the Environment Cue, X&Y, and head direction
+      and translate to an input array of 19 values
+      (w/ Cartesian and Polar coords)
+    """
+
+    """
+    TODO:
+    - Make sure to have something in code that records where agent is all the time,
+    not dependent on Cartesian
+    - The code needs to be refactored, as you cannot silence the Cartesian coords
     """
 
     def __init__(self, taskid, seed=None):
@@ -486,6 +476,8 @@ class DuplicatedCoordsEnv(Environment):
         super().__init__(taskid=taskid, seed=seed)
         self.reset()
 
+    # Dict: the original Environment info
+    # Flat: the array of 19 inputs
     def conv_dict_to_flat_duplicated_coords(self, state):
         """Convert composite state dictionary to a tensor."""
         coords_orig = torch.tensor(
@@ -524,7 +516,12 @@ class DuplicatedCoordsEnv(Environment):
         return conv_state
 
     def step(self, action, current_state):
-        """Wrap the base method."""
+        """
+        Wrap the base method.
+        
+        We translate back and forth between Env system
+        and DupEnv system
+        """
         current_conv_state = self.conv_flat_duplicated_coords_to_dict(current_state)
         # The step is done in the dict format
         new_state, reward, done = super().step(action, current_conv_state) 
@@ -544,7 +541,10 @@ class DuplicatedCoordsEnv(Environment):
         return conv_state
 
     def conv2north_cartesian(self, coords_orig):
-        """Convert origin (0, 0) coords to Cartesian coords from the North port."""
+        """
+        Convert origin (0, 0) coords to Cartesian coords from the North port.
+        This sets the North port as (0, 0)
+        """
         new_x = -coords_orig[0] + 2
         new_y = -coords_orig[1] + 2
         # direction_orig = coords_orig[2].item()

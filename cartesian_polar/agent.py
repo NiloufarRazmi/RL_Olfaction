@@ -50,7 +50,7 @@ class EpsilonGreedy:
         def sample(action_space, generator=None):
             return random_choice(action_space, generator=self.generator)
 
-        # # First we randomize a number
+        # First we randomize a number
         explor_exploit_tradeoff = torch.rand(1, generator=self.generator)
 
         # Exploration
@@ -77,8 +77,6 @@ class EpsilonGreedy:
     epsilon_min : a floor to prevent fully greedy
 
     Decays according to classic exponential decay, a smooth reduction
-
-    !!! POINT OF EXPERIMENTATION !!! 
     """
     def update_epsilon(self, ep):
         """Reduce epsilon after `ep` episodes."""
@@ -109,7 +107,8 @@ class DQN(nn.Module):
         Network Architecture: 6 layers of neurons, 4 hidden layers
         """
         self.mlp = nn.Sequential(
-            nn.Linear(n_observations, n_units), 
+            nn.Linear(n_observations, n_units),
+            # We have no ReLU activation here, becuase that would disregard negative inputs
             nn.Linear(n_units, n_units),
             nn.ReLU(),
             nn.Linear(n_units, n_units),
