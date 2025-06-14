@@ -18,7 +18,7 @@ from .agent import EpsilonGreedy, neural_network
 from .environment import CONTEXTS_LABELS, Actions, Cues, DuplicatedCoordsEnv
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-USE_INTERNAL_STATE = True
+USE_INTERNAL_STATE = False
 
 
 def training_loop(p, current_path, logger, generator=None):
