@@ -143,7 +143,7 @@ class Environment:
         #     )
         # )
         agent_coords = self.sample_coord_position()
-        start_state = TensorDict(
+        self.current_state = TensorDict(
             {
                 "cue": torch.tensor(Cues.NoOdor.value, device=DEVICE).unsqueeze(-1),
                 "x": agent_coords[0].unsqueeze(-1),
@@ -172,7 +172,7 @@ class Environment:
         #         generator=self.generator,
         #     ).item()
         # )
-        return start_state
+        return self.current_state
 
     def sample_coord_position(self):
         """Sample coordinates X and Y until they fit the upper or lower triangle."""
@@ -252,9 +252,11 @@ class Environment:
                 )
         return reward
 
-    def step(self, action, current_state):
+    def step(self, action, current_state, use_internal_state=None):
         """Take an action, observe reward and the next state."""
         new_state = TensorDict({}, batch_size=[1], device=DEVICE)
+        if use_internal_state:
+            current_state = self.current_state
         new_state["cue"] = current_state["cue"]
         new_agent_loc = self.move(
             x=current_state["x"],
@@ -451,10 +453,12 @@ class DuplicatedCoordsEnv(Environment):
         )
         return conv_state
 
-    def step(self, action, current_state):
+    def step(self, action, current_state, use_internal_state=None):
         """Wrap the base method."""
         current_conv_state = self.conv_flat_duplicated_coords_to_dict(current_state)
-        new_state, reward, done = super().step(action, current_conv_state)
+        new_state, reward, done = super().step(
+            action, current_conv_state, use_internal_state=use_internal_state
+        )
         new_state_conv = self.conv_dict_to_flat_duplicated_coords(new_state)
         reward = torch.tensor([reward], device=DEVICE).float()  # Convert to tensor
         new_state_conv = (

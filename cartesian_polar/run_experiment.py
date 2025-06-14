@@ -18,6 +18,7 @@ from .agent import EpsilonGreedy, neural_network
 from .environment import CONTEXTS_LABELS, Actions, Cues, DuplicatedCoordsEnv
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+USE_INTERNAL_STATE = True
 
 
 def training_loop(p, current_path, logger, generator=None):
@@ -89,7 +90,15 @@ def training_loop(p, current_path, logger, generator=None):
                 all_states[run][episode].append(state.cpu())
                 all_actions[run][episode].append(Actions(action).name)
 
-                next_state, reward, done = env.step(action=action, current_state=state)
+                next_state, reward, done = env.step(
+                    action=action,
+                    current_state=state,
+                    use_internal_state=USE_INTERNAL_STATE,
+                )
+                if USE_INTERNAL_STATE:
+                    env.current_state = env.conv_flat_duplicated_coords_to_dict(
+                        next_state
+                    )
 
                 # Store transition in replay buffer
                 # [current_state (2 or 28 x1), action (1x1), next_state (2 or 28 x1),
