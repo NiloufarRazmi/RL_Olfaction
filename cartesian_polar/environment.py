@@ -7,7 +7,8 @@ from enum import Enum
 import torch
 from tensordict.tensordict import TensorDict
 
-from .utils import make_deterministic, random_choice
+# !TODO Investigate relative import issue
+from utils import make_deterministic, random_choice
 
 
 class OdorCondition(Enum):
