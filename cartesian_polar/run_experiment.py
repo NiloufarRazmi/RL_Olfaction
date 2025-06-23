@@ -201,7 +201,6 @@ def training_loop(p, current_path, logger, generator=None):
 
                     # SmoothL1 loss function is common to stabilize
                     # criterion = nn.MSELoss() 
-                    # !!! POINT OF EXPERIMENTATION !!!
                     criterion = nn.SmoothL1Loss()
                     loss = criterion(
                         input=state_action_values,  # prediction

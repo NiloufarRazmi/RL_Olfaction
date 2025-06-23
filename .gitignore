@@ -618,3 +618,7 @@ poetry.toml
 pyrightconfig.json
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,matlab,python,latex,emacs
+
+
+# Figures
+cartesian_polar/figures/
