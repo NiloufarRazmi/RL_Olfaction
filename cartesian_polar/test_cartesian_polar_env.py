@@ -5,6 +5,7 @@ import math
 import numpy as np
 import pytest
 import torch
+import torch.nn.functional as F
 from tensordict.tensordict import TensorDict
 
 from .agent import EpsilonGreedy
@@ -1031,7 +1032,9 @@ def test_DuplicatedCoordsEnv_logic(task, triangle, expected_reward):
     coords_orig = torch.tensor([x_orig, y_orig, direction_orig])
     state = torch.cat(
         (
-            torch.tensor(Cues.NoOdor.value).unsqueeze(-1),
+            F.one_hot(
+                torch.tensor(Cues.NoOdor.value, device=DEVICE), num_classes=len(Cues)
+            ),
             env.conv2north_cartesian(coords_orig),
             env.conv2south_cartesian(coords_orig),
             env.conv2north_polar(coords_orig),
@@ -1041,12 +1044,14 @@ def test_DuplicatedCoordsEnv_logic(task, triangle, expected_reward):
     state, reward, done = env.step(action=Actions.forward.value, current_state=state)
     assert done is False
     assert env.odor_condition == OdorCondition.post
-    assert state[0] == Cues.OdorA.value or Cues.OdorB.value
+    assert torch.all(state[1:3] == torch.tensor([0.0, 1.0])) or torch.all(
+        state[1:3] == torch.tensor([1.0, 0.0])
+    )
 
     # Post odor presentation
     if task == TaskID.EastWest:
         if triangle == TriangleState.upper:
-            if state[0] == Cues.OdorA.value:
+            if state[1] == 1.0:  # Odor A
                 if expected_reward == 1:
                     action = Actions.left.value
                     state, reward, done = env.step(action=action, current_state=state)
@@ -1054,7 +1059,7 @@ def test_DuplicatedCoordsEnv_logic(task, triangle, expected_reward):
                     action = Actions.right.value
                     state, reward, done = env.step(action=action, current_state=state)
                     state, reward, done = env.step(action=action, current_state=state)
-            elif state[0] == Cues.OdorB.value:
+            elif state[2] == 1.0:  # Odor B
                 if expected_reward == 1:
                     action = Actions.right.value
                     state, reward, done = env.step(action=action, current_state=state)
@@ -1063,7 +1068,7 @@ def test_DuplicatedCoordsEnv_logic(task, triangle, expected_reward):
                     action = Actions.left.value
                     state, reward, done = env.step(action=action, current_state=state)
         elif triangle == TriangleState.lower:
-            if state[0] == Cues.OdorA.value:
+            if state[1] == 1.0:  # Odor A
                 if expected_reward == 1:
                     action = Actions.right.value
                     state, reward, done = env.step(action=action, current_state=state)
@@ -1071,7 +1076,7 @@ def test_DuplicatedCoordsEnv_logic(task, triangle, expected_reward):
                 else:
                     action = Actions.left.value
                     state, reward, done = env.step(action=action, current_state=state)
-            elif state[0] == Cues.OdorB.value:
+            elif state[2] == 1.0:  # Odor B
                 if expected_reward == 1:
                     action = Actions.left.value
                     state, reward, done = env.step(action=action, current_state=state)
@@ -1081,7 +1086,7 @@ def test_DuplicatedCoordsEnv_logic(task, triangle, expected_reward):
                     state, reward, done = env.step(action=action, current_state=state)
     elif task == TaskID.LeftRight:
         if triangle == TriangleState.upper:
-            if state[0] == Cues.OdorA.value:
+            if state[1] == 1.0:  # Odor A
                 if expected_reward == 1:
                     action = Actions.left.value
                     state, reward, done = env.step(action=action, current_state=state)
@@ -1089,7 +1094,7 @@ def test_DuplicatedCoordsEnv_logic(task, triangle, expected_reward):
                     action = Actions.right.value
                     state, reward, done = env.step(action=action, current_state=state)
                     state, reward, done = env.step(action=action, current_state=state)
-            elif state[0] == Cues.OdorB.value:
+            elif state[2] == 1.0:  # Odor B
                 if expected_reward == 1:
                     action = Actions.right.value
                     state, reward, done = env.step(action=action, current_state=state)
@@ -1098,7 +1103,7 @@ def test_DuplicatedCoordsEnv_logic(task, triangle, expected_reward):
                     action = Actions.left.value
                     state, reward, done = env.step(action=action, current_state=state)
         elif triangle == TriangleState.lower:
-            if state[0] == Cues.OdorB.value:
+            if state[2] == 1.0:  # Odor B
                 if expected_reward == 1:
                     action = Actions.right.value
                     state, reward, done = env.step(action=action, current_state=state)
@@ -1106,7 +1111,7 @@ def test_DuplicatedCoordsEnv_logic(task, triangle, expected_reward):
                 else:
                     action = Actions.left.value
                     state, reward, done = env.step(action=action, current_state=state)
-            elif state[0] == Cues.OdorA.value:
+            elif state[1] == 1.0:  # Odor A
                 if expected_reward == 1:
                     action = Actions.left.value
                     state, reward, done = env.step(action=action, current_state=state)

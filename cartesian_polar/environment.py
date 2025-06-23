@@ -5,6 +5,7 @@ from collections import OrderedDict
 from enum import Enum
 
 import torch
+import torch.nn.functional as F
 from tensordict.tensordict import TensorDict
 
 # !TODO Investigate relative import issue
@@ -170,7 +171,7 @@ class Environment:
         Randomizes agent position : agent starts on lower or upper triangle
         """
         agent_coords = self.sample_coord_position()
-        start_state = TensorDict(
+        self.current_state = TensorDict(
             {
                 # Cue always starts as NoOdor
                 "cue": torch.tensor(Cues.NoOdor.value, device=DEVICE).unsqueeze(-1), 
@@ -204,7 +205,7 @@ class Environment:
         #         generator=self.generator,
         #     ).item()
         # )
-        return start_state
+        return self.current_state
 
     def sample_coord_position(self):
         """Sample coordinates X and Y until they fit the upper or lower triangle."""
@@ -292,9 +293,11 @@ class Environment:
                 )
         return reward
 
-    def step(self, action, current_state):
+    def step(self, action, current_state, use_internal_state=None):
         """Take an action, observe reward and the next state."""
         new_state = TensorDict({}, batch_size=[1], device=DEVICE)
+        if use_internal_state:
+            current_state = self.current_state
         new_state["cue"] = current_state["cue"]
         new_agent_loc = self.move( # Defines the new location of the agent
             x=current_state["x"],
@@ -484,7 +487,7 @@ class DuplicatedCoordsEnv(Environment):
         coords_orig = torch.tensor(
             [state["x"], state["y"], state["direction"]], device=DEVICE
         )
-        cue = torch.tensor([state["cue"]], device=DEVICE)
+        cue = F.one_hot(state["cue"], num_classes=len(Cues)).squeeze()
         north_cart_coords = self.conv2north_cartesian(coords_orig)
         south_cart_coords = self.conv2south_cartesian(coords_orig)
         north_polar_coords = self.conv2north_polar(coords_orig)
@@ -503,10 +506,12 @@ class DuplicatedCoordsEnv(Environment):
 
     def conv_flat_duplicated_coords_to_dict(self, state):
         """Convert back tensor state to original composite state."""
-        coords_orig = self.conv_north_cartesian2orig(state[1:5])
+        coords_orig = self.conv_north_cartesian2orig(state[3:7])
         conv_state = TensorDict(
             {
-                "cue": torch.tensor([state[0]], device=DEVICE),
+                "cue": torch.tensor(
+                    [state[0 : len(Cues)].argwhere().item()], device=DEVICE
+                ),
                 "x": torch.tensor([coords_orig[0]], device=DEVICE),
                 "y": torch.tensor([coords_orig[1]], device=DEVICE),
                 "direction": torch.tensor([coords_orig[2]], device=DEVICE),
@@ -516,16 +521,12 @@ class DuplicatedCoordsEnv(Environment):
         )
         return conv_state
 
-    def step(self, action, current_state):
-        """
-        Wrap the base method.
-        
-        We translate back and forth between Env system
-        and DupEnv system
-        """
+    def step(self, action, current_state, use_internal_state=None):
+        """Wrap the base method."""
         current_conv_state = self.conv_flat_duplicated_coords_to_dict(current_state)
-        # The step is done in the dict format
-        new_state, reward, done = super().step(action, current_conv_state) 
+        new_state, reward, done = super().step(
+            action, current_conv_state, use_internal_state=use_internal_state
+        )
         new_state_conv = self.conv_dict_to_flat_duplicated_coords(new_state)
         reward = torch.tensor([reward], device=DEVICE).float()  # Convert to tensor
         new_state_conv = (
