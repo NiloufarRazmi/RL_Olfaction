@@ -5,6 +5,7 @@ from collections import OrderedDict
 from enum import Enum
 
 import torch
+import torch.nn.functional as F
 from tensordict.tensordict import TensorDict
 
 from .utils import make_deterministic, random_choice
@@ -422,7 +423,7 @@ class DuplicatedCoordsEnv(Environment):
         coords_orig = torch.tensor(
             [state["x"], state["y"], state["direction"]], device=DEVICE
         )
-        cue = torch.tensor([state["cue"]], device=DEVICE)
+        cue = F.one_hot(state["cue"], num_classes=len(Cues)).squeeze()
         north_cart_coords = self.conv2north_cartesian(coords_orig)
         south_cart_coords = self.conv2south_cartesian(coords_orig)
         north_polar_coords = self.conv2north_polar(coords_orig)
@@ -440,10 +441,12 @@ class DuplicatedCoordsEnv(Environment):
 
     def conv_flat_duplicated_coords_to_dict(self, state):
         """Convert back tensor state to original composite state."""
-        coords_orig = self.conv_north_cartesian2orig(state[1:5])
+        coords_orig = self.conv_north_cartesian2orig(state[3:7])
         conv_state = TensorDict(
             {
-                "cue": torch.tensor([state[0]], device=DEVICE),
+                "cue": torch.tensor(
+                    [state[0 : len(Cues)].argwhere().item()], device=DEVICE
+                ),
                 "x": torch.tensor([coords_orig[0]], device=DEVICE),
                 "y": torch.tensor([coords_orig[1]], device=DEVICE),
                 "direction": torch.tensor([coords_orig[2]], device=DEVICE),
