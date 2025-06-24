@@ -40,7 +40,8 @@ def training_loop(p, current_path, logger, generator=None):
     steps = torch.zeros((p.total_episodes, p.n_runs), device=DEVICE) 
     episodes = torch.arange(p.total_episodes, device=DEVICE) # Episode indices
     all_states = [[[] for _ in range(p.total_episodes)] for _ in range(p.n_runs)]
-    all_actions = [[[] for _ in range(p.total_episodes)] for _ in range(p.n_runs)] 
+    all_actions = [[[] for _ in range(p.total_episodes)] for _ in range(p.n_runs)]
+    all_qvalues = [[[] for _ in range(p.total_episodes)] for _ in range(p.n_runs)]
     losses = [[] for _ in range(p.n_runs)] 
 
     for run in range(p.n_runs):  # Run several times to account for stochasticity
@@ -103,9 +104,10 @@ def training_loop(p, current_path, logger, generator=None):
                     state_action_values=state_action_values,
                 ).item()
 
-                # Record states and actions
+                # Record states, actions, and q-values
                 all_states[run][episode].append(state.cpu())
                 all_actions[run][episode].append(Actions(action).name)
+                all_qvalues[run][episode].append(state_action_values)
 
                 next_state, reward, done = env.step(
                     action=action,
@@ -307,6 +309,7 @@ def training_loop(p, current_path, logger, generator=None):
         "episodes": episodes.cpu(),
         "all_states": np.array(all_states, dtype=object),
         "all_actions": np.array(all_actions, dtype=object),
+        "all_qvalues": np.array(all_qvalues, dtype=object),
         "losses": np.array(losses, dtype=object),
         "p": p,
         "epsilons": epsilons,
