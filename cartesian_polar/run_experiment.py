@@ -107,7 +107,7 @@ def training_loop(p, current_path, logger, generator=None):
                 # Record states, actions, and q-values
                 all_states[run][episode].append(state.cpu())
                 all_actions[run][episode].append(Actions(action).name)
-                all_qvalues[run][episode].append(state_action_values)
+                all_qvalues[run][episode].append(state_action_values.cpu().detach().numpy())
 
                 next_state, reward, done = env.step(
                     action=action,
