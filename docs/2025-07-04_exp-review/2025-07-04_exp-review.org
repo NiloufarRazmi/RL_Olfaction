@@ -1,0 +1,133 @@
+#+TITLE: Perturbation experiment
+#+AUTHOR: Andrea Pierré
+#+date: July 04, 2025
+* HEADER :noexport:
+#+SETUPFILE: ./style.org
+
+* Results
+** Training (for reference)
+#+begin_export latex
+\centering
+#+end_export
+Left/Right
+#+ATTR_LaTeX: :width 0.85\textwidth
+[[file:medias/LeftRight/training.png]]
+
+East/West
+#+ATTR_LaTeX: :width 0.85\textwidth
+[[file:medias/EastWest/training.png]]
+
+** Randomized Cartesian inputs
+#+begin_export latex
+\centering
+#+end_export
+Left/Right
+#+ATTR_LaTeX: :width 0.85\textwidth
+[[file:medias/LeftRight/exp_keep-polar_silence-False.png]]
+
+East/West
+#+ATTR_LaTeX: :width 0.85\textwidth
+[[file:medias/EastWest/exp_keep-polar_silence-False.png]]
+
+** Silenced Cartesian inputs
+#+begin_export latex
+\centering
+#+end_export
+Left/Right
+#+ATTR_LaTeX: :width 0.85\textwidth
+[[file:medias/LeftRight/exp_keep-polar_silence-True.png]]
+
+East/West
+#+ATTR_LaTeX: :width 0.85\textwidth
+[[file:medias/EastWest/exp_keep-polar_silence-True.png]]
+
+** Randomized polar inputs
+#+begin_export latex
+\centering
+#+end_export
+Left/Right
+#+ATTR_LaTeX: :width 0.85\textwidth
+[[file:medias/LeftRight/exp_keep-cartesian_silence-False.png]]
+
+East/West
+#+ATTR_LaTeX: :width 0.85\textwidth
+[[file:medias/EastWest/exp_keep-cartesian_silence-False.png]]
+
+** Silenced polar inputs
+#+begin_export latex
+\centering
+#+end_export
+Left/Right
+#+ATTR_LaTeX: :width 0.85\textwidth
+[[file:medias/LeftRight/exp_keep-cartesian_silence-True.png]]
+
+East/West
+#+ATTR_LaTeX: :width 0.85\textwidth
+[[file:medias/EastWest/exp_keep-cartesian_silence-True.png]]
+
+* Conclusion
+** Conclusion
+- Results not as expected \to performance is degraded but the agents are able to solve the task most of the time even if part of their inputs are perturbated
+- Changes from lab meeting:
+  - One-hot encoded cue
+  - 256 neurons/layer instead of 512
+* COMMENT Add plain option to Beamer TOC
+% Local variables:
+% org-beamer-outline-frame-options: "plain"
+% End:
+
+* Feedback :noexport:
+
+** Need for some causal framework?
+- [[https://doi.org/10.1038/s42256-020-0218-x]]
+- [[https://doi.org/10.31235/osf.io/aeszf]]
+- [[https://github.com/kochbj/Deep-Learning-for-Causal-Inference]]
+
+** TODO Metrics for ablation study
+*** Performance histogram
+*** Percent correct
+*** Shift in behavior
+*** Number of steps
+** Conflicting information
+*** 1 set of coord is right, the other is wrong
+*** See if the agent follow one or the other
+** Cosine input or x node
+*** What's the distrib coming on the sine
+*** Multidim problem
+*** Look for sensitivity coming in the first layer
+** Derive of any input wrt input
+*** Avg over playback of the agent
+*** How sensitive is the agent for this task
+** Clustering
+*** Cluster by action space
+*** Cluster if moved the agent closer to goal or not
+**** Break by task phases
+**** before cue after cue
+*** Target: E/W or L/R
+**** Supervised clustering
+**** Across all the layers
+*** Other type of clustering?
+**** Not hierarchical clustering
+**** Fix some condition
+** TODO Reorganize the weights matrices
+*** Clustering of the first layer of weights
+*** TODO Sort the rows
+*** TODO Sort last weight matrix with actions
+** TODO t-SNE
+*** TODO color
+*** TODO transpose matrix
+*** Plot evolution during training
+** Try other clustering methods
+*** MDS
+*** PCA
+*** Graph clustering?
+** Correlation only on a certain type of coords?
+** Conjunctive cells?
+** TODO Perturbation
+*** TODO 15 deg rotation
+*** Inject the expected mean
+*** Instead of randomize, just add some noise
+*** Check sensitivity of the input
+**** Translate a little bit the input until it doesn't work anymore
+** Sample all the states the agent have seen
+** [?] How about applying SHAP or LIME to trained network?
