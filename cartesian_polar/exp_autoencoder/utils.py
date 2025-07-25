@@ -223,7 +223,7 @@ def postprocess_rewards_steps(episodes, n_runs, rewards, steps):
 
 def postprocess_bottleneck_steps(episodes, n_runs, rewards, steps, bottleneck):
     """Convert the results of the simulation in dataframes."""
-    bottleneck_vec = np.ones_like(episodes) * bottleneck[0]
+    bottleneck_vec = np.ones_like(episodes.cpu()) * bottleneck[0]
     for btl_val in bottleneck[1:]:
         bottleneck_vec = np.concat([bottleneck_vec, np.ones_like(episodes) * btl_val])
     res = pd.DataFrame(
