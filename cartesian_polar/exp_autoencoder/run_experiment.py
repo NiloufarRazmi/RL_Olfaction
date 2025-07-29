@@ -57,7 +57,7 @@ def training_loop(p, current_path, logger, generator=None):
         net, target_net = auto_encoders(
             n_observations=p.n_observations,
             n_actions=p.n_actions,
-            bottleneck=p.bottleneck[run],
+            bottleneck=p.bottleneck,
             nHiddenUnits=p.n_hidden_units,
         )  # Reset weights
         logger.info(f"Network architecture:\n{net}")
@@ -328,13 +328,13 @@ def visualization_plots(data_path, p, current_path, logger):
     rew_steps_df = utils.postprocess_rewards_steps(
         episodes=episodes, n_runs=p.n_runs, rewards=rewards, steps=steps
     )
-    bottleneck_steps_df = utils.postprocess_bottleneck_steps(
-        episodes=episodes,
-        n_runs=p.n_runs,
-        rewards=rewards,
-        steps=steps,
-        bottleneck=p.bottleneck,
-    )
+    # bottleneck_steps_df = utils.postprocess_bottleneck_steps(
+    #     episodes=episodes,
+    #     n_runs=p.n_runs,
+    #     rewards=rewards,
+    #     steps=steps,
+    #     bottleneck=p.bottleneck,
+    # )
     loss_df = utils.postprocess_loss(losses=losses, window_size=1)
     q_values = utils.get_q_values_by_states(env=env, cues=Cues, net=net)
     weights_val_df = utils.postprocess_weights(weights["val"])
@@ -360,9 +360,9 @@ def visualization_plots(data_path, p, current_path, logger):
     viz.plot_steps_and_rewards(
         rew_steps_df, n_runs=p.n_runs, figpath=current_path, logger=logger
     )
-    viz.plot_steps_trained_boxplot(
-        df=bottleneck_steps_df, figpath=current_path, logger=logger
-    )
+    # viz.plot_steps_trained_boxplot(
+    #     df=bottleneck_steps_df, figpath=current_path, logger=logger
+    # )
     viz.plot_loss(loss_df, n_runs=p.n_runs, figpath=current_path, logger=logger)
     viz.plot_policies_by_head_directions(
         q_values=q_values,
@@ -435,7 +435,7 @@ def cli(paramsfile):
     """Run the main command-line function."""
     paramsfile = Path(paramsfile)
     p = utils.get_exp_params_from_config(config_path=paramsfile)
-    p.n_runs = len(p.bottleneck)
+    #p.n_runs = len(p.bottleneck)
     current_path = utils.create_save_path(
         task=p.taskid, experiment_tag=p.experiment_tag
     )

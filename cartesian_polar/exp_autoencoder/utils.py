@@ -43,7 +43,7 @@ class Params:
     # Deep network
     nLayers: int = 5
     n_hidden_units: int = 2**7
-    bottleneck: list[int] = 100
+    bottleneck: int = 10
 
     # Environment
     # action_size: Optional[int] = None
@@ -412,6 +412,7 @@ def get_exp_params_from_config(config_path):
             "target_net_update",
             "layer_inspected",
             "epsilon_warmup",
+            "bottleneck"
         ]:
             params[key] = int(config["experiment"][key])
         elif key in [
@@ -427,14 +428,14 @@ def get_exp_params_from_config(config_path):
         elif key in ["n_hidden_units", "batch_size"]:
             # Strings that need to be evaluated first
             params[key] = int(eval(config["experiment"][key]))
-        elif key in ["bottleneck"]:
-            # List of strings that need to be evaluated first
-            items_list = (
-                config["experiment"][key].replace("[", "").replace("]", "").split(",")
-            )
-            for idx, val in enumerate(items_list):
-                items_list[idx] = int(eval(val))
-            params[key] = items_list
+        # elif key in ["bottleneck"]:
+        #     # List of strings that need to be evaluated first
+        #     items_list = (
+        #         config["experiment"][key].replace("[", "").replace("]", "").split(",")
+        #     )
+        #     for idx, val in enumerate(items_list):
+        #         items_list[idx] = int(eval(val))
+        #     params[key] = items_list
         else:
             params[key] = config["experiment"][key]
     p = Params(**params)
