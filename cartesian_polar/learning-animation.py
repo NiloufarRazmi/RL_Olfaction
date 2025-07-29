@@ -123,6 +123,10 @@ CELL_SIZE = 100
 WINDOW_SIZE = GRID_SIZE * CELL_SIZE
 FPS = 3  # frames per second
 
+# Colors
+RED = (255, 0, 0)
+BLACK = (0, 0, 0)
+
 # Map headings to direction arrows
 arrow_map = {
     "N": (0, 1),
@@ -163,7 +167,7 @@ def grid_to_screen(x, y):
     return (screen_x, screen_y)
 
 # Draw grid lines
-def draw_grid():
+def draw_grid(upper_triangle=True):
     for row in range(GRID_SIZE):
         for col in range(GRID_SIZE):
             screen_x = col * CELL_SIZE
@@ -173,6 +177,32 @@ def draw_grid():
         pygame.draw.line(screen, (200, 200, 200), (x, 0), (x, WINDOW_SIZE))
     for y in range(0, WINDOW_SIZE, CELL_SIZE):
         pygame.draw.line(screen, (200, 200, 200), (0, y), (WINDOW_SIZE, y))
+
+
+    if upper_triangle:
+        # Draw staircase diagonal by highlighting the grid edges
+        for i in range(GRID_SIZE):
+            # Horizontal segment: move down by 1
+            start_h = (i * CELL_SIZE, (i + 1) * CELL_SIZE)
+            end_h = ((i + 1) * CELL_SIZE, (i + 1) * CELL_SIZE)
+            pygame.draw.line(screen, BLACK, start_h, end_h, 3)
+
+            # Vertical segment
+            start_v = ((i + 1) * CELL_SIZE, (i + 1) * CELL_SIZE)
+            end_v = ((i + 1) * CELL_SIZE, (i + 2) * CELL_SIZE)
+            pygame.draw.line(screen, BLACK, start_v, end_v, 3)
+    else:
+        # Draw staircase shifted up by 1
+        for i in range(1, GRID_SIZE + 1):
+            # Horizontal segment: row i - 1
+            start_h = ((i - 1) * CELL_SIZE, (i - 1) * CELL_SIZE)
+            end_h = (i * CELL_SIZE, (i - 1) * CELL_SIZE)
+            pygame.draw.line(screen, BLACK, start_h, end_h, 3)
+
+            # Vertical segment: col i
+            start_v = (i * CELL_SIZE, (i - 1) * CELL_SIZE)
+            end_v = (i * CELL_SIZE, i * CELL_SIZE)
+            pygame.draw.line(screen, BLACK, start_v, end_v, 3)
 
 def draw_agent(state):
     x, y = state["x"], state["y"]
@@ -213,11 +243,10 @@ for episode in episode_states:
             odor_label = 'B'
 
         odor_text_surface = font.render(f"Odor {odor_label}", True, (0, 0, 255))
+        upper_triangle = state["UpperTriangle"]
 
         screen.fill((30, 30, 30))
-        draw_grid()
-
-        upper_triangle = state["UpperTriangle"]
+        draw_grid(upper_triangle=upper_triangle)
 
         # TODO: put an 'X' on the incorrect reward port
         if no_odor == True:
