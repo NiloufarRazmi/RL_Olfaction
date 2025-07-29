@@ -34,5 +34,6 @@ env-update: ## Update the Conda environment & install CLI
 	mamba env update -f environment.yml
 
 export PARAMSFILE := cartesian_polar/params.ini
+#export PARAMSFILE := cartesian_polar/params-bis.ini
 slurm: ## Run the simulation on Slurm cluster
 	sbatch cartesian_polar/slurm_job.sh
