@@ -11,9 +11,9 @@
 ##SBATCH --partition=gpu-debug
 #SBATCH -N 1  # Number of node
 #SBATCH -n 2
-#SBATCH --mem=3G
+#SBATCH --mem=5G
 ##SBATCH -t 01:00:00
-#SBATCH -t 03:00:00
+#SBATCH -t 10:00:00
 #SBATCH --account=carney-afleisc2-condo
 #SBATCH --mail-type=begin       # send email when job begins
 #SBATCH --mail-type=end         # send email when job ends
@@ -30,5 +30,6 @@ module load texlive/20220321-pocclov
 . /users/jjmendez/data/jmendez/RL_Olfaction/cartesian_polar/.venv/bin/activate # Activate virtual environment
 # pip install -Ue .
 # python ./TriangleTask/run_experiment.py
-runexp $PARAMSFILE
+# runexp $PARAMSFILE
+runexp_auto exp_autoencoder/params.ini
 # python run_experiment.py

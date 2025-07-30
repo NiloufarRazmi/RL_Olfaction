@@ -9,7 +9,7 @@ import torch.nn.functional as F
 from tensordict.tensordict import TensorDict
 
 # !TODO Investigate relative import issue
-from utils import make_deterministic, random_choice
+from .utils import make_deterministic, random_choice
 
 
 class OdorCondition(Enum):

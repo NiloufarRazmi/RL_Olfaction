@@ -10,10 +10,10 @@ import pandas as pd
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from exp_autoencoder import plotting as viz
-from exp_autoencoder import utils
-from exp_autoencoder.agent import EpsilonGreedy, auto_encoders
-from exp_autoencoder.environment import (
+from cartesian_polar.exp_autoencoder import plotting as viz
+from cartesian_polar.exp_autoencoder import utils
+from cartesian_polar.exp_autoencoder.agent import EpsilonGreedy, auto_encoders
+from cartesian_polar.exp_autoencoder.environment import (
     CONTEXTS_LABELS,
     Actions,
     Cues,

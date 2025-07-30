@@ -15,7 +15,7 @@ import seaborn as sns
 import torch
 
 # from utils import get_location_count
-from exp_autoencoder.environment import Actions, TriangleState
+from cartesian_polar.exp_autoencoder.environment import Actions, TriangleState
 
 # from curlyBrace import curlyBrace
 from imojify import imojify
