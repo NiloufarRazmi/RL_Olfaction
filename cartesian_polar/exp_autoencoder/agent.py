@@ -77,11 +77,11 @@ class DQN(nn.Module):
         self.mlp = nn.Sequential(
             nn.Linear(n_observations, n_units),
             # nn.Linear(n_units, n_units),
-            # nn.ReLU(),
+            # nn.LeakyReLU(),
             nn.Linear(n_units, n_units),
-            nn.ReLU(),
+            nn.LeakyReLU(),
             nn.Linear(n_units, n_units),
-            nn.ReLU(),
+            nn.LeakyReLU(),
             nn.Linear(n_units, n_actions),
         )
 
@@ -116,13 +116,13 @@ class Autoencoder(nn.Module):
         super().__init__()
         self.mlp = nn.Sequential(
             nn.Linear(n_observations, n_units),
-            nn.ReLU(),
+            nn.LeakyReLU(),
             nn.Linear(n_units, bottleneck),
-            nn.ReLU(),
+            nn.LeakyReLU(),
             nn.Linear(bottleneck, n_units),
-            nn.ReLU(),
+            nn.LeakyReLU(),
             # nn.Linear(n_units, n_units),
-            # nn.ReLU(),
+            # nn.LeakyReLU(),
             nn.Linear(n_units, n_actions),
         )
 
