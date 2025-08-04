@@ -622,6 +622,8 @@ pyrightconfig.json
 
 # Figures
 cartesian_polar/figures/
+cartesian_polar/exp_autoencoder/figures/
+cartesian_polar/exp_autoencoder/save/
 
 # Animation Frames, Sprites, Videos
 cartesian_polar/frames/
