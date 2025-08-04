@@ -25,6 +25,7 @@ module load texlive/20220321-pocclov
 
 # Run program
 . /users/apierre3/DRL-olfaction/.venv/bin/activate
+pip install -U pip
 pip install -Ue .
 # python ./TriangleTask/run_experiment.py
 runexp $PARAMSFILE
