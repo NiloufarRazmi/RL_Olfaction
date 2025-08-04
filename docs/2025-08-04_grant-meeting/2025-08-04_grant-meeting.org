@@ -381,7 +381,7 @@ Randomizing inputs
 :PROPERTIES:
 :BEAMER_act: [<+->]
 :END:
-- The *pre-odor activations* cluster together, but no other clear pattern seems to emerge
+- Hierarchical clustering \to the *pre-odor activations* cluster together, but no other clear pattern seems to emerge
 - Dimensionality reduction analysis \to the network seems to mainly encode the *position of the agent on the grid*
 - With this task setup, it seems *both types of coordinates information are required* to solve the task \to is this a negative result that invalidates our original hypothesis or is this due to overfitting?
   - From earlier experiments, we know the agent can perfectly solve the task without needing duplicated inputs$\text{\dots}$
@@ -389,10 +389,10 @@ Randomizing inputs
 :PROPERTIES:
 :BEAMER_act: [<+->]
 :END:
-- What happens in between tiles? Did the network learn to interpolate?
-- Add dropout during training to make the network more robust to perturbations and avoid overfitting?
-- Identify the potential functions of the neurons in the bottleneck layer? What type of information do they encode? Any sign of potential conjunctive cells?
-- End of this project \to still looking for well defined results/principes/rules for a potential MVP (Minimum Viable Publication)
+- What happens in between tiles? Did the network learn to *interpolate*?
+- Add *dropout* during training to make the network more robust to perturbations and avoid overfitting?
+- Identify the potential functions of the neurons in the bottleneck layer? What type of information do they encode? Any sign of potential *conjunctive cells*?
+- End of this project \to still looking for well defined results/principles/rules for a potential MVP (Minimum Viable Publication)
 
 ** \nbsp{}
 :PROPERTIES:
@@ -438,3 +438,11 @@ DQN(
 *** Instead of randomize, just add some noise
 *** Check sensitivity of the input
 **** Translate a little bit the input until it doesn't work anymore
+** How do these representations change across learning?
+** What representation do you learn under certain form of constrains?
+** Lines between PCA dots
+** Variations between agents?
+** PCA across training
+*** More direct representations?
+** SHAP feature importance
+*** Cartesian vs polar favored in some location on the grid?

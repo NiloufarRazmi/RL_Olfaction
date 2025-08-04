@@ -1,4 +1,4 @@
-% Created 2025-08-04 Mon 01:15
+% Created 2025-08-04 Mon 08:44
 % Intended LaTeX compiler: lualatex
 \documentclass[bigger]{beamer}
 \usepackage{amsmath}
@@ -60,8 +60,8 @@ fg=headercolor
 \end{frame}
 
 \section{Project recap}
-\label{sec:orgae57615}
-\begin{frame}[label={sec:org11e8010}]{The LEC is key to sensory associations and spatial memory}
+\label{sec:org3a38fe1}
+\begin{frame}[label={sec:orgba5a550}]{The LEC is key to sensory associations and spatial memory}
 \begin{columns}
 \begin{column}{0.45\columnwidth}
 \footnotesize
@@ -85,7 +85,7 @@ Lee et al., 2021
 \end{column}
 \end{columns}
 \end{frame}
-\begin{frame}[label={sec:org72bed81}]{Half triangle task for olfactory-spatial association learning}
+\begin{frame}[label={sec:org235903e}]{Half triangle task for olfactory-spatial association learning}
 \begin{columns}
 \begin{column}[c]{0.33\columnwidth}
 \begin{center}
@@ -106,7 +106,7 @@ Left/Right task
 \end{column}
 \end{columns}
 \end{frame}
-\begin{frame}[label={sec:orgcb37737}]{Deep Reinforcement Learning model}
+\begin{frame}[label={sec:orgb95da7f}]{Deep Reinforcement Learning model}
 \begin{columns}
 \begin{column}[c]{0.5\columnwidth}
 \begin{center}
@@ -125,7 +125,7 @@ Left/Right task
 \end{column}
 \end{columns}
 \end{frame}
-\begin{frame}[label={sec:orgdb679ef}]{The environment}
+\begin{frame}[label={sec:orgd6d9df5}]{The environment}
 \begin{center}
 \includegraphics[height=0.6\textheight]{medias/RL_env-cartesian-polar.drawio.png}
 \end{center}
@@ -140,7 +140,7 @@ Left/Right task
 \end{itemize}
 \end{itemize}
 \end{frame}
-\begin{frame}[label={sec:orga34c87a}]{Questions \& Hypothesis}
+\begin{frame}[label={sec:org8a02257}]{Questions \& Hypothesis}
 \metroset{block=fill}
 \begin{exampleblock}{Questions}
 \begin{itemize}
@@ -164,13 +164,13 @@ Left/Right task
 \end{exampleblock}
 \end{frame}
 \section{Modeling \& Simulation}
-\label{sec:orgbc9a86c}
-\begin{frame}[label={sec:org89a78da}]{State space \& network architecture}
+\label{sec:orgcb3bbdf}
+\begin{frame}[label={sec:org3b7f8e9}]{State space \& network architecture}
 \begin{center}
 \includegraphics[height=0.95\textheight]{medias/NN-architecture-MLP.drawio.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:orgc9c9fa1}]{Training}
+\begin{frame}[label={sec:org29e2ead}]{Training}
 East/West
 \begin{center}
 \includegraphics[height=0.35\textheight]{medias/EastWest/training.png}
@@ -180,7 +180,7 @@ Left/Right
 \includegraphics[height=0.35\textheight]{medias/LeftRight/training.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:orgffc63ac}]{Agent behavior}
+\begin{frame}[label={sec:orga689496}]{Agent behavior}
 \begin{columns}
 \begin{column}[t]{0.33\columnwidth}
 \begin{center}
@@ -206,18 +206,18 @@ Trained agent\\[1em]
 \end{columns}
 \end{frame}
 \section{Results}
-\label{sec:org9a2b5c4}
-\begin{frame}[label={sec:org8bb0ba1}]{Pre-odor activations cluster together -- East/West}
+\label{sec:orgcd9d909}
+\begin{frame}[label={sec:org813d123}]{Pre-odor activations cluster together -- East/West}
 \begin{center}
 \includegraphics[height=0.9\textheight]{medias/activations-learned-EastWest.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org95631fe}]{Pre-odor activations cluster together -- Left/Right}
+\begin{frame}[label={sec:org84ba671}]{Pre-odor activations cluster together -- Left/Right}
 \begin{center}
 \includegraphics[height=0.9\textheight]{medias/activations-learned-LeftRight.png}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org9a95a04}]{PCA on activations by layer on \(\{x, y\}\) coordinates -- Left/Right}
+\begin{frame}[label={sec:org81ce62d}]{PCA on activations by layer on \(\{x, y\}\) coordinates -- Left/Right}
 \begin{textblock}{15}(0.5, 3.5)%
 \includegraphics[height=0.7\textheight, keepaspectratio]{medias/PCA-layers-activations-coords-LeftRight.png}
 \vspace{-2em}
@@ -229,7 +229,7 @@ Trained agent\\[1em]
 \end{itemize}
 \end{textblock}
 \end{frame}
-\begin{frame}[label={sec:orgada7815}]{PCA on activations by layer on odor cue -- Left/Right}
+\begin{frame}[label={sec:orge0582c6}]{PCA on activations by layer on odor cue -- Left/Right}
 \begin{textblock}{15}(0.2, 3.5)%
 \includegraphics[height=0.68\textheight, keepaspectratio]{medias/PCA-layers-activations-cue-LeftRight.png}
 \vspace{-2em}
@@ -241,7 +241,7 @@ Trained agent\\[1em]
 \end{itemize}
 \end{textblock}
 \end{frame}
-\begin{frame}[label={sec:org522d681}]{Cartesian inputs unchanged -- polar inputs perturbed}
+\begin{frame}[label={sec:org2846752}]{Cartesian inputs unchanged -- polar inputs perturbed}
 \begin{columns}
 \begin{column}[c]{0.5\columnwidth}
 \begin{center}
@@ -281,7 +281,7 @@ Randomizing inputs
 \end{column}
 \end{columns}
 \end{frame}
-\begin{frame}[label={sec:org4507a69}]{Polar inputs unchanged -- Cartesian inputs perturbed}
+\begin{frame}[label={sec:org29a5971}]{Polar inputs unchanged -- Cartesian inputs perturbed}
 \begin{columns}
 \begin{column}[c]{0.5\columnwidth}
 \begin{center}
@@ -321,7 +321,7 @@ Randomizing inputs
 \end{column}
 \end{columns}
 \end{frame}
-\begin{frame}[label={sec:org8212a43}]{Bottleneck network \(\to\) performance degrades below \(\sim\!10\) neurons}
+\begin{frame}[label={sec:orgd11d452}]{Bottleneck network \(\to\) performance degrades below \(\sim\!10\) neurons}
 \begin{center}
 \includegraphics[height=0.4\textheight]{medias/NN-architecture-bottleneck.drawio.png}
 \end{center}
@@ -348,10 +348,10 @@ Randomizing inputs
 \end{columns}
 \end{frame}
 \section{Conclusion}
-\label{sec:org66bca22}
-\begin{frame}[<+->][label={sec:org55e3f32}]{Partial conclusions so far}
+\label{sec:org8b81dae}
+\begin{frame}[<+->][label={sec:org3fa0f1c}]{Partial conclusions so far}
 \begin{itemize}
-\item The \alert{pre-odor activations} cluster together, but no other clear pattern seems to emerge
+\item Hierarchical clustering \(\to\) the \alert{pre-odor activations} cluster together, but no other clear pattern seems to emerge
 \item Dimensionality reduction analysis \(\to\) the network seems to mainly encode the \alert{position of the agent on the grid}
 \item With this task setup, it seems \alert{both types of coordinates information are required} to solve the task \(\to\) is this a negative result that invalidates our original hypothesis or is this due to overfitting?
 \begin{itemize}
@@ -359,15 +359,15 @@ Randomizing inputs
 \end{itemize}
 \end{itemize}
 \end{frame}
-\begin{frame}[<+->][label={sec:org964d3f9}]{Next steps}
+\begin{frame}[<+->][label={sec:orgeea9413}]{Next steps}
 \begin{itemize}
-\item What happens in between tiles? Did the network learn to interpolate?
-\item Add dropout during training to make the network more robust to perturbations and avoid overfitting?
-\item Identify the potential functions of the neurons in the bottleneck layer? What type of information do they encode? Any sign of potential conjunctive cells?
-\item End of this project \(\to\) still looking for well defined results/principes/rules for a potential MVP (Minimum Viable Publication)
+\item What happens in between tiles? Did the network learn to \alert{interpolate}?
+\item Add \alert{dropout} during training to make the network more robust to perturbations and avoid overfitting?
+\item Identify the potential functions of the neurons in the bottleneck layer? What type of information do they encode? Any sign of potential \alert{conjunctive cells}?
+\item End of this project \(\to\) still looking for well defined results/principles/rules for a potential MVP (Minimum Viable Publication)
 \end{itemize}
 \end{frame}
-\begin{frame}[label={sec:orgd42eafa},standout]{~}
+\begin{frame}[label={sec:org73781a3},standout]{~}
 Questions ?
 \end{frame}
 \appendix
