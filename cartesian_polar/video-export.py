@@ -4,12 +4,12 @@ import os
 # Set the path to your frames
 frames_folder = './frames'
 output_video = 'output_video.mp4'
-fps = 3  # Change as needed
+fps = 3  # Change as needed; match FPS in learning-animation.py
 
-# Get a sorted list of all frame filenames
+# Get a list of all frames
 frame_files = [f for f in os.listdir(frames_folder) if f.endswith(('.png', '.jpg'))]
 
-# Sort based on numbers in filename (assumes format like 'frame_001.png')
+# Sort frames based on numbers in filename (assumes format like 'frame_001.png')
 frame_files = sorted(frame_files, key=lambda x: int(''.join(filter(str.isdigit, x))))
 print(frame_files)
 

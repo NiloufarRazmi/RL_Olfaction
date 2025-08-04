@@ -8,7 +8,7 @@ import torch
 import torch.nn.functional as F
 from tensordict.tensordict import TensorDict
 
-from .utils import make_deterministic, random_choice
+from cartesian_polar.exp_autoencoder.utils import make_deterministic, random_choice
 
 
 class OdorCondition(Enum):
