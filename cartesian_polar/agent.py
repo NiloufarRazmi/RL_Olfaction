@@ -109,13 +109,13 @@ class DQN(nn.Module):
         """
         self.mlp = nn.Sequential(
             nn.Linear(n_observations, n_units),
-            # We have no ReLU activation here, becuase that would disregard negative inputs
+            nn.LeakyReLU(),
+            # nn.Linear(n_units, n_units),
+            # nn.LeakyReLU(),
             nn.Linear(n_units, n_units),
-            nn.ReLU(),
+            nn.LeakyReLU(),
             nn.Linear(n_units, n_units),
-            nn.ReLU(),
-            nn.Linear(n_units, n_units),
-            nn.ReLU(),
+            nn.LeakyReLU(),
             nn.Linear(n_units, n_actions),
         )
 

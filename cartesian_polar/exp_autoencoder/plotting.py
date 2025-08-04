@@ -1260,7 +1260,7 @@ def plot_steps_trained_boxplot(df, figpath=None, logger=None):
     # Draw a nested boxplot to show bills by day and time
     sns.violinplot(
         x="Bottleneck",
-        y="Steps",
+        y="Last 50 steps",
         data=df_select,
         bw_adjust=0.5,
         cut=1,
