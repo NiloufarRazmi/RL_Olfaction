@@ -111,6 +111,12 @@ for episode in run_states[300:350]: # Modify for episodes of interest
 
 print(f"NUM EPISODES: {len(episode_states)}")
 
+with open("topk_dict.pkl", "rb") as f:
+    topk_dict = pickle.load(f)
+
+# automate from topk_metadata in max-activation
+episode_states = [topk_dict]
+
 """
 Begin setting up PyGame animation : prelim variables and functions
 """
@@ -223,9 +229,10 @@ upper_triangle = False
 num_frame = 0
 for episode in episode_states:
     # Render the text (text, antialias, color)
-    episode_text_surface = font.render(f"Episode {i}", True, (255, 0, 0))
+    #episode_text_surface = font.render(f"Episode {i}", True, (255, 0, 0))
     for state in episode:
         print(state)
+        # TODO: make this code more efficient by just referring to state itself
         if (state['odor'] == 'No Odor'):
             no_odor = True
             odor_label = 'None'
@@ -267,7 +274,7 @@ for episode in episode_states:
         draw_agent(state)
 
         # Draw the text at position 
-        screen.blit(episode_text_surface, (305, 0))
+        #screen.blit(episode_text_surface, (305, 0))
         screen.blit(odor_text_surface, (330, 0))
 
         # Saving frame; use video-export.py to convert frames to full video
