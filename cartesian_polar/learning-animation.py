@@ -100,7 +100,7 @@ for episode in run_states[300:350]: # Modify for episodes of interest
         all_agent_orig_state.append(agent_orig_state)
         i += 1
 
-    states = [{"cue": s[3], "x": s[0].item(), "y": s[1].item(), "heading": s[2].item(), "UpperTriangle": check_upper_triangle} for s in all_agent_orig_state]
+    states = [{"odor": s[3], "x": s[0].item(), "y": s[1].item(), "heading": s[2].item(), "UpperTriangle": check_upper_triangle} for s in all_agent_orig_state]
 
     for state in states:
         deg = state["heading"]
@@ -223,15 +223,14 @@ odor_A = False
 upper_triangle = False
 num_frame = 0
 for episode in episode_states:
-    j = 0
     # Render the text (text, antialias, color)
     episode_text_surface = font.render(f"Episode {i}", True, (255, 0, 0))
     for state in episode:
         print(state)
-        if (all_states[agent][i][j][0].item() == 1.0):
+        if (state['odor'] == 'No Odor'):
             no_odor = True
             odor_label = 'None'
-        elif (all_states[agent][i][j][1].item() == 1.0):
+        elif (state['odor'] == 'Odor A'):
             no_odor = False
             odor_A = True
             odor_label = 'A'
@@ -261,6 +260,10 @@ for episode in episode_states:
                 screen.blit(reward_image, (425, 425)) # EAST
             else:
                 screen.blit(reward_image, (25, 25)) # WEST
+        elif odor_A == True:
+            screen.blit(reward_image, (25, 25)) # WEST
+        else:
+            screen.blit(reward_image, (425, 425)) # EAST
 
         draw_agent(state)
 
@@ -290,7 +293,6 @@ for episode in episode_states:
         #         elif event.type == pygame.KEYDOWN:
         #             if event.key == pygame.K_SPACE:
         #                 waiting_for_space = False
-        j += 1
         num_frame += 1
     i += 1
 
