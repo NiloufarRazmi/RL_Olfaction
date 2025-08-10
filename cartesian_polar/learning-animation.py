@@ -227,10 +227,10 @@ for episode in episode_states:
     episode_text_surface = font.render(f"Episode {i}", True, (255, 0, 0))
     for state in episode:
         print(state)
-        if (state['odor'] == 'No Odor'):
+        if (state['odor'] == 0):
             no_odor = True
             odor_label = 'None'
-        elif (state['odor'] == 'Odor A'):
+        elif (state['odor'] == 1):
             no_odor = False
             odor_A = True
             odor_label = 'A'
