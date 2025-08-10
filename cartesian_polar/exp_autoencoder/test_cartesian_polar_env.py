@@ -6,8 +6,6 @@ import numpy as np
 import pytest
 import torch
 import torch.nn.functional as F
-from tensordict.tensordict import TensorDict
-
 from exp_autoencoder.agent import EpsilonGreedy
 from exp_autoencoder.environment import (
     Actions,
@@ -19,6 +17,7 @@ from exp_autoencoder.environment import (
     TriangleState,
 )
 from exp_autoencoder.utils import random_choice
+from tensordict.tensordict import TensorDict
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 

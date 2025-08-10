@@ -1,11 +1,17 @@
-import torch
-from pathlib import Path
+"""
+Code for creating the frames of the learning animation.
+
+See video-export.py to export frames to full video.
+"""
+
 import math
-import pygame
+import os
 import sys
 import time
-import os
-from moviepy import *
+from pathlib import Path
+
+import pygame
+import torch
 
 """
 Prelims : setting up data paths
@@ -24,62 +30,73 @@ left_right = True
 # Set up output directory
 os.makedirs("frames", exist_ok=True)
 
-"""
-Function for converting Cartesian North coords to Origin coords
-"""
+
 def conv_north_cartesian2orig(coords_orig):
-        new_x = -coords_orig[0] + 2
-        new_y = -coords_orig[1] + 2
+    """Convert Cartesian North coords to Origin coords."""
+    new_x = -coords_orig[0] + 2
+    new_y = -coords_orig[1] + 2
 
-        # cos and sin are switch beacuse `direction_orig` is taken from the north port
-        sin_dir = -coords_orig[2]
-        cos_dir = -coords_orig[3]
-        new_direction = torch.atan2(input=sin_dir, other=cos_dir) * 180 / math.pi
-        new_direction = new_direction % 360
-        return [new_x, new_y, new_direction]
+    # cos and sin are switch beacuse `direction_orig` is taken from the north port
+    sin_dir = -coords_orig[2]
+    cos_dir = -coords_orig[3]
+    new_direction = torch.atan2(input=sin_dir, other=cos_dir) * 180 / math.pi
+    new_direction = new_direction % 360
+    return [new_x, new_y, new_direction]
 
-"""
-Function for converting angle degree to cardinal direction
-"""
+
 def degrees_to_cardinal(degree):
+    """Convert angle degree to cardinal direction."""
     # Normalize the degree to [0, 360)
     degree = degree % 360
 
     # Define the mapping
-    directions = {
-        0: 'N',
-        90: 'E',
-        180: 'S',
-        270: 'W'
-    }
+    directions = {0: "N", 90: "E", 180: "S", 270: "W"}
 
     # Find the closest cardinal angle
     closest = min(directions.keys(), key=lambda x: abs(x - degree))
     return directions[closest]
 
+
 # Specifies the "strict" upper triangle in the arena (diagonal not included)
-upper_triangle_coords = [(-1,2), (0,2), (1,2), (2,2), (0,1), (1,1), (2,1), (1,0), (2,0), (2,-1)]
-
+upper_triangle_coords = [
+    (-1, 2),
+    (0, 2),
+    (1, 2),
+    (2, 2),
+    (0, 1),
+    (1, 1),
+    (2, 1),
+    (1, 0),
+    (2, 0),
+    (2, -1),
+]
 
 
 """
-This loop builds a "clean" state list of the agent, converting relevant info from the original Tensors.
-You can choose the relevant episodes you are interested in by modifying the iteration through run_states.
+This loop builds a "clean" state list of the agent, 
+converting relevant info from the original Tensors.
+
+You can choose the relevant episodes you are interested 
+in by modifying the iteration through run_states.
 """
-all_states = data_dict['all_states']
+all_states = data_dict["all_states"]
 episode_states = []
-agent = 0 
+agent = 0
 run_states = all_states[agent]
-for episode in run_states[300:350]: # Modify for episodes of interest
+for episode in run_states[300:350]:  # Modify for episodes of interest
     check_upper_triangle = False
-    i = 0
     all_agent_orig_state = []
     for step in episode:
         odor_indicator = 0
         check_odor_A = False
         check_no_odor = True
         agent_full_state = step
-        agent_north_cart = [agent_full_state[3], agent_full_state[4], agent_full_state[5], agent_full_state[6]]
+        agent_north_cart = [
+            agent_full_state[3],
+            agent_full_state[4],
+            agent_full_state[5],
+            agent_full_state[6],
+        ]
         agent_orig_state = conv_north_cartesian2orig(coords_orig=agent_north_cart)
         agent_coords = (agent_orig_state[0], agent_orig_state[1])
         if agent_coords in upper_triangle_coords:
@@ -98,9 +115,17 @@ for episode in run_states[300:350]: # Modify for episodes of interest
 
         agent_orig_state.append(odor_indicator)
         all_agent_orig_state.append(agent_orig_state)
-        i += 1
 
-    states = [{"odor": s[3], "x": s[0].item(), "y": s[1].item(), "heading": s[2].item(), "UpperTriangle": check_upper_triangle} for s in all_agent_orig_state]
+    states = [
+        {
+            "odor": s[3],
+            "x": s[0].item(),
+            "y": s[1].item(),
+            "heading": s[2].item(),
+            "UpperTriangle": check_upper_triangle,
+        }
+        for s in all_agent_orig_state
+    ]
 
     for state in states:
         deg = state["heading"]
@@ -109,7 +134,6 @@ for episode in run_states[300:350]: # Modify for episodes of interest
     episode_states.append(states)
 
 print(f"NUM EPISODES: {len(episode_states)}")
-
 
 
 """
@@ -126,12 +150,7 @@ RED = (255, 0, 0)
 BLACK = (0, 0, 0)
 
 # Map headings to direction arrows
-arrow_map = {
-    "N": (0, 1),
-    "S": (0, -1),
-    "E": (1, 0),
-    "W": (-1, 0)
-}
+arrow_map = {"N": (0, 1), "S": (0, -1), "E": (1, 0), "W": (-1, 0)}
 
 # Initialize pygame
 pygame.init()
@@ -143,30 +162,32 @@ clock = pygame.time.Clock()
 font = pygame.font.SysFont(None, 48)  # None means default font
 
 # Loading Sprites
-tile_image = pygame.image.load('sprites/tile100.png').convert()
+tile_image = pygame.image.load("sprites/tile100.png").convert()
 tile_image = pygame.transform.scale(tile_image, (CELL_SIZE, CELL_SIZE))
 
-odor_image = pygame.image.load('sprites/odor.png').convert_alpha()
-odor_image = pygame.transform.scale(odor_image, (55,55))
+odor_image = pygame.image.load("sprites/odor.png").convert_alpha()
+odor_image = pygame.transform.scale(odor_image, (55, 55))
 
-reward_image = pygame.image.load('sprites/water_drop.png').convert_alpha()
-reward_image = pygame.transform.scale(reward_image, (55,55))
+reward_image = pygame.image.load("sprites/water_drop.png").convert_alpha()
+reward_image = pygame.transform.scale(reward_image, (55, 55))
 
 mouse_sprites = {
-    'N': pygame.image.load('sprites/mouse_up.png').convert_alpha(),
-    'S': pygame.image.load('sprites/mouse_down.png').convert_alpha(),
-    'W': pygame.image.load('sprites/mouse_left.png').convert_alpha(),
-    'E': pygame.image.load('sprites/mouse_right.png').convert_alpha()
+    "N": pygame.image.load("sprites/mouse_up.png").convert_alpha(),
+    "S": pygame.image.load("sprites/mouse_down.png").convert_alpha(),
+    "W": pygame.image.load("sprites/mouse_left.png").convert_alpha(),
+    "E": pygame.image.load("sprites/mouse_right.png").convert_alpha(),
 }
 
-# Function used for centering agent in square
+
 def grid_to_screen(x, y):
+    """Center agent in square."""
     screen_x = WINDOW_SIZE // 2 + x * CELL_SIZE
     screen_y = WINDOW_SIZE // 2 - y * CELL_SIZE  # invert y so +y is up
     return (screen_x, screen_y)
 
-# Draw grid lines
+
 def draw_grid(upper_triangle=True):
+    """Draw grid lines, as well as upper/lower triangle division."""
     for row in range(GRID_SIZE):
         for col in range(GRID_SIZE):
             screen_x = col * CELL_SIZE
@@ -202,10 +223,11 @@ def draw_grid(upper_triangle=True):
             end_v = (i * CELL_SIZE, i * CELL_SIZE)
             pygame.draw.line(screen, BLACK, start_v, end_v, 3)
 
-# Function for drawing agent based off current state
+
 def draw_agent(state):
+    """Draw agent based off current state."""
     x, y = state["x"], state["y"]
-    heading = state['heading']
+    heading = state["heading"]
     sprite = mouse_sprites[heading]
     center = grid_to_screen(x, y)
 
@@ -213,11 +235,10 @@ def draw_agent(state):
     screen.blit(sprite, rect)
 
 
-
 """
 Main loop to animate states
 """
-i = 300 # This index is used to label the episodes; make sure matches with episodes you selected
+i = 300  # for labeling episodes
 no_odor = True
 odor_A = False
 upper_triangle = False
@@ -227,17 +248,17 @@ for episode in episode_states:
     episode_text_surface = font.render(f"Episode {i}", True, (255, 0, 0))
     for state in episode:
         print(state)
-        if (state['odor'] == 0):
+        if state["odor"] == 0:
             no_odor = True
-            odor_label = 'None'
-        elif (state['odor'] == 1):
+            odor_label = "None"
+        elif state["odor"] == 1:
             no_odor = False
             odor_A = True
-            odor_label = 'A'
+            odor_label = "A"
         else:
             no_odor = False
             odor_A = False
-            odor_label = 'B'
+            odor_label = "B"
 
         odor_text_surface = font.render(f"Odor {odor_label}", True, (0, 0, 255))
         upper_triangle = state["UpperTriangle"]
@@ -245,29 +266,29 @@ for episode in episode_states:
         screen.fill((30, 30, 30))
         draw_grid(upper_triangle=upper_triangle)
 
-        if no_odor == True:
-            if upper_triangle == False:
-                screen.blit(odor_image, (25, 425))
-            else: 
+        if no_odor:
+            if upper_triangle:
                 screen.blit(odor_image, (425, 25))
-        elif odor_A == True and left_right == True:
-            if upper_triangle == True:
-                screen.blit(reward_image, (25, 25)) # WEST
             else:
-                screen.blit(reward_image, (425, 425)) # EAST
-        elif odor_A == False and left_right == True:
-            if upper_triangle == True:
-                screen.blit(reward_image, (425, 425)) # EAST
+                screen.blit(odor_image, (25, 425))
+        elif odor_A and left_right:
+            if upper_triangle:
+                screen.blit(reward_image, (25, 25))  # WEST
             else:
-                screen.blit(reward_image, (25, 25)) # WEST
-        elif odor_A == True:
-            screen.blit(reward_image, (25, 25)) # WEST
+                screen.blit(reward_image, (425, 425))  # EAST
+        elif not odor_A and left_right:
+            if upper_triangle:
+                screen.blit(reward_image, (425, 425))  # EAST
+            else:
+                screen.blit(reward_image, (25, 25))  # WEST
+        elif odor_A:
+            screen.blit(reward_image, (25, 25))  # WEST
         else:
-            screen.blit(reward_image, (425, 425)) # EAST
+            screen.blit(reward_image, (425, 425))  # EAST
 
         draw_agent(state)
 
-        # Draw the text at position 
+        # Draw the text at position
         screen.blit(episode_text_surface, (305, 0))
         screen.blit(odor_text_surface, (0, 0))
 
@@ -275,14 +296,15 @@ for episode in episode_states:
         pygame.image.save(screen, f"frames/frame_{num_frame:04d}.png")
 
         pygame.display.flip()
-        clock.tick(FPS) # FPS determines speed of animation
+        clock.tick(FPS)  # FPS determines speed of animation
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
 
-        # Uncomment the below code if you want to switch animation to pressing spacebar to proceed
+        # Uncomment the below code if you want to
+        # switch animation to pressing spacebar to proceed
 
         # waiting_for_space = True
         # while waiting_for_space:
