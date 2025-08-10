@@ -6,6 +6,7 @@ import sys
 import time
 import os
 from moviepy import *
+import pickle
 
 """
 Prelims : setting up data paths
@@ -19,7 +20,7 @@ data_path = data_dir / "data.tar"
 assert data_path.exists(), "data path does not exist"
 data_dict = torch.load(data_path, weights_only=False, map_location=DEVICE)
 
-left_right = True
+left_right = False
 
 # Set up output directory
 os.makedirs("frames", exist_ok=True)
@@ -110,7 +111,11 @@ for episode in run_states[300:350]: # Modify for episodes of interest
 
 print(f"NUM EPISODES: {len(episode_states)}")
 
+with open("topk_dict.pkl", "rb") as f:
+    topk_dict = pickle.load(f)
 
+# automate from topk_metadata in max-activation
+episode_states = [topk_dict]
 
 """
 Begin setting up PyGame animation : prelim variables and functions
@@ -223,15 +228,15 @@ odor_A = False
 upper_triangle = False
 num_frame = 0
 for episode in episode_states:
-    j = 0
     # Render the text (text, antialias, color)
-    episode_text_surface = font.render(f"Episode {i}", True, (255, 0, 0))
+    #episode_text_surface = font.render(f"Episode {i}", True, (255, 0, 0))
     for state in episode:
         print(state)
-        if (all_states[agent][i][j][0].item() == 1.0):
+        # TODO: make this code more efficient by just referring to state itself
+        if (state['odor'] == 'No Odor'):
             no_odor = True
             odor_label = 'None'
-        elif (all_states[agent][i][j][1].item() == 1.0):
+        elif (state['odor'] == 'Odor A'):
             no_odor = False
             odor_A = True
             odor_label = 'A'
@@ -243,7 +248,7 @@ for episode in episode_states:
         odor_text_surface = font.render(f"Odor {odor_label}", True, (0, 0, 255))
         upper_triangle = state["UpperTriangle"]
 
-        screen.fill((30, 30, 30))
+        # screen.fill((30, 30, 30))
         draw_grid(upper_triangle=upper_triangle)
 
         if no_odor == True:
@@ -261,12 +266,16 @@ for episode in episode_states:
                 screen.blit(reward_image, (425, 425)) # EAST
             else:
                 screen.blit(reward_image, (25, 25)) # WEST
+        elif odor_A == True:
+            screen.blit(reward_image, (25, 25)) # WEST
+        else:
+            screen.blit(reward_image, (425, 425)) # EAST
 
         draw_agent(state)
 
         # Draw the text at position 
-        screen.blit(episode_text_surface, (305, 0))
-        screen.blit(odor_text_surface, (0, 0))
+        #screen.blit(episode_text_surface, (305, 0))
+        screen.blit(odor_text_surface, (330, 0))
 
         # Saving frame; use video-export.py to convert frames to full video
         pygame.image.save(screen, f"frames/frame_{num_frame:04d}.png")
@@ -274,23 +283,22 @@ for episode in episode_states:
         pygame.display.flip()
         clock.tick(FPS) # FPS determines speed of animation
 
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
+        # for event in pygame.event.get():
+        #     if event.type == pygame.QUIT:
+        #         pygame.quit()
+        #         sys.exit()
 
         # Uncomment the below code if you want to switch animation to pressing spacebar to proceed
 
-        # waiting_for_space = True
-        # while waiting_for_space:
-        #     for event in pygame.event.get():
-        #         if event.type == pygame.QUIT:
-        #             pygame.quit()
-        #             sys.exit()
-        #         elif event.type == pygame.KEYDOWN:
-        #             if event.key == pygame.K_SPACE:
-        #                 waiting_for_space = False
-        j += 1
+        waiting_for_space = True
+        while waiting_for_space:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        waiting_for_space = False
         num_frame += 1
     i += 1
 

@@ -116,11 +116,14 @@ class Autoencoder(nn.Module):
         super().__init__()
         self.mlp = nn.Sequential(
             nn.Linear(n_observations, n_units),
-            nn.LeakyReLU(),
+            #nn.LeakyReLU(),
+            nn.ReLU(),
             nn.Linear(n_units, bottleneck),
-            nn.LeakyReLU(),
+            #nn.LeakyReLU(),
+            nn.ReLU(),
             nn.Linear(bottleneck, n_units),
-            nn.LeakyReLU(),
+            #nn.LeakyReLU(),
+            nn.ReLU(),
             # nn.Linear(n_units, n_units),
             # nn.LeakyReLU(),
             nn.Linear(n_units, n_actions),
