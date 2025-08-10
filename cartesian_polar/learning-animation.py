@@ -20,7 +20,7 @@ data_path = data_dir / "data.tar"
 assert data_path.exists(), "data path does not exist"
 data_dict = torch.load(data_path, weights_only=False, map_location=DEVICE)
 
-left_right = False
+left_right = True
 
 # Set up output directory
 os.makedirs("frames", exist_ok=True)
@@ -101,7 +101,7 @@ for episode in run_states[300:350]: # Modify for episodes of interest
         all_agent_orig_state.append(agent_orig_state)
         i += 1
 
-    states = [{"cue": s[3], "x": s[0].item(), "y": s[1].item(), "heading": s[2].item(), "UpperTriangle": check_upper_triangle} for s in all_agent_orig_state]
+    states = [{"odor": s[3], "x": s[0].item(), "y": s[1].item(), "heading": s[2].item(), "UpperTriangle": check_upper_triangle} for s in all_agent_orig_state]
 
     for state in states:
         deg = state["heading"]
@@ -226,10 +226,10 @@ for episode in episode_states:
     episode_text_surface = font.render(f"Episode {i}", True, (255, 0, 0))
     for state in episode:
         print(state)
-        if (state['odor'] == 'No Odor'):
+        if (state['odor'] == 0):
             no_odor = True
             odor_label = 'None'
-        elif (state['odor'] == 'Odor A'):
+        elif (state['odor'] == 1):
             no_odor = False
             odor_A = True
             odor_label = 'A'
@@ -268,7 +268,7 @@ for episode in episode_states:
 
         # Draw the text at position 
         screen.blit(episode_text_surface, (305, 0))
-        screen.blit(odor_text_surface, (330, 0))
+        screen.blit(odor_text_surface, (0, 0))
 
         # Saving frame; use video-export.py to convert frames to full video
         pygame.image.save(screen, f"frames/frame_{num_frame:04d}.png")
@@ -276,22 +276,22 @@ for episode in episode_states:
         pygame.display.flip()
         clock.tick(FPS) # FPS determines speed of animation
 
-        # for event in pygame.event.get():
-        #     if event.type == pygame.QUIT:
-        #         pygame.quit()
-        #         sys.exit()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
 
         # Uncomment the below code if you want to switch animation to pressing spacebar to proceed
 
-        waiting_for_space = True
-        while waiting_for_space:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
-                elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_SPACE:
-                        waiting_for_space = False
+        # waiting_for_space = True
+        # while waiting_for_space:
+        #     for event in pygame.event.get():
+        #         if event.type == pygame.QUIT:
+        #             pygame.quit()
+        #             sys.exit()
+        #         elif event.type == pygame.KEYDOWN:
+        #             if event.key == pygame.K_SPACE:
+        #                 waiting_for_space = False
         num_frame += 1
     i += 1
 
