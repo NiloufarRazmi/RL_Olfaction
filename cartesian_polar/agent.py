@@ -77,12 +77,15 @@ class DQN(nn.Module):
         self.mlp = nn.Sequential(
             nn.Linear(n_observations, n_units),
             nn.LeakyReLU(),
+            nn.Dropout(p=0.2),
             # nn.Linear(n_units, n_units),
             # nn.LeakyReLU(),
             nn.Linear(n_units, n_units),
             nn.LeakyReLU(),
+            nn.Dropout(p=0.2),
             nn.Linear(n_units, n_units),
             nn.LeakyReLU(),
+            nn.Dropout(p=0.2),
             nn.Linear(n_units, n_actions),
         )
 
