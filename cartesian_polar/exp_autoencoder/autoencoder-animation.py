@@ -12,18 +12,18 @@ import pickle
 Prelims : setting up data paths
 """
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-save_path = Path("save")
-assert save_path.exists(), "save folder does not exist"
-data_dir = save_path / "7-21-LR"
-assert data_dir.exists(), "data directory does not exist"
-data_path = data_dir / "data.tar"
-assert data_path.exists(), "data path does not exist"
-data_dict = torch.load(data_path, weights_only=False, map_location=DEVICE)
+# save_path = Path("save")
+# assert save_path.exists(), "save folder does not exist"
+# data_dir = save_path / "7-21-LR"
+# assert data_dir.exists(), "data directory does not exist"
+# data_path = data_dir / "data.tar"
+# assert data_path.exists(), "data path does not exist"
+# data_dict = torch.load(data_path, weights_only=False, map_location=DEVICE)
 
-left_right = False
+left_right = True
 
 # Set up output directory
-os.makedirs("frames", exist_ok=True)
+#os.makedirs("frames", exist_ok=True)
 
 """
 Function for converting Cartesian North coords to Origin coords
@@ -63,53 +63,53 @@ upper_triangle_coords = [(-1,2), (0,2), (1,2), (2,2), (0,1), (1,1), (2,1), (1,0)
 
 
 
-"""
-This loop builds a "clean" state list of the agent, converting relevant info from the original Tensors.
-You can choose the relevant episodes you are interested in by modifying the iteration through run_states.
-"""
-all_states = data_dict['all_states']
-episode_states = []
-agent = 0 
-run_states = all_states[agent]
-for episode in run_states[300:350]: # Modify for episodes of interest
-    check_upper_triangle = False
-    i = 0
-    all_agent_orig_state = []
-    for step in episode:
-        odor_indicator = 0
-        check_odor_A = False
-        check_no_odor = True
-        agent_full_state = step
-        agent_north_cart = [agent_full_state[3], agent_full_state[4], agent_full_state[5], agent_full_state[6]]
-        agent_orig_state = conv_north_cartesian2orig(coords_orig=agent_north_cart)
-        agent_coords = (agent_orig_state[0], agent_orig_state[1])
-        if agent_coords in upper_triangle_coords:
-            check_upper_triangle = True
-        if agent_full_state[0].item() == 1:
-            check_no_odor = True
-            odor_indicator = 0
-        elif agent_full_state[1].item() == 1:
-            check_odor_A = True
-            check_no_odor = False
-            odor_indicator = 1
-        else:
-            check_odor_A = False
-            check_no_odor = False
-            odor_indicator = 2
+# """
+# This loop builds a "clean" state list of the agent, converting relevant info from the original Tensors.
+# You can choose the relevant episodes you are interested in by modifying the iteration through run_states.
+# """
+# all_states = data_dict['all_states']
+# episode_states = []
+# agent = 0 
+# run_states = all_states[agent]
+# for episode in run_states[300:350]: # Modify for episodes of interest
+#     check_upper_triangle = False
+#     i = 0
+#     all_agent_orig_state = []
+#     for step in episode:
+#         odor_indicator = 0
+#         check_odor_A = False
+#         check_no_odor = True
+#         agent_full_state = step
+#         agent_north_cart = [agent_full_state[3], agent_full_state[4], agent_full_state[5], agent_full_state[6]]
+#         agent_orig_state = conv_north_cartesian2orig(coords_orig=agent_north_cart)
+#         agent_coords = (agent_orig_state[0], agent_orig_state[1])
+#         if agent_coords in upper_triangle_coords:
+#             check_upper_triangle = True
+#         if agent_full_state[0].item() == 1:
+#             check_no_odor = True
+#             odor_indicator = 0
+#         elif agent_full_state[1].item() == 1:
+#             check_odor_A = True
+#             check_no_odor = False
+#             odor_indicator = 1
+#         else:
+#             check_odor_A = False
+#             check_no_odor = False
+#             odor_indicator = 2
 
-        agent_orig_state.append(odor_indicator)
-        all_agent_orig_state.append(agent_orig_state)
-        i += 1
+#         agent_orig_state.append(odor_indicator)
+#         all_agent_orig_state.append(agent_orig_state)
+#         i += 1
 
-    states = [{"cue": s[3], "x": s[0].item(), "y": s[1].item(), "heading": s[2].item(), "UpperTriangle": check_upper_triangle} for s in all_agent_orig_state]
+#     states = [{"cue": s[3], "x": s[0].item(), "y": s[1].item(), "heading": s[2].item(), "UpperTriangle": check_upper_triangle} for s in all_agent_orig_state]
 
-    for state in states:
-        deg = state["heading"]
-        state["heading"] = degrees_to_cardinal(deg)
+#     for state in states:
+#         deg = state["heading"]
+#         state["heading"] = degrees_to_cardinal(deg)
 
-    episode_states.append(states)
+#     episode_states.append(states)
 
-print(f"NUM EPISODES: {len(episode_states)}")
+# print(f"NUM EPISODES: {len(episode_states)}")
 
 with open("topk_dict.pkl", "rb") as f:
     topk_dict = pickle.load(f)
@@ -148,20 +148,20 @@ clock = pygame.time.Clock()
 font = pygame.font.SysFont(None, 48)  # None means default font
 
 # Loading Sprites
-tile_image = pygame.image.load('sprites/tile100.png').convert()
+tile_image = pygame.image.load('../sprites/tile100.png').convert()
 tile_image = pygame.transform.scale(tile_image, (CELL_SIZE, CELL_SIZE))
 
-odor_image = pygame.image.load('sprites/odor.png').convert_alpha()
+odor_image = pygame.image.load('../sprites/odor.png').convert_alpha()
 odor_image = pygame.transform.scale(odor_image, (55,55))
 
-reward_image = pygame.image.load('sprites/water_drop.png').convert_alpha()
+reward_image = pygame.image.load('../sprites/water_drop.png').convert_alpha()
 reward_image = pygame.transform.scale(reward_image, (55,55))
 
 mouse_sprites = {
-    'N': pygame.image.load('sprites/mouse_up.png').convert_alpha(),
-    'S': pygame.image.load('sprites/mouse_down.png').convert_alpha(),
-    'W': pygame.image.load('sprites/mouse_left.png').convert_alpha(),
-    'E': pygame.image.load('sprites/mouse_right.png').convert_alpha()
+    'N': pygame.image.load('../sprites/mouse_up.png').convert_alpha(),
+    'S': pygame.image.load('../sprites/mouse_down.png').convert_alpha(),
+    'W': pygame.image.load('../sprites/mouse_left.png').convert_alpha(),
+    'E': pygame.image.load('../sprites/mouse_right.png').convert_alpha()
 }
 
 # Function used for centering agent in square
@@ -278,7 +278,7 @@ for episode in episode_states:
         screen.blit(odor_text_surface, (330, 0))
 
         # Saving frame; use video-export.py to convert frames to full video
-        pygame.image.save(screen, f"frames/frame_{num_frame:04d}.png")
+        #pygame.image.save(screen, f"frames/frame_{num_frame:04d}.png")
 
         pygame.display.flip()
         clock.tick(FPS) # FPS determines speed of animation
