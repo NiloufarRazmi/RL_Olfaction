@@ -20,10 +20,10 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # assert data_path.exists(), "data path does not exist"
 # data_dict = torch.load(data_path, weights_only=False, map_location=DEVICE)
 
-left_right = True
+left_right = False
 
 # Set up output directory
-#os.makedirs("frames", exist_ok=True)
+os.makedirs("frames", exist_ok=True)
 
 """
 Function for converting Cartesian North coords to Origin coords
@@ -111,7 +111,7 @@ upper_triangle_coords = [(-1,2), (0,2), (1,2), (2,2), (0,1), (1,1), (2,1), (1,0)
 
 # print(f"NUM EPISODES: {len(episode_states)}")
 
-with open("topk_dict.pkl", "rb") as f:
+with open("grid_path.pkl", "rb") as f:
     topk_dict = pickle.load(f)
 
 # automate from topk_metadata in max-activation
@@ -210,7 +210,8 @@ def draw_grid(upper_triangle=True):
 # Function for drawing agent based off current state
 def draw_agent(state):
     x, y = state["x"], state["y"]
-    heading = state['heading']
+    heading = state['direction']
+    heading = degrees_to_cardinal(heading)
     sprite = mouse_sprites[heading]
     center = grid_to_screen(x, y)
 
@@ -233,10 +234,10 @@ for episode in episode_states:
     for state in episode:
         print(state)
         # TODO: make this code more efficient by just referring to state itself
-        if (state['odor'] == 'No Odor'):
+        if (state['cue'] == torch.tensor(0)):
             no_odor = True
             odor_label = 'None'
-        elif (state['odor'] == 'Odor A'):
+        elif (state['cue'] == torch.tensor(1)):
             no_odor = False
             odor_A = True
             odor_label = 'A'
@@ -278,7 +279,7 @@ for episode in episode_states:
         screen.blit(odor_text_surface, (330, 0))
 
         # Saving frame; use video-export.py to convert frames to full video
-        #pygame.image.save(screen, f"frames/frame_{num_frame:04d}.png")
+        pygame.image.save(screen, f"frames/frame_{num_frame:04d}.png")
 
         pygame.display.flip()
         clock.tick(FPS) # FPS determines speed of animation

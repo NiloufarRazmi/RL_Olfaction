@@ -5,6 +5,7 @@ import pygame
 import sys
 import time
 import os
+import glob
 from moviepy import *
 import pickle
 
@@ -12,18 +13,20 @@ import pickle
 Prelims : setting up data paths
 """
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-save_path = Path("save")
+save_path = Path("exp_autoencoder/save")
 assert save_path.exists(), "save folder does not exist"
-data_dir = save_path / "7-21-LR"
+data_dir = save_path / "7-30-A-10-EW-2"
 assert data_dir.exists(), "data directory does not exist"
 data_path = data_dir / "data.tar"
 assert data_path.exists(), "data path does not exist"
 data_dict = torch.load(data_path, weights_only=False, map_location=DEVICE)
 
-left_right = True
+left_right = False
 
 # Set up output directory
 os.makedirs("frames", exist_ok=True)
+for f in glob.glob("frames/*"):
+    os.remove(f)
 
 """
 Function for converting Cartesian North coords to Origin coords
