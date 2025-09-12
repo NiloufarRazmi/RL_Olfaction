@@ -72,20 +72,20 @@ class EpsilonGreedy:
 class DQN(nn.Module):
     """Define network."""
 
-    def __init__(self, n_observations, n_actions, n_units=16):
+    def __init__(self, n_observations, n_actions, n_units=16, dropout=0.2):
         super().__init__()
         self.mlp = nn.Sequential(
             nn.Linear(n_observations, n_units),
             nn.LeakyReLU(),
-            nn.Dropout(p=0.2),
+            nn.Dropout(p=dropout),
             # nn.Linear(n_units, n_units),
             # nn.LeakyReLU(),
             nn.Linear(n_units, n_units),
             nn.LeakyReLU(),
-            nn.Dropout(p=0.2),
+            nn.Dropout(p=dropout),
             nn.Linear(n_units, n_units),
             nn.LeakyReLU(),
-            nn.Dropout(p=0.2),
+            nn.Dropout(p=dropout),
             nn.Linear(n_units, n_actions),
         )
 
@@ -94,18 +94,20 @@ class DQN(nn.Module):
         return self.mlp(x)
 
 
-def neural_network(n_observations, n_actions, nHiddenUnits):
+def neural_network(n_observations, n_actions, nHiddenUnits, dropout=0.2):
     """Define policy and target networks."""
     policy_net = DQN(
         n_observations=n_observations,
         n_actions=n_actions,
         n_units=nHiddenUnits,
+        dropout=dropout,
     ).to(DEVICE)
 
     target_net = DQN(
         n_observations=n_observations,
         n_actions=n_actions,
         n_units=nHiddenUnits,
+        dropout=dropout,
     ).to(DEVICE)
 
     target_net.load_state_dict(policy_net.state_dict())
